@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Going North</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <div class="bg-blur"></div>
+    <div class="bg-gradient-overlay"></div>
+    <div class="bg-bottom-fade"></div>
+
+    <!-- header -->
+    <header class="main-header">
+     <nav class="navbar">
+        <div class="navdiv">
+            <div class="nav-logo">
+                <a href="#" class="logo"><img src="images/Vector (1).png" alt="Going North - Logo"></a>
+            </div>
+            <ul class="nav-menu">
+               <li><a href="index.html">Home</a></li>
+               <li><a href="dashboard.html">Dashboard</a></li>
+               <li><a href="investimentos.html">Investimentos</a></li>
+               <li><a href="educacao.html">Educação</a></li>
+               <li><a href="consultoria.html">Consultoria</a></li>
+               <li><a href="sobre.html">Sobre</a></li>
+               <li><a href="contato.html">Contato</a></li>
+            </ul>
+            <div class="nav-login">
+                <a href="#Login" class="btn-login">Login</a>
+            </div>
+        </div>
+    </nav>
+    </header>
+
+    <!-- Home -->
+     <section class="home main-content" id="Home">
+        <span class="home-tag">
+            <span class="home-tag-dot"></span>
+            Controle Financeiro Personalizado
+        </span>
+        <h1>Organize suas finanças. <span class="highlight">Conquiste</span> sua liberdade.</h1>
+        <p class="home-description">A Going North combina tecnologia e consultoria especializada para você ter controle total das suas finanças, definir metas claras e construir o futuro que você merece.</p>
+        <div class="home-buttons">
+            <a href="#" class="btn-primary">Começar meu controle financeiro →</a>
+            <a href="#" class="btn-secondary">Saiba mais</a>
+        </div>
+    </section>
+
+    <script>
+        // Detecta a página atual e aplica o efeito "ativo" no menu
+        (function() {
+            const path = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-menu a').forEach(function(link) {
+                const href = link.getAttribute('href') || '';
+                if (href === path || (path === '' && href === 'index.html')) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        })();
+    </script>
+</body>
+</html> 

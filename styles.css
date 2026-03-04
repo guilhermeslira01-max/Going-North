@@ -1,0 +1,235 @@
+* {
+    text-decoration: none;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Camada 1: Imagem de fundo com blur */
+.bg-blur {
+    position: fixed;
+    inset: 0;
+    background-image: url("images/Component 1.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(4px);
+    transform: scale(1.05);
+    z-index: -3;
+}
+
+/* Camada 2: Degradê azul claro → verde claro */
+.bg-gradient-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(42, 85, 134, 0.25) 0%,
+        rgba(32, 155, 145, 0.2) 50%,
+        rgba(46, 150, 84, 0.15) 100%
+    );
+    z-index: -2;
+}
+
+/* Camada 3: Degradê branco na parte inferior (quebra de página) */
+.bg-bottom-fade {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35vh;
+    background: linear-gradient(
+        to top,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.4) 35%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+}
+
+.main-header,
+.main-content {
+    position: relative;
+    z-index: 1;
+}
+
+header, .navbar {
+    width: 100%;
+}
+
+header {
+    padding: 12px 0;
+    margin-bottom: 0;
+}
+
+.navbar {
+    padding: 0 32px;
+}
+
+.navdiv {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.nav-logo {
+    margin-left: 0;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-login {
+    margin-right: 0;
+}
+
+li {
+    list-style: none;
+}
+
+.logo img {
+    height: 32px;
+    width: auto;
+    display: block;
+}
+
+.nav-menu li a {
+    color: rgba(176, 196, 222, 0.9);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 80px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.nav-menu li a:hover {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Item ativo/selecionado - retângulo arredondado */
+.nav-menu li a.active {
+    background: rgba(95, 115, 134, 0.6);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Login - menor, no extremo direito */
+.btn-login {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-login:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Home Section */
+section.home {
+    margin-top: 0;
+    padding: 80px 32px 100px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.home-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(92, 92, 92, 0.4);
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 24px;
+}
+
+.home-tag-dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+.home h1 {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin: 0 0 20px;
+    max-width: 600px;
+}
+
+.home h1 .highlight {
+    color: #22c55e;
+}
+
+.home-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 32px;
+    max-width: 520px;
+}
+
+.home-buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 14px 28px;
+    background: #22c55e;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 100px;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary:hover {
+    background: #16a34a;
+}
+
+.btn-secondary {
+    display: inline-block;
+    padding: 14px 28px;
+    background: transparent;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 100px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+}
