@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Going North — Entrar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
+:root{
+  --green:#1aab5e;--green-h:#13834a;--green-glow:rgba(26,171,94,.35);
+  --green-dim:rgba(26,171,94,.15);
+  --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
+  --white:#fff;--w80:rgba(255,255,255,.80);--w50:rgba(255,255,255,.50);
+  --w20:rgba(255,255,255,.20);--w10:rgba(255,255,255,.10);--w06:rgba(255,255,255,.06);
+}
+
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;align-items:stretch;}
+
+/* ── BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:-1;}
+.bg-img{position:absolute;inset:0;background:url('images/Component 1.png') center/cover no-repeat;filter:blur(4px);transform:scale(1.05);}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(10,30,20,.80) 0%,rgba(8,40,28,.72) 60%,rgba(10,50,30,.68) 100%);}
+.bg-glow{position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(26,171,94,.18) 0%,transparent 70%);pointer-events:none;}
+.bg-glow2{position:absolute;bottom:-15%;left:-5%;width:500px;height:500px;background:radial-gradient(circle,rgba(13,148,136,.12) 0%,transparent 70%);pointer-events:none;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;width:100%;min-height:100vh;}
+
+/* ── LEFT PANEL ── */
+.left{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;position:relative;overflow:hidden;}
+.left-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.15rem;}
+.left-logo-icon{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.left-content{max-width:480px;}
+.left-tag{display:inline-flex;align-items:center;gap:8px;background:var(--w10);border:1px solid var(--w20);border-radius:20px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--green);margin-bottom:28px;letter-spacing:.03em;}
+.left-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+.left h1{font-family:var(--font-d);font-size:2.6rem;font-weight:800;line-height:1.15;color:#fff;margin-bottom:20px;}
+.left h1 .hl{color:var(--green);}
+.left p{font-size:.95rem;color:var(--w80);line-height:1.7;margin-bottom:40px;}
+.features{display:flex;flex-direction:column;gap:14px;}
+.feat{display:flex;align-items:center;gap:12px;color:var(--w80);font-size:.88rem;}
+.feat-icon{width:32px;height:32px;border-radius:8px;background:var(--w06);border:1px solid var(--w10);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.left-footer{color:var(--w50);font-size:.78rem;}
+
+/* ── RIGHT PANEL ── */
+.right{width:480px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:40px 32px;background:rgba(255,255,255,.03);border-left:1px solid var(--w10);backdrop-filter:blur(20px);}
+
+/* ── CARD ── */
+.auth-card{width:100%;max-width:400px;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.auth-title{font-family:var(--font-d);font-size:1.5rem;font-weight:700;color:#fff;margin-bottom:6px;}
+.auth-sub{font-size:.875rem;color:var(--w50);margin-bottom:32px;}
+.auth-sub a{color:var(--green);font-weight:600;cursor:pointer;}
+.auth-sub a:hover{text-decoration:underline;}
+
+/* ── TABS ── */
+.auth-tabs{display:flex;gap:4px;background:var(--w06);border:1px solid var(--w10);border-radius:10px;padding:4px;margin-bottom:28px;}
+.auth-tab{flex:1;padding:8px;border-radius:7px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--w50);transition:all .2s;font-family:var(--font-b);}
+.auth-tab.active{background:var(--green);color:#fff;}
+
+/* ── FORM ── */
+.form-group{margin-bottom:16px;position:relative;}
+.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--w80);margin-bottom:7px;letter-spacing:.02em;}
+.form-control{width:100%;padding:12px 16px;border:1.5px solid var(--w20);border-radius:10px;font-size:.88rem;font-family:var(--font-b);color:#fff;background:var(--w06);outline:none;transition:all .2s;-webkit-autofill{background:transparent;}}
+.form-control::placeholder{color:var(--w50);}
+.form-control:focus{border-color:var(--green);background:rgba(26,171,94,.06);box-shadow:0 0 0 3px var(--green-dim);}
+.form-control:-webkit-autofill{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0px 1000px rgba(10,30,20,.9) inset;}
+.pw-wrap{position:relative;}
+.pw-toggle{position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--w50);padding:4px;transition:color .2s;}
+.pw-toggle:hover{color:var(--w80);}
+
+/* ── ERROR / SUCCESS ── */
+.form-error{font-size:.77rem;color:#f87171;margin-top:6px;display:none;}
+.form-error.show{display:block;}
+.alert{padding:11px 14px;border-radius:9px;font-size:.82rem;font-weight:500;margin-bottom:16px;display:none;align-items:center;gap:8px;}
+.alert.show{display:flex;}
+.alert-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;}
+.alert-success{background:rgba(26,171,94,.12);border:1px solid rgba(26,171,94,.25);color:#86efac;}
+
+/* ── BUTTON ── */
+.btn-submit{width:100%;padding:13px;border-radius:11px;background:var(--green);border:none;color:#fff;font-size:.93rem;font-weight:700;font-family:var(--font-d);cursor:pointer;transition:all .25s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;}
+.btn-submit:hover{background:var(--green-h);transform:translateY(-1px);box-shadow:0 6px 24px var(--green-glow);}
+.btn-submit:active{transform:translateY(0);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.btn-submit.loading .spinner{display:block;}
+.btn-submit.loading .btn-text{display:none;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--w50);font-size:.78rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--w10);}
+
+/* ── FORGOT ── */
+.forgot{text-align:right;margin-top:-8px;margin-bottom:16px;}
+.forgot a{font-size:.78rem;color:var(--w50);cursor:pointer;transition:color .2s;}
+.forgot a:hover{color:var(--green);}
+
+/* ── STRENGTH ── */
+.pw-strength{margin-top:6px;display:none;}
+.pw-strength.show{display:block;}
+.strength-bar{display:flex;gap:3px;margin-bottom:4px;}
+.strength-seg{flex:1;height:3px;border-radius:20px;background:var(--w10);transition:background .3s;}
+.strength-label{font-size:.72rem;color:var(--w50);}
+
+/* ── TERMS ── */
+.terms{font-size:.76rem;color:var(--w50);text-align:center;margin-top:14px;line-height:1.5;}
+.terms a{color:var(--green);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:820px){
+  .left{display:none;}
+  .right{width:100%;border-left:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="bg-img"></div>
+  <div class="bg-overlay"></div>
+  <div class="bg-glow"></div>
+  <div class="bg-glow2"></div>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="left-logo">
+      <div class="left-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      Going <span style="color:var(--green);margin-left:4px;">North</span>
+    </div>
+
+    <div class="left-content">
+      <div class="left-tag">
+        <span class="left-tag-dot"></span>
+        Controle Financeiro Inteligente
+      </div>
+      <h1>Organize.<br>Planeje.<br><span class="hl">Conquiste.</span></h1>
+      <p>Tenha visão total das suas finanças em um só lugar. Metas, parcelas, histórico e relatórios — tudo pensado para te levar mais longe.</p>
+      <div class="features">
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+          </div>
+          Dashboard em tempo real com gráficos interativos
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </div>
+          Metas financeiras com acompanhamento de progresso
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          Controle de parcelas e pagamentos mensais
+        </div>
+        <div class="feat">
+          <div class="feat-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          Exportação de extrato completo em PDF
+        </div>
+      </div>
+    </div>
+
+    <div class="left-footer">© 2025 Going North. Todos os direitos reservados.</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="auth-card">
+
+      <div class="auth-title" id="card-title">Bem-vindo de volta</div>
+      <div class="auth-sub" id="card-sub">Não tem uma conta? <a onclick="setMode('register')">Criar conta grátis</a></div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="setMode('login')">Entrar</button>
+        <button class="auth-tab" id="tab-register" onclick="setMode('register')">Criar conta</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert alert-error" id="alert-error">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="alert-error-msg"></span>
+      </div>
+      <div class="alert alert-success" id="alert-success">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span id="alert-success-msg"></span>
+      </div>
+
+      <!-- Form: Login -->
+      <div id="form-login">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input class="form-control" id="login-email" type="email" placeholder="seu@email.com" autocomplete="email">
+          <div class="form-error" id="err-login-email"></div>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <div class="pw-wrap">
+            <input class="form-control" id="login-pw" type="password" placeholder="••••••••" autocomplete="current-password">
+            <button class="pw-toggle" type="button" onclick="togglePw('login-pw', this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="form-error" id="err-login-pw"></div>
+        </div>
+        <div class="forgot"><a onclick="showForgot()">Esqueci minha senha</a></div>
+        <button class="btn-submit" id="btn-login" onclick="doLogin()">
+          <span class="btn-text">Entrar na conta</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+
+      <!-- Form: Register -->
+      <div id="form-register" style="display:none;">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input class="form-control" id="reg-name" type="text" placeholder="Pedro Henrique" autocomplete="name">
+          <div class="form-error" id="err-reg-name"></div>
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input class="form-control" id="reg-email" type="email" placeholder="seu@email.com" autocomplete="email">
+          <div class="form-error" id="err-reg-email"></div>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <div class="pw-wrap">
+            <input class="form-control" id="reg-pw" type="password" placeholder="Mínimo 6 caracteres" oninput="checkStrength()" autocomplete="new-password">
+            <button class="pw-toggle" type="button" onclick="togglePw('reg-pw', this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="pw-strength" id="pw-strength">
+            <div class="strength-bar">
+              <div class="strength-seg" id="seg1"></div>
+              <div class="strength-seg" id="seg2"></div>
+              <div class="strength-seg" id="seg3"></div>
+              <div class="strength-seg" id="seg4"></div>
+            </div>
+            <div class="strength-label" id="strength-label"></div>
+          </div>
+          <div class="form-error" id="err-reg-pw"></div>
+        </div>
+        <div class="form-group">
+          <label>Confirmar senha</label>
+          <div class="pw-wrap">
+            <input class="form-control" id="reg-pw2" type="password" placeholder="Repita a senha" autocomplete="new-password">
+            <button class="pw-toggle" type="button" onclick="togglePw('reg-pw2', this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="form-error" id="err-reg-pw2"></div>
+        </div>
+        <button class="btn-submit" id="btn-register" onclick="doRegister()">
+          <span class="btn-text">Criar conta grátis</span>
+          <div class="spinner"></div>
+        </button>
+        <div class="terms">
+          Ao criar uma conta você concorda com os <a href="#">Termos de uso</a> e <a href="#">Política de privacidade</a>.
+        </div>
+      </div>
+
+      <!-- Form: Forgot -->
+      <div id="form-forgot" style="display:none;">
+        <p style="color:var(--w80);font-size:.86rem;margin-bottom:20px;line-height:1.6;">Informe seu e-mail cadastrado e enviaremos as instruções de recuperação.</p>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input class="form-control" id="forgot-email" type="email" placeholder="seu@email.com">
+          <div class="form-error" id="err-forgot"></div>
+        </div>
+        <button class="btn-submit" onclick="doForgot()">
+          <span class="btn-text">Enviar instruções</span>
+          <div class="spinner"></div>
+        </button>
+        <div style="text-align:center;margin-top:16px;">
+          <a onclick="setMode('login')" style="color:var(--w50);font-size:.8rem;cursor:pointer;">← Voltar para o login</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── STATE ── */
+let mode = 'login';
+
+/* ── MODE SWITCH ── */
+function setMode(m) {
+  mode = m;
+  hideAlerts();
+
+  document.getElementById('form-login').style.display = m === 'login' ? 'block' : 'none';
+  document.getElementById('form-register').style.display = m === 'register' ? 'block' : 'none';
+  document.getElementById('form-forgot').style.display = m === 'forgot' ? 'block' : 'none';
+
+  document.getElementById('tab-login').classList.toggle('active', m === 'login');
+  document.getElementById('tab-register').classList.toggle('active', m === 'register');
+  document.querySelector('.auth-tabs').style.display = m === 'forgot' ? 'none' : 'flex';
+
+  if (m === 'login') {
+    document.getElementById('card-title').textContent = 'Bem-vindo de volta';
+    document.getElementById('card-sub').innerHTML = 'Não tem uma conta? <a onclick="setMode(\'register\')">Criar conta grátis</a>';
+  } else if (m === 'register') {
+    document.getElementById('card-title').textContent = 'Criar conta';
+    document.getElementById('card-sub').innerHTML = 'Já tem uma conta? <a onclick="setMode(\'login\')">Entrar</a>';
+  } else {
+    document.getElementById('card-title').textContent = 'Recuperar senha';
+    document.getElementById('card-sub').innerHTML = '';
+  }
+}
+
+function showForgot() { setMode('forgot'); }
+
+/* ── ALERTS ── */
+function showError(msg) {
+  hideAlerts();
+  document.getElementById('alert-error-msg').textContent = msg;
+  document.getElementById('alert-error').classList.add('show');
+}
+function showSuccess(msg) {
+  hideAlerts();
+  document.getElementById('alert-success-msg').textContent = msg;
+  document.getElementById('alert-success').classList.add('show');
+}
+function hideAlerts() {
+  document.getElementById('alert-error').classList.remove('show');
+  document.getElementById('alert-success').classList.remove('show');
+}
+
+/* ── FIELD ERROR ── */
+function fieldErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.toggle('show', !!msg); }
+}
+function clearErrors() {
+  document.querySelectorAll('.form-error').forEach(e => { e.textContent = ''; e.classList.remove('show'); });
+}
+
+/* ── PASSWORD TOGGLE ── */
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.innerHTML = show
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+
+/* ── PASSWORD STRENGTH ── */
+function checkStrength() {
+  const val = document.getElementById('reg-pw').value;
+  const el = document.getElementById('pw-strength');
+  if (!val) { el.classList.remove('show'); return; }
+  el.classList.add('show');
+
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+  if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
+
+  const colors = ['#ef4444','#f97316','#eab308','#1aab5e'];
+  const labels = ['Muito fraca','Fraca','Média','Forte'];
+  for (let i = 1; i <= 4; i++) {
+    const seg = document.getElementById('seg' + i);
+    seg.style.background = i <= score ? colors[score - 1] : 'rgba(255,255,255,.1)';
+  }
+  document.getElementById('strength-label').textContent = labels[score - 1] || '';
+  document.getElementById('strength-label').style.color = colors[score - 1] || 'var(--w50)';
+}
+
+/* ── LOADING ── */
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  btn.classList.toggle('loading', on);
+  btn.disabled = on;
+}
+
+/* ── HELPERS ── */
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('gn_users') || '[]'); } catch(e) { return []; }
+}
+function saveUsers(users) {
+  localStorage.setItem('gn_users', JSON.stringify(users));
+}
+function setSession(user) {
+  localStorage.setItem('gn_session', JSON.stringify({ email: user.email, name: user.name, loggedAt: Date.now() }));
+}
+
+/* ── LOGIN ── */
+function doLogin() {
+  clearErrors(); hideAlerts();
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+
+  let valid = true;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    fieldErr('err-login-email', 'Informe um e-mail válido.'); valid = false;
+  }
+  if (!pw) { fieldErr('err-login-pw', 'Informe sua senha.'); valid = false; }
+  if (!valid) return;
+
+  setLoading('btn-login', true);
+  setTimeout(() => {
+    const users = getUsers();
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    if (!user) {
+      setLoading('btn-login', false);
+      showError('E-mail não encontrado. Crie uma conta primeiro.');
+      return;
+    }
+    if (user.pw !== btoa(pw)) {
+      setLoading('btn-login', false);
+      showError('Senha incorreta. Tente novamente.');
+      return;
+    }
+    setSession(user);
+    showSuccess('Login realizado! Redirecionando...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+  }, 800);
+}
+
+/* ── REGISTER ── */
+function doRegister() {
+  clearErrors(); hideAlerts();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pw = document.getElementById('reg-pw').value;
+  const pw2 = document.getElementById('reg-pw2').value;
+
+  let valid = true;
+  if (!name || name.length < 2) { fieldErr('err-reg-name', 'Informe seu nome completo.'); valid = false; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { fieldErr('err-reg-email', 'Informe um e-mail válido.'); valid = false; }
+  if (!pw || pw.length < 6) { fieldErr('err-reg-pw', 'A senha deve ter no mínimo 6 caracteres.'); valid = false; }
+  if (pw !== pw2) { fieldErr('err-reg-pw2', 'As senhas não coincidem.'); valid = false; }
+  if (!valid) return;
+
+  setLoading('btn-register', true);
+  setTimeout(() => {
+    const users = getUsers();
+    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+      setLoading('btn-register', false);
+      showError('Este e-mail já está cadastrado. Faça login.');
+      return;
+    }
+    const user = { email, name, pw: btoa(pw), createdAt: Date.now() };
+    users.push(user);
+    saveUsers(users);
+    setSession(user);
+    showSuccess('Conta criada com sucesso! Redirecionando...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1100);
+  }, 800);
+}
+
+/* ── FORGOT ── */
+function doForgot() {
+  clearErrors(); hideAlerts();
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    fieldErr('err-forgot', 'Informe um e-mail válido.'); return;
+  }
+  const users = getUsers();
+  setTimeout(() => {
+    // Always show success (security best practice — don't reveal if email exists)
+    showSuccess('Se o e-mail estiver cadastrado, você receberá as instruções em breve.');
+  }, 600);
+}
+
+/* ── ENTER KEY ── */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (mode === 'login') doLogin();
+  else if (mode === 'register') doRegister();
+});
+
+/* ── AUTO-REDIRECT if already logged in ── */
+(function() {
+  try {
+    const s = JSON.parse(localStorage.getItem('gn_session') || 'null');
+    if (s && s.email) {
+      // Valid session → go straight to dashboard
+      window.location.href = 'dashboard.html';
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>
