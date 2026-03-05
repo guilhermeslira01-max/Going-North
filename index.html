@@ -3,95 +3,660 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Going North</title>
+    <title>Going North — Controle Financeiro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-
 </head>
 <body>
+
+    <!-- ── BACKGROUND LAYERS ── -->
     <div class="bg-blur"></div>
     <div class="bg-gradient-overlay"></div>
     <div class="bg-bottom-fade"></div>
 
-    <!-- header -->
-    <header class="main-header">
-     <nav class="navbar">
-        <div class="navdiv">
-            <div class="nav-logo">
-                <a href="#" class="logo"><img src="images/Vector (1).png" alt="Going North - Logo"></a>
+    <!-- ── NAVBAR ── -->
+    <header class="main-header" id="navbar">
+        <nav class="navbar">
+            <div class="navdiv">
+                <div class="nav-logo">
+                    <a href="index.html" class="logo">
+                        <img src="images/Vector (1).png" alt="Going North">
+                    </a>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="investimentos.html">Investimentos</a></li>
+                    <li><a href="educacao.html">Educação</a></li>
+                    <li><a href="consultoria.html">Consultoria</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                </ul>
+                <div class="nav-right">
+                    <a href="#login" class="btn-login">Login</a>
+                    <a href="#cadastro" class="btn-nav-cta">Começar grátis</a>
+                    <button class="hamburger" id="hamburger" aria-label="Menu">
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
             </div>
-            <ul class="nav-menu">
-               <li><a href="index.html">Home</a></li>
-               <li><a href="dashboard.html">Dashboard</a></li>
-               <li><a href="investimentos.html">Investimentos</a></li>
-               <li><a href="educacao.html">Educação</a></li>
-               <li><a href="consultoria.html">Consultoria</a></li>
-               <li><a href="sobre.html">Sobre</a></li>
-               <li><a href="contato.html">Contato</a></li>
-            </ul>
-            <div class="nav-login">
-                <a href="#Login" class="btn-login">Login</a>
-            </div>
-        </div>
-    </nav>
+        </nav>
     </header>
 
-    <!-- Home -->
-     <section class="home main-content" id="Home">
-        <span class="home-tag">
-            <span class="home-tag-dot"></span>
-            Controle Financeiro Personalizado
-        </span>
-        <h1>Organize suas finanças. <span class="highlight">Conquiste</span> sua liberdade.</h1>
-        <p class="home-description">A Going North combina tecnologia e consultoria especializada para você ter controle total das suas finanças, definir metas claras e construir o futuro que você merece.</p>
-        <div class="home-buttons">
-            <a href="#" class="btn-primary">Começar meu controle financeiro →</a>
-            <a href="#" class="btn-secondary">Saiba mais</a>
+    <!-- ── HERO ── -->
+    <section class="hero main-content" id="Home">
+        <div class="hero-inner">
+            <div class="hero-content">
+                <span class="home-tag">
+                    <span class="home-tag-dot"></span>
+                    Controle Financeiro Personalizado
+                </span>
+                <h1>
+                    Organize suas finanças.<br>
+                    <span class="highlight">Conquiste</span> sua liberdade.
+                </h1>
+                <p class="home-description">
+                    A Going North combina tecnologia e consultoria especializada para você ter controle total das suas finanças, definir metas claras e construir o futuro que merece.
+                </p>
+                <div class="home-buttons">
+                    <a href="#cadastro" class="btn-primary">
+                        Começar meu controle financeiro
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <a href="#como-funciona" class="btn-secondary">
+                        Saiba mais
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7l5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                </div>
+                <div class="home-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="12000" data-suffix="k+">0</div>
+                        <div class="stat-label">Usuários ativos</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-prefix="R$&nbsp;" data-target="2.4" data-suffix="M">0</div>
+                        <div class="stat-label">Economizados</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-target="98" data-suffix="%">0</div>
+                        <div class="stat-label">Satisfação</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard floating card -->
+            <div class="hero-visual">
+                <div class="dashboard-card">
+                    <div class="dc-header">
+                        <div class="dc-title">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="9" y="2" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="2" y="9" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="9" y="9" width="5" height="5" rx="1.2" fill="#22c55e"/></svg>
+                            Dashboard
+                        </div>
+                        <span class="dc-date">Março 2025</span>
+                    </div>
+                    <div class="dc-balance">
+                        <div class="dc-balance-label">Patrimônio Total</div>
+                        <div class="dc-balance-value">R$ 48.320</div>
+                        <div class="dc-balance-change">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 9V3M6 3L3 6M6 3L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            +12,4% este mês
+                        </div>
+                    </div>
+                    <div class="dc-chart">
+                        <div class="dc-chart-bars">
+                            <div class="dc-bar" style="--h:35%"><span>Jan</span></div>
+                            <div class="dc-bar" style="--h:52%"><span>Fev</span></div>
+                            <div class="dc-bar" style="--h:44%"><span>Mar</span></div>
+                            <div class="dc-bar" style="--h:68%"><span>Abr</span></div>
+                            <div class="dc-bar" style="--h:58%"><span>Mai</span></div>
+                            <div class="dc-bar" style="--h:76%"><span>Jun</span></div>
+                            <div class="dc-bar active" style="--h:89%"><span>Jul</span></div>
+                        </div>
+                    </div>
+                    <div class="dc-goals">
+                        <div class="dc-goal-title">Metas</div>
+                        <div class="dc-goal">
+                            <div class="dc-goal-row"><span>Reserva</span><span>74%</span></div>
+                            <div class="dc-goal-bar"><div class="dc-goal-fill" style="--w:74%; background: #22c55e"></div></div>
+                        </div>
+                        <div class="dc-goal">
+                            <div class="dc-goal-row"><span>Viagem</span><span>38%</span></div>
+                            <div class="dc-goal-bar"><div class="dc-goal-fill" style="--w:38%; background: #c8a96e"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating badges -->
+                <div class="float-badge float-badge--tl">
+                    <div class="fb-icon fb-green">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 12V4M8 4L4 8M8 4L12 8" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div><div class="fb-val">+R$ 4.020</div><div class="fb-lbl">Saldo positivo</div></div>
+                </div>
+                <div class="float-badge float-badge--br">
+                    <div class="fb-icon fb-gold">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#c8a96e" stroke-width="1.6"/><path d="M8 5.5V8l1.5 1.5" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div><div class="fb-val">Meta: 74%</div><div class="fb-lbl">Reserva de emergência</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-hint" aria-hidden="true">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
         </div>
     </section>
 
-    <script>
-        // Detecta a página atual e aplica o efeito "ativo" no menu
-        (function() {
-            const path = window.location.pathname.split('/').pop() || 'index.html';
-            document.querySelectorAll('.nav-menu a').forEach(function(link) {
-                const href = link.getAttribute('href') || '';
-                if (href === path || (path === '' && href === 'index.html')) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            });
-        })();
-    </script>
-
-    <!-- Sobre -->
-        <div class="fundiv">
- <p>FUNCIONALIDADES</p>
-    <h2>Tudo que você precisa para <span>organizar suas finanças</span></h2>
-        <p>Uma plataforma completa que une tecnologia, educação e consultoria para você tomar o controle da sua vida financeira.</p>
-            <div class="card">
-                <div class="card-icon">
-                    <p class="card-title"> Dashboard Inteligente</p>
-                        <p class="card-description">Visualize receitas, despesas e saldo em um painel completo e intuitivo</p>
-                </div>
-
+    <!-- ── LOGOS / TRUST STRIP ── -->
+    <div class="trust-strip reveal">
+        <div class="trust-inner">
+            <span class="trust-label">Compatível com os principais bancos</span>
+            <div class="trust-logos">
+                <div class="trust-logo">Itaú</div>
+                <div class="trust-logo">Bradesco</div>
+                <div class="trust-logo">Nubank</div>
+                <div class="trust-logo">Inter</div>
+                <div class="trust-logo">C6 Bank</div>
+                <div class="trust-logo">BTG</div>
             </div>
-             <div class="card">
-                <div class="card-icon">
-                    <p class="card-title"> Dashboard Inteligente</p>
-                        <p class="card-description">Visualize receitas, despesas e saldo em um painel completo e intuitivo</p>
+        </div>
+    </div>
+
+    <!-- ── HOW IT WORKS ── -->
+    <section class="section section--dark" id="como-funciona">
+        <div class="section-inner">
+            <div class="section-head reveal">
+                <div class="section-tag">
+                    <span class="tag-dot"></span>
+                    Como Funciona
                 </div>
+                <h2 class="section-title">Três passos para o <span class="highlight">controle total</span></h2>
+                <p class="section-sub">Sem complexidade. Em minutos você já começa a ver sua vida financeira com clareza.</p>
             </div>
 
-             <div class="card">
-                <div class="card-icon">
-                    <p class="card-title"> Dashboard Inteligente</p>
-                        <p class="card-description">Visualize receitas, despesas e saldo em um painel completo e intuitivo</p>
+            <div class="steps-grid">
+                <div class="step-card reveal">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="5" width="20" height="14" rx="3"/>
+                            <path d="M2 10h20"/>
+                            <path d="M6 15h4M14 15h4"/>
+                        </svg>
+                    </div>
+                    <h3>Conecte suas contas</h3>
+                    <p>Importe extratos ou conecte seus bancos com segurança. Tudo em um lugar, categorizado automaticamente pela nossa IA.</p>
+                    <div class="step-arrow">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(255,255,255,0.3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                </div>
+                <div class="step-card reveal">
+                    <div class="step-number">02</div>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22V12M12 12L8 16M12 12L16 16"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <h3>Defina suas metas</h3>
+                    <p>Estabeleça objetivos financeiros reais — reserva de emergência, viagem, imóvel — e acompanhe cada passo do progresso.</p>
+                    <div class="step-arrow">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 6l4 4-4 4" stroke="rgba(255,255,255,0.3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                </div>
+                <div class="step-card reveal">
+                    <div class="step-number">03</div>
+                    <div class="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="4 17 8 12 12 14 18 6"/>
+                            <path d="M4 20h16"/>
+                        </svg>
+                    </div>
+                    <h3>Veja sua evolução</h3>
+                    <p>Relatórios visuais e insights personalizados te mostram exatamente onde você está e o que fazer para ir mais longe.</p>
+                    <div class="step-arrow" style="opacity:0; pointer-events:none">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"></svg>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- ── FEATURES ── -->
+    <section class="section section--features" id="funcionalidades">
+        <div class="section-inner">
+            <div class="features-layout">
+                <div class="features-left">
+                    <div class="section-tag reveal">
+                        <span class="tag-dot"></span>
+                        Funcionalidades
+                    </div>
+                    <h2 class="section-title reveal">Tudo que você precisa para <span class="highlight">ir mais longe</span></h2>
+                    <p class="section-sub reveal">Ferramentas pensadas para quem quer sair do piloto automático e tomar decisões com confiança.</p>
+
+                    <div class="feat-list">
+                        <div class="feat-item reveal" data-feat="0">
+                            <div class="feat-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 13 7 8 11 11 17 4"/><path d="M3 17h14"/></svg>
+                            </div>
+                            <div>
+                                <div class="feat-title">Dashboard em tempo real</div>
+                                <div class="feat-desc">Visualize receitas, gastos e patrimônio em um painel intuitivo e sempre atualizado.</div>
+                            </div>
+                        </div>
+                        <div class="feat-item reveal" data-feat="1">
+                            <div class="feat-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2.5"/></svg>
+                            </div>
+                            <div>
+                                <div class="feat-title">Metas e planejamento</div>
+                                <div class="feat-desc">Crie objetivos e receba um plano de ação personalizado para alcançá-los no prazo.</div>
+                            </div>
+                        </div>
+                        <div class="feat-item reveal" data-feat="2">
+                            <div class="feat-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h14M3 10h10M3 14h6"/></svg>
+                            </div>
+                            <div>
+                                <div class="feat-title">Relatórios detalhados</div>
+                                <div class="feat-desc">Análises mensais e anuais com gráficos claros para você entender cada centavo.</div>
+                            </div>
+                        </div>
+                        <div class="feat-item reveal" data-feat="3">
+                            <div class="feat-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="3"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
+                            </div>
+                            <div>
+                                <div class="feat-title">Consultoria especializada</div>
+                                <div class="feat-desc">Acesso a consultores certificados para orientação financeira personalizada quando precisar.</div>
+                            </div>
+                        </div>
+                        <div class="feat-item reveal" data-feat="4">
+                            <div class="feat-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#22c55e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="11" rx="2"/><path d="M7 17h6M10 15v2"/></svg>
+                            </div>
+                            <div>
+                                <div class="feat-title">Educação financeira</div>
+                                <div class="feat-desc">Conteúdos práticos e trilhas de aprendizado para desenvolver sua inteligência financeira.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features-right reveal">
+                    <div class="feat-visual-card">
+                        <div class="fvc-title">Movimentações — Março</div>
+                        <div class="fvc-rows">
+                            <div class="fvc-row">
+                                <div class="fvc-info">
+                                    <div class="fvc-dot" style="background:#22c55e"></div>
+                                    <span>Salário</span>
+                                </div>
+                                <div class="fvc-right">
+                                    <span class="fvc-amount pos">+ R$ 6.500</span>
+                                    <span class="fvc-tag tag-up">receita</span>
+                                </div>
+                            </div>
+                            <div class="fvc-row">
+                                <div class="fvc-info">
+                                    <div class="fvc-dot" style="background:#c8a96e"></div>
+                                    <span>Freelance</span>
+                                </div>
+                                <div class="fvc-right">
+                                    <span class="fvc-amount pos">+ R$ 1.300</span>
+                                    <span class="fvc-tag tag-up">receita</span>
+                                </div>
+                            </div>
+                            <div class="fvc-row">
+                                <div class="fvc-info">
+                                    <div class="fvc-dot" style="background:rgba(255,255,255,0.3)"></div>
+                                    <span>Aluguel</span>
+                                </div>
+                                <div class="fvc-right">
+                                    <span class="fvc-amount neg">− R$ 1.800</span>
+                                    <span class="fvc-tag tag-dn">fixo</span>
+                                </div>
+                            </div>
+                            <div class="fvc-row">
+                                <div class="fvc-info">
+                                    <div class="fvc-dot" style="background:rgba(255,255,255,0.3)"></div>
+                                    <span>Alimentação</span>
+                                </div>
+                                <div class="fvc-right">
+                                    <span class="fvc-amount neg">− R$ 780</span>
+                                    <span class="fvc-tag tag-dn">variável</span>
+                                </div>
+                            </div>
+                            <div class="fvc-row">
+                                <div class="fvc-info">
+                                    <div class="fvc-dot" style="background:#22c55e"></div>
+                                    <span>Investimentos</span>
+                                </div>
+                                <div class="fvc-right">
+                                    <span class="fvc-amount neg">− R$ 1.200</span>
+                                    <span class="fvc-tag tag-inv">meta</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fvc-footer">
+                            <span>Saldo do mês</span>
+                            <span class="fvc-saldo">+ R$ 4.020</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── TESTIMONIALS ── -->
+    <section class="section section--dark" id="depoimentos">
+        <div class="section-inner">
+            <div class="section-head reveal">
+                <div class="section-tag">
+                    <span class="tag-dot"></span>
+                    Depoimentos
+                </div>
+                <h2 class="section-title">O que nossos usuários <span class="highlight">dizem</span></h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testi-card reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"Em 3 meses eu consegui organizar minhas dívidas e criar minha primeira reserva de emergência. O dashboard é incrível."</p>
+                    <div class="testi-author">
+                        <div class="testi-avatar">AM</div>
+                        <div>
+                            <div class="testi-name">Ana Martins</div>
+                            <div class="testi-role">Designer, SP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"Finalmente entendi para onde ia meu dinheiro todo mês. A consultoria me ajudou a investir de forma inteligente."</p>
+                    <div class="testi-author">
+                        <div class="testi-avatar">RC</div>
+                        <div>
+                            <div class="testi-name">Rafael Costa</div>
+                            <div class="testi-role">Engenheiro, RJ</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card reveal">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"As metas visuais me mantiveram motivada. Atingi meu objetivo de dar entrada no apartamento antes do prazo!"</p>
+                    <div class="testi-author">
+                        <div class="testi-avatar">JS</div>
+                        <div>
+                            <div class="testi-name">Juliana Silva</div>
+                            <div class="testi-role">Médica, BH</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── PRICING ── -->
+    <section class="section section--features" id="planos">
+        <div class="section-inner">
+            <div class="section-head reveal">
+                <div class="section-tag">
+                    <span class="tag-dot"></span>
+                    Planos
+                </div>
+                <h2 class="section-title">Simples, <span class="highlight">transparente</span></h2>
+                <p class="section-sub">Comece grátis. Evolua no seu ritmo.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card reveal">
+                    <div class="pricing-name">Gratuito</div>
+                    <div class="pricing-price">R$ 0<span>/mês</span></div>
+                    <div class="pricing-desc">Perfeito para começar a organizar suas finanças.</div>
+                    <ul class="pricing-features">
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Dashboard básico</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Até 2 metas</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Relatório mensal</li>
+                        <li class="disabled"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3L3 11" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round"/></svg> Consultoria</li>
+                        <li class="disabled"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 3l8 8M11 3L3 11" stroke="rgba(255,255,255,0.2)" stroke-width="1.8" stroke-linecap="round"/></svg> Cursos premium</li>
+                    </ul>
+                    <a href="#cadastro" class="btn-pricing-outline">Começar grátis</a>
+                </div>
+                <div class="pricing-card pricing-card--featured reveal">
+                    <div class="pricing-badge">Mais popular</div>
+                    <div class="pricing-name">Pro</div>
+                    <div class="pricing-price">R$ 29<span>/mês</span></div>
+                    <div class="pricing-desc">Para quem quer controle total e resultados reais.</div>
+                    <ul class="pricing-features">
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Dashboard completo</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Metas ilimitadas</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Relatórios avançados</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 1 consultoria/mês</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Cursos premium</li>
+                    </ul>
+                    <a href="#cadastro" class="btn-pricing-primary">Assinar Pro</a>
+                </div>
+                <div class="pricing-card reveal">
+                    <div class="pricing-name">Business</div>
+                    <div class="pricing-price">R$ 79<span>/mês</span></div>
+                    <div class="pricing-desc">Para famílias e autônomos que precisam de mais.</div>
+                    <ul class="pricing-features">
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Tudo do Pro</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Até 5 usuários</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Consultoria ilimitada</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> API de integração</li>
+                        <li><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Suporte prioritário</li>
+                    </ul>
+                    <a href="#cadastro" class="btn-pricing-outline">Assinar Business</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="section section--cta" id="cadastro">
+        <div class="section-inner">
+            <div class="cta-box reveal">
+                <div class="cta-glow"></div>
+                <div class="cta-content">
+                    <div class="section-tag" style="justify-content:center">
+                        <span class="tag-dot"></span>
+                        Comece hoje mesmo
+                    </div>
+                    <h2 class="section-title" style="text-align:center">Sua jornada ao norte<br>começa <span class="highlight">agora</span></h2>
+                    <p class="section-sub" style="text-align:center;max-width:460px;margin:0 auto 36px">Junte-se a milhares de pessoas que já transformaram sua relação com o dinheiro. Grátis para começar.</p>
+                    <form class="cta-form" onsubmit="handleCTA(event)">
+                        <input type="email" class="cta-input" placeholder="seu@email.com" required>
+                        <button type="submit" class="btn-cta">
+                            Criar conta grátis
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </form>
+                    <p class="cta-footnote">Sem cartão de crédito &nbsp;·&nbsp; Cancele quando quiser &nbsp;·&nbsp; 100% seguro</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo footer-logo">
+                        <img src="images/Vector (1).png" alt="Going North">
+                    </a>
+                    <p>A plataforma que transforma o jeito que você cuida do seu dinheiro.</p>
+                </div>
+                <div class="footer-links-grid">
+                    <div class="footer-col">
+                        <div class="footer-col-title">Produto</div>
+                        <a href="dashboard.html">Dashboard</a>
+                        <a href="investimentos.html">Investimentos</a>
+                        <a href="educacao.html">Educação</a>
+                        <a href="#planos">Planos</a>
+                    </div>
+                    <div class="footer-col">
+                        <div class="footer-col-title">Empresa</div>
+                        <a href="sobre.html">Sobre nós</a>
+                        <a href="consultoria.html">Consultoria</a>
+                        <a href="contato.html">Contato</a>
+                        <a href="#">Blog</a>
+                    </div>
+                    <div class="footer-col">
+                        <div class="footer-col-title">Legal</div>
+                        <a href="#">Privacidade</a>
+                        <a href="#">Termos de uso</a>
+                        <a href="#">Segurança</a>
+                        <a href="#">Cookies</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2025 Going North. Todos os direitos reservados.</span>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Instagram">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M7 10v7M7 7v.01M12 17v-4a2 2 0 014 0v4M12 10v7"/></svg>
+                    </a>
+                    <a href="#" aria-label="Twitter / X">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // ── Active nav link ──
+    (function () {
+        const page = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === page);
+        });
+    })();
+
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ── Hamburger menu ──
+    const hamburger = document.getElementById('hamburger');
+    const navMenu   = document.getElementById('navMenu');
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('open');
+        navMenu.classList.toggle('open');
+    });
+    // close on link click
+    navMenu.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+            hamburger.classList.remove('open');
+            navMenu.classList.remove('open');
+        });
+    });
+
+    // ── Scroll reveal ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                revealObs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => revealObs.observe(el));
+
+    // ── Animated counter ──
+    function animateCounter(el) {
+        const target  = parseFloat(el.dataset.target);
+        const suffix  = el.dataset.suffix || '';
+        const prefix  = el.dataset.prefix || '';
+        const isFloat = el.dataset.target.includes('.');
+        const duration = 1800;
+        const start = performance.now();
+
+        function step(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const value = target * ease;
+            el.innerHTML = prefix + (isFloat ? value.toFixed(1) : Math.floor(value)) + suffix;
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+
+    const counterEls = document.querySelectorAll('.stat-number[data-target]');
+    const counterObs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target);
+                counterObs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    counterEls.forEach(el => counterObs.observe(el));
+
+    // ── Animate dashboard chart bars ──
+    const dcBars = document.querySelectorAll('.dc-bar');
+    const dcBarsObs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                dcBars.forEach((bar, i) => {
+                    setTimeout(() => bar.classList.add('animated'), i * 80);
+                });
+                dcBarsObs.disconnect();
+            }
+        });
+    }, { threshold: 0.4 });
+    const dcChart = document.querySelector('.dc-chart');
+    if (dcChart) dcBarsObs.observe(dcChart);
+
+    // ── Animate goal bars ──
+    const goalFills = document.querySelectorAll('.dc-goal-fill');
+    const goalObs = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                goalFills.forEach(f => f.classList.add('animated'));
+                goalObs.disconnect();
+            }
+        });
+    }, { threshold: 0.4 });
+    const goalsEl = document.querySelector('.dc-goals');
+    if (goalsEl) goalObs.observe(goalsEl);
+
+    // ── CTA form ──
+    function handleCTA(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('.btn-cta');
+        btn.innerHTML = '✓ Cadastro realizado!';
+        btn.style.background = '#16a34a';
+        setTimeout(() => {
+            btn.innerHTML = 'Criar conta grátis <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            btn.style.background = '';
+            e.target.reset();
+        }, 3000);
+    }
+
+    // ── Smooth scroll for anchor links ──
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            const id = a.getAttribute('href').slice(1);
+            const target = document.getElementById(id);
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+    </script>
 </body>
-</html> 
+</html>
