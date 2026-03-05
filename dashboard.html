@@ -239,10 +239,10 @@ select.form-control{cursor:pointer;}
   </div>
   <div class="nav-right">
     <div class="nav-user">
-      <div class="nav-avatar">PH</div>
-      Pedro Henrique
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span id="nav-username">Carregando...</span>
     </div>
-    <button class="btn-logout" onclick="showToast('Até logo! 👋')">
+    <button class="btn-logout" onclick="doLogout()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Sair
     </button>
@@ -649,6 +649,42 @@ select.form-control{cursor:pointer;}
 
 <script>
 /* ════════════════════════════════════════
+   AUTH GUARD
+════════════════════════════════════════ */
+let currentUser = null;
+
+(function authGuard() {
+  try {
+    const s = JSON.parse(localStorage.getItem('gn_session') || 'null');
+    if (!s || !s.email) {
+      window.location.href = 'login.html';
+      return;
+    }
+    currentUser = s;
+
+    // Display name: use first name from full name, or email prefix
+    const displayName = s.name
+      ? s.name.split(' ')[0]
+      : s.email.split('@')[0];
+
+    // Avatar: initials from name or first letter of email
+    const initials = s.name
+      ? s.name.split(' ').slice(0, 2).map(w => w[0].toUpperCase()).join('')
+      : s.email[0].toUpperCase();
+
+    document.getElementById('nav-username').textContent = displayName;
+    document.getElementById('nav-avatar').textContent = initials;
+  } catch(e) {
+    window.location.href = 'login.html';
+  }
+})();
+
+function doLogout() {
+  localStorage.removeItem('gn_session');
+  window.location.href = 'login.html';
+}
+
+/* ════════════════════════════════════════
    STATE
 ════════════════════════════════════════ */
 let state = {
@@ -659,16 +695,18 @@ let state = {
   currentYear: new Date().getFullYear()
 };
 
-// Load from localStorage
+// Load from localStorage — chave por usuário
+function stateKey() {
+  return 'gn_state_' + (currentUser ? btoa(currentUser.email).replace(/=/g,'') : 'guest');
+}
 function loadState() {
   try {
-    const s = localStorage.getItem('gn_state');
+    const s = localStorage.getItem(stateKey());
     if (s) state = { ...state, ...JSON.parse(s) };
   } catch(e) {}
 }
-
 function saveState() {
-  try { localStorage.setItem('gn_state', JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem(stateKey(), JSON.stringify(state)); } catch(e) {}
 }
 
 /* ════════════════════════════════════════
