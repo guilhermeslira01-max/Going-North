@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Going North — Investimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
+:root{
+  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.12);--green-glow:rgba(26,171,94,.25);
+  --teal:#0d9488;--blue:#3b82f6;--gold:#c8a96e;--red:#ef4444;--red-light:rgba(239,68,68,.10);
+  --purple:#7c3aed;--purple-light:rgba(124,58,237,.10);
+  --bg:#f0f4f2;--surface:#ffffff;--surface2:#f7faf8;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.04);
+  --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
+  --nav-bg:#0f2318;--nav-text:rgba(255,255,255,.75);
+  --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+  --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 4px 24px rgba(0,0,0,.10);
+  --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:99px;}
+
+/* ── NAVBAR ── */
+.navbar{background:var(--nav-bg);padding:0 32px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
+.nav-logo-icon{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.nav-links{display:flex;align-items:center;gap:4px;flex:1;}
+.nav-links a{color:var(--nav-text);font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:7px;transition:all .2s;}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.07);}
+.nav-links a.active{color:#fff;background:var(--green);font-weight:600;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.85);font-size:.88rem;font-weight:500;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:.75rem;font-weight:700;color:#fff;}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font-b);}
+.btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
+
+/* ── HERO BANNER ── */
+.inv-hero{background:linear-gradient(135deg,var(--nav-bg) 0%,#0d3320 50%,#0a2b1a 100%);padding:36px 32px 48px;position:relative;overflow:hidden;}
+.inv-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(26,171,94,.18) 0%,transparent 65%);pointer-events:none;}
+.inv-hero::after{content:'';position:absolute;bottom:-80px;left:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(13,148,136,.12) 0%,transparent 65%);pointer-events:none;}
+.hero-inner{max-width:1340px;margin:0 auto;}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px;}
+.hero-top h1{font-family:var(--font-d);font-size:1.7rem;font-weight:700;color:#fff;}
+.hero-top p{color:rgba(255,255,255,.55);font-size:.88rem;margin-top:4px;}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-primary{background:var(--green);color:#fff;border:none;padding:11px 22px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .2s;font-family:var(--font-b);}
+.btn-primary:hover{background:var(--green-h);transform:translateY(-1px);box-shadow:0 4px 16px var(--green-glow);}
+.btn-ghost-light{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);padding:10px 18px;border-radius:10px;font-size:.84rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;font-family:var(--font-b);}
+.btn-ghost-light:hover{background:rgba(255,255,255,.14);color:#fff;}
+.visibility-btn{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;padding:4px;transition:color .2s;}
+.visibility-btn:hover{color:#fff;}
+
+/* ── HERO CARDS ── */
+.hero-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.hcard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:var(--r-lg);padding:20px 24px;backdrop-filter:blur(4px);transition:background .2s;}
+.hcard:hover{background:rgba(255,255,255,.09);}
+.hcard-label{font-size:.78rem;color:rgba(255,255,255,.5);font-weight:500;display:flex;align-items:center;gap:7px;margin-bottom:12px;}
+.hcard-val{font-family:var(--font-d);font-size:1.6rem;font-weight:700;color:#fff;}
+.hcard-val.green{color:#4ade80;}
+.hcard-val.red{color:#f87171;}
+.hcard-change{font-size:.78rem;margin-top:6px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:5px;}
+.hcard-change.up{color:#4ade80;}
+.hcard-change.dn{color:#f87171;}
+
+/* ── MAIN ── */
+.main{padding:32px;max-width:1340px;margin:0 auto;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:28px;width:fit-content;box-shadow:var(--shadow);}
+.tab{padding:8px 22px;border-radius:9px;font-size:.85rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .2s;font-family:var(--font-b);}
+.tab.active{background:var(--nav-bg);color:#fff;font-weight:600;}
+.tab-content{display:none;}
+.tab-content.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow);}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.card-title{font-family:var(--font-d);font-size:.95rem;font-weight:700;color:var(--text);}
+.card-sub{font-size:.78rem;color:var(--text3);margin-top:2px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;}
+.chart-wrap{position:relative;height:220px;}
+
+/* ── INVESTMENT LIST ── */
+.inv-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;background:var(--surface2);border:1px solid var(--border2);margin-bottom:10px;transition:background .15s;cursor:pointer;}
+.inv-item:hover{background:#eef5f1;}
+.inv-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;}
+.inv-info{flex:1;min-width:0;}
+.inv-name{font-size:.9rem;font-weight:600;color:var(--text);}
+.inv-meta{font-size:.76rem;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:8px;}
+.inv-values{text-align:right;}
+.inv-current{font-family:var(--font-d);font-size:.95rem;font-weight:700;color:var(--text);}
+.inv-gain{font-size:.76rem;margin-top:3px;font-weight:600;}
+.inv-gain.pos{color:var(--green);}
+.inv-gain.neg{color:var(--red);}
+.inv-bar-wrap{width:80px;height:4px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:5px;margin-left:auto;}
+.inv-bar{height:100%;border-radius:20px;background:var(--green);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600;}
+.badge-rf{background:rgba(26,171,94,.12);color:var(--green);}
+.badge-rv{background:rgba(59,130,246,.12);color:var(--blue);}
+.badge-crypto{background:rgba(245,158,11,.12);color:#d97706;}
+.badge-fi{background:rgba(124,58,237,.12);color:var(--purple);}
+.inv-actions{display:flex;gap:6px;opacity:0;transition:opacity .2s;}
+.inv-item:hover .inv-actions{opacity:1;}
+.inv-action-btn{background:none;border:1.5px solid var(--border);border-radius:7px;padding:4px 10px;font-size:.74rem;cursor:pointer;font-family:var(--font-b);color:var(--text2);transition:all .2s;}
+.inv-action-btn:hover{border-color:var(--green);color:var(--green);}
+.inv-action-btn.danger:hover{border-color:var(--red);color:var(--red);}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:56px 20px;color:var(--text3);}
+.empty-state svg{opacity:.2;margin-bottom:14px;}
+.empty-state p{font-size:.92rem;font-weight:600;color:var(--text2);}
+.empty-state span{font-size:.82rem;margin-top:6px;display:block;}
+
+/* ── PRODUCTS ── */
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px;}
+.product-card{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.product-banner{height:130px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.product-banner::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);}
+.product-banner::after{content:'';position:absolute;bottom:-20px;left:-20px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.06);}
+.product-banner svg{position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,.2));}
+.product-body{background:var(--surface);padding:18px 20px;}
+.product-name{font-family:var(--font-d);font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.product-desc{font-size:.8rem;color:var(--text3);margin-bottom:14px;line-height:1.5;}
+.product-footer{display:flex;align-items:center;justify-content:space-between;}
+.product-rate{font-size:.8rem;color:var(--green);font-weight:600;display:flex;align-items:center;gap:5px;}
+.product-cta{font-size:.8rem;color:var(--green);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;transition:gap .2s;}
+.product-cta:hover{gap:7px;}
+
+/* ── SIMULATOR ── */
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.sim-form{display:flex;flex-direction:column;gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:.8rem;font-weight:600;color:var(--text2);}
+.form-control{padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:.87rem;font-family:var(--font-b);color:var(--text);background:#fff;outline:none;transition:border .2s;}
+.form-control:focus{border-color:var(--green);}
+select.form-control{cursor:pointer;}
+.range-wrap{display:flex;flex-direction:column;gap:8px;}
+.range-input{-webkit-appearance:none;width:100%;height:4px;border-radius:20px;background:var(--border);outline:none;cursor:pointer;}
+.range-input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 0 3px rgba(26,171,94,.2);}
+.range-labels{display:flex;justify-content:space-between;font-size:.74rem;color:var(--text3);}
+
+/* ── SIM RESULT ── */
+.sim-result{background:var(--surface2);border-radius:var(--r-lg);padding:24px;border:1px solid var(--border2);}
+.sim-result-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:20px;}
+.sim-stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border2);}
+.sim-stat:last-child{border-bottom:none;}
+.sim-stat-label{font-size:.82rem;color:var(--text3);}
+.sim-stat-val{font-family:var(--font-d);font-size:.92rem;font-weight:700;color:var(--text);}
+.sim-stat-val.green{color:var(--green);}
+.sim-chart-wrap{height:160px;margin-top:16px;}
+
+/* ── PLATFORMS ── */
+.platform-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;}
+.platform-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;text-align:center;box-shadow:var(--shadow);transition:all .2s;cursor:pointer;}
+.platform-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--green);}
+.platform-logo{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:1.4rem;}
+.platform-name{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.platform-desc{font-size:.76rem;color:var(--text3);line-height:1.5;margin-bottom:14px;}
+.platform-status{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:3px 10px;border-radius:20px;}
+.ps-available{background:var(--green-light);color:var(--green);}
+.ps-soon{background:rgba(0,0,0,.05);color:var(--text3);}
+
+/* ── INFO BOX ── */
+.info-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.18);border-radius:var(--r-md);padding:16px 18px;display:flex;gap:12px;margin-top:16px;}
+.info-box svg{flex-shrink:0;color:var(--blue);margin-top:1px;}
+.info-box-text{font-size:.83rem;color:var(--text2);line-height:1.6;}
+.info-box-text a{color:var(--green);font-weight:600;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px);}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:var(--r-xl);padding:32px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal h3{font-family:var(--font-d);font-size:1.1rem;font-weight:700;margin-bottom:20px;color:var(--text);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+.btn-cancel{padding:10px 20px;border-radius:9px;border:1.5px solid var(--border);background:transparent;font-size:.86rem;cursor:pointer;color:var(--text2);font-family:var(--font-b);transition:all .2s;}
+.btn-cancel:hover{background:var(--bg);}
+.btn-ghost{background:transparent;color:var(--green);border:1.5px solid var(--green);padding:9px 18px;border-radius:10px;font-size:.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;font-family:var(--font-b);}
+.btn-ghost:hover{background:var(--green-light);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--nav-bg);color:#fff;padding:13px 20px;border-radius:12px;font-size:.86rem;font-weight:500;box-shadow:var(--shadow-md);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{color:var(--green);}
+
+/* ── DONUT LEGEND ── */
+.donut-legend{display:flex;flex-direction:column;gap:9px;}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.8rem;}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.legend-name{color:var(--text2);flex:1;}
+.legend-val{font-weight:600;color:var(--text);font-family:var(--font-d);}
+
+/* ── SCROLL LIST ── */
+.scroll-list{max-height:380px;overflow-y:auto;padding-right:2px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.hero-cards{grid-template-columns:1fr 1fr;}.products-grid{grid-template-columns:1fr 1fr;}.platform-grid{grid-template-columns:1fr 1fr;}.three-col{grid-template-columns:1fr;}}
+@media(max-width:700px){.hero-cards{grid-template-columns:1fr;}.two-col{grid-template-columns:1fr;}.products-grid{grid-template-columns:1fr;}.platform-grid{grid-template-columns:1fr;}.sim-grid{grid-template-columns:1fr;}.main{padding:16px;}.inv-hero{padding:24px 16px 36px;}.navbar{padding:0 16px;}.nav-links{display:none;}.form-row{grid-template-columns:1fr;}}
+
+/* ── ALLOCATION TABLE ── */
+.alloc-table{width:100%;border-collapse:collapse;}
+.alloc-table th{font-size:.74rem;font-weight:600;color:var(--text3);text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--border);text-transform:uppercase;letter-spacing:.04em;}
+.alloc-table td{font-size:.83rem;padding:11px 12px;border-bottom:1px solid var(--border2);color:var(--text);}
+.alloc-table tr:last-child td{border-bottom:none;}
+.alloc-table tr:hover td{background:var(--surface2);}
+.perc-bar{width:80px;height:5px;background:var(--border);border-radius:20px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:8px;}
+.perc-fill{height:100%;border-radius:20px;}
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+        <path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    Going <span style="color:var(--green);margin-left:4px;">North</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="investimentos.html" class="active">Investimentos</a>
+    <a href="educacao.html">Educação</a>
+    <a href="consultoria.html">Consultoria</a>
+    <a href="sobre.html">Sobre</a>
+    <a href="contato.html">Contato</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span id="nav-username">...</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO BANNER ── -->
+<div class="inv-hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div>
+        <h1>Investimentos</h1>
+        <p>Acompanhe, simule e gerencie sua carteira</p>
+      </div>
+      <div class="hero-actions">
+        <button class="btn-ghost-light" id="toggle-visibility" onclick="toggleVisibility()">
+          <svg id="vis-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Ocultar valores
+        </button>
+        <button class="btn-primary" onclick="openModal('modal-inv')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar investimento
+        </button>
+      </div>
+    </div>
+    <div class="hero-cards">
+      <div class="hcard">
+        <div class="hcard-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Total investido
+        </div>
+        <div class="hcard-val" id="h-total">R$ 0,00</div>
+        <div class="hcard-change" id="h-total-ch">— aportes</div>
+      </div>
+      <div class="hcard">
+        <div class="hcard-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+          Valor atual
+        </div>
+        <div class="hcard-val" id="h-atual">R$ 0,00</div>
+        <div class="hcard-change" id="h-atual-ch">— posição atual</div>
+      </div>
+      <div class="hcard">
+        <div class="hcard-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          Rentabilidade
+        </div>
+        <div class="hcard-val" id="h-rent">+0,00%</div>
+        <div class="hcard-change" id="h-rent-abs">+R$ 0,00 de ganho</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('meus')">Meus Investimentos</button>
+    <button class="tab" onclick="switchTab('carteira')">Carteira</button>
+    <button class="tab" onclick="switchTab('produtos')">Produtos disponíveis</button>
+    <button class="tab" onclick="switchTab('plataformas')">Plataformas</button>
+    <button class="tab" onclick="switchTab('simulador')">Simulador</button>
+  </div>
+
+  <!-- ══ TAB: MEUS INVESTIMENTOS ══ -->
+  <div id="tab-meus" class="tab-content active">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Meus Investimentos</div>
+          <div class="card-sub">Todos os seus ativos em um só lugar</div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <select class="form-control" style="width:auto;padding:7px 12px;font-size:.82rem;" id="filter-tipo" onchange="renderInvestimentos()">
+            <option value="">Todos os tipos</option>
+            <option value="Renda Fixa">Renda Fixa</option>
+            <option value="Renda Variável">Renda Variável</option>
+            <option value="Cripto">Cripto</option>
+            <option value="Fundo">Fundo</option>
+          </select>
+          <button class="btn-primary" onclick="openModal('modal-inv')">+ Adicionar</button>
+        </div>
+      </div>
+      <div id="inv-list" class="scroll-list"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: CARTEIRA ══ -->
+  <div id="tab-carteira" class="tab-content">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Distribuição da Carteira</div>
+            <div class="card-sub">Por tipo de ativo</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;">
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-carteira-donut"></canvas></div>
+          <div class="donut-legend" id="carteira-legend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Evolução do Patrimônio</div>
+          <div class="card-sub">Simulação de crescimento</div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart-evolucao"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Alocação detalhada</div></div>
+      <div style="overflow-x:auto;">
+        <table class="alloc-table" id="alloc-table">
+          <thead><tr><th>Ativo</th><th>Tipo</th><th>Aporte</th><th>Valor atual</th><th>Ganho/Perda</th><th>% Carteira</th></tr></thead>
+          <tbody id="alloc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: PRODUTOS ══ -->
+  <div id="tab-produtos" class="tab-content">
+    <div class="products-grid">
+
+      <div class="product-card" onclick="openProductModal('caixinha')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7 7-7z"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Caixinhas</div>
+          <div class="product-desc">Organize seu dinheiro por objetivos e faça seu dinheiro render enquanto aguarda.</div>
+          <div class="product-footer">
+            <div class="product-rate">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              100% do CDI
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="openProductModal('rdb')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#2563eb,#3b82f6);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">RDB</div>
+          <div class="product-desc">Rendimento previsível e seguro. Protegido pelo FGC até R$ 250 mil por CPF.</div>
+          <div class="product-footer">
+            <div class="product-rate">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              105% do CDI
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="openProductModal('tesouro')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#059669,#10b981);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Tesouro Direto</div>
+          <div class="product-desc">Títulos públicos do governo federal. Alta segurança e liquidez diária disponível.</div>
+          <div class="product-footer">
+            <div class="product-rate">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              IPCA + 6%
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="openProductModal('cdb')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">CDB</div>
+          <div class="product-desc">Certificado de Depósito Bancário com rentabilidade acima da poupança e proteção FGC.</div>
+          <div class="product-footer">
+            <div class="product-rate">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              Até 110% do CDI
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="openProductModal('acoes')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#0f2318,#1a4731);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">Ações</div>
+          <div class="product-desc">Invista nas maiores empresas da bolsa brasileira e internacional com potencial de crescimento.</div>
+          <div class="product-footer">
+            <div class="product-rate" style="color:var(--text3);">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              Renda variável
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" onclick="openProductModal('fiis')">
+        <div class="product-banner" style="background:linear-gradient(135deg,#0e7490,#06b6d4);">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-name">FIIs</div>
+          <div class="product-desc">Fundos Imobiliários com distribuição mensal de rendimentos e exposição ao mercado imobiliário.</div>
+          <div class="product-footer">
+            <div class="product-rate" style="color:var(--text3);">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              Dividendos mensais
+            </div>
+            <div class="product-cta">Saiba mais <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="info-box-text">
+        <strong>Como funciona?</strong> Todos os investimentos de Renda Fixa são protegidos pelo FGC (Fundo Garantidor de Créditos) até R$ 250.000 por CPF e instituição financeira.<br>
+        <a href="#">Seus investimentos rendem todos os dias, inclusive finais de semana e feriados.</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: PLATAFORMAS ══ -->
+  <div id="tab-plataformas" class="tab-content">
+    <div class="platform-grid">
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#ff6600;font-size:1.3rem;">🟠</div>
+        <div class="platform-name">XP Investimentos</div>
+        <div class="platform-desc">Uma das maiores plataformas de investimentos do Brasil com ampla variedade de produtos.</div>
+        <span class="platform-status ps-soon">Em breve</span>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#820ad1;font-size:1.3rem;">💜</div>
+        <div class="platform-name">Nubank / NuInvest</div>
+        <div class="platform-desc">Integração com a plataforma de investimentos do Nubank para importação automática.</div>
+        <span class="platform-status ps-soon">Em breve</span>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#ff6600;font-size:1.3rem;">🟧</div>
+        <div class="platform-name">Rico</div>
+        <div class="platform-desc">Corretora digital com foco em acessibilidade e produtos para todos os perfis de investidor.</div>
+        <span class="platform-status ps-soon">Em breve</span>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#009900;font-size:1.3rem;">🟢</div>
+        <div class="platform-name">Inter Invest</div>
+        <div class="platform-desc">Plataforma de investimentos do Banco Inter com zero corretagem em diversas operações.</div>
+        <span class="platform-status ps-soon">Em breve</span>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#1a1a2e;color:#fff;font-size:1rem;font-family:var(--font-d);font-weight:700;">B3</div>
+        <div class="platform-name">B3 (Manual)</div>
+        <div class="platform-desc">Importe sua carteira via CSV diretamente da B3 para visualizar ações e FIIs no dashboard.</div>
+        <span class="platform-status ps-available">✓ Disponível</span>
+      </div>
+      <div class="platform-card">
+        <div class="platform-logo" style="background:#0078d4;font-size:1.3rem;">📊</div>
+        <div class="platform-name">Importar planilha</div>
+        <div class="platform-desc">Importe sua carteira por arquivo Excel ou CSV de qualquer corretora ou banco.</div>
+        <span class="platform-status ps-available">✓ Disponível</span>
+      </div>
+    </div>
+    <div class="info-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="info-box-text">
+        As integrações automáticas com corretoras estão em desenvolvimento. Por enquanto, você pode adicionar seus investimentos manualmente ou importar via CSV. <a href="#">Saiba como importar.</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: SIMULADOR ══ -->
+  <div id="tab-simulador" class="tab-content">
+    <div class="sim-grid">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Simulador de Investimento</div></div>
+        <div class="sim-form">
+          <div class="form-group">
+            <label>Tipo de investimento</label>
+            <select class="form-control" id="sim-tipo" onchange="simular()">
+              <option value="cdi">Renda Fixa (% do CDI)</option>
+              <option value="ipca">Tesouro IPCA+</option>
+              <option value="selic">Tesouro Selic</option>
+              <option value="acoes">Renda Variável (Est.)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Aporte inicial (R$)</label>
+            <input class="form-control" id="sim-inicial" type="number" value="1000" min="0" oninput="simular()">
+          </div>
+          <div class="form-group">
+            <label>Aporte mensal (R$)</label>
+            <input class="form-control" id="sim-mensal" type="number" value="500" min="0" oninput="simular()">
+          </div>
+          <div class="form-group">
+            <label>Período: <strong id="sim-periodo-label">12 meses</strong></label>
+            <div class="range-wrap">
+              <input class="range-input" id="sim-periodo" type="range" min="1" max="360" value="12" oninput="updatePeriodo();simular()">
+              <div class="range-labels"><span>1 mês</span><span>30 anos</span></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Taxa anual estimada: <strong id="sim-taxa-label">12%</strong></label>
+            <div class="range-wrap">
+              <input class="range-input" id="sim-taxa" type="range" min="1" max="30" value="12" step="0.5" oninput="updateTaxa();simular()">
+              <div class="range-labels"><span>1%</span><span>30%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sim-result" style="margin-bottom:16px;">
+          <div class="sim-result-title">Resultado da simulação</div>
+          <div class="sim-stat"><span class="sim-stat-label">Total investido</span><span class="sim-stat-val" id="sim-r-total">R$ 0,00</span></div>
+          <div class="sim-stat"><span class="sim-stat-label">Rendimento bruto</span><span class="sim-stat-val green" id="sim-r-rend">+R$ 0,00</span></div>
+          <div class="sim-stat"><span class="sim-stat-label">Imposto estimado (IR)</span><span class="sim-stat-val" id="sim-r-ir" style="color:var(--red);">-R$ 0,00</span></div>
+          <div class="sim-stat"><span class="sim-stat-label">Valor final líquido</span><span class="sim-stat-val green" id="sim-r-final" style="font-size:1.05rem;">R$ 0,00</span></div>
+          <div class="sim-stat"><span class="sim-stat-label">Rentabilidade total</span><span class="sim-stat-val green" id="sim-r-pct">+0,00%</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Crescimento ao longo do tempo</div></div>
+          <div class="sim-chart-wrap"><canvas id="chart-sim"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Modal: Adicionar Investimento -->
+<div class="modal-overlay" id="modal-inv">
+  <div class="modal">
+    <h3>Adicionar Investimento</h3>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Nome do ativo</label>
+      <input class="form-control" id="inv-nome" placeholder="Ex: Tesouro Selic 2027, PETR4, Bitcoin...">
+    </div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>Tipo</label>
+        <select class="form-control" id="inv-tipo">
+          <option value="Renda Fixa">Renda Fixa</option>
+          <option value="Renda Variável">Renda Variável</option>
+          <option value="Cripto">Cripto</option>
+          <option value="Fundo">Fundo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Instituição</label>
+        <input class="form-control" id="inv-inst" placeholder="Ex: NuInvest, XP...">
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>Valor aportado (R$)</label>
+        <input class="form-control" id="inv-aporte" type="number" min="0" step="0.01" placeholder="0,00">
+      </div>
+      <div class="form-group">
+        <label>Valor atual (R$)</label>
+        <input class="form-control" id="inv-atual" type="number" min="0" step="0.01" placeholder="0,00">
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>Taxa / Rentabilidade</label>
+        <input class="form-control" id="inv-taxa" placeholder="Ex: 105% CDI, IPCA+6%">
+      </div>
+      <div class="form-group">
+        <label>Data do aporte</label>
+        <input class="form-control" id="inv-data" type="date">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-inv')">Cancelar</button>
+      <button class="btn-primary" onclick="addInvestimento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalhe do Produto -->
+<div class="modal-overlay" id="modal-produto">
+  <div class="modal">
+    <h3 id="prod-modal-title">Produto</h3>
+    <div id="prod-modal-body" style="font-size:.87rem;color:var(--text2);line-height:1.7;margin-bottom:20px;"></div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-produto')">Fechar</button>
+      <button class="btn-primary" onclick="closeModal('modal-produto');openModal('modal-inv')">Adicionar à carteira</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar Investimento -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <h3>Atualizar Valor</h3>
+    <input type="hidden" id="edit-id">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Valor atual do investimento (R$)</label>
+      <input class="form-control" id="edit-atual" type="number" min="0" step="0.01" placeholder="0,00">
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn-primary" onclick="saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   AUTH GUARD
+════════════════════════════════════════ */
+let currentUser = null;
+(function() {
+  try {
+    const s = JSON.parse(localStorage.getItem('gn_session') || 'null');
+    if (!s || !s.email) { window.location.href = 'login.html'; return; }
+    currentUser = s;
+    const displayName = s.name ? s.name.split(' ')[0] : s.email.split('@')[0];
+    const initials = s.name ? s.name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('') : s.email[0].toUpperCase();
+    document.getElementById('nav-username').textContent = displayName;
+    document.getElementById('nav-avatar').textContent = initials;
+  } catch(e) { window.location.href = 'login.html'; }
+})();
+function doLogout() { localStorage.removeItem('gn_session'); window.location.href = 'login.html'; }
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+function stateKey() { return 'gn_inv_' + (currentUser ? btoa(currentUser.email).replace(/=/g,'') : 'guest'); }
+let investments = [];
+
+function loadInv() {
+  try { investments = JSON.parse(localStorage.getItem(stateKey()) || '[]'); } catch(e) { investments = []; }
+}
+function saveInv() {
+  try { localStorage.setItem(stateKey(), JSON.stringify(investments)); } catch(e) {}
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function fmt(v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function showToast(msg, err) {
+  const t = document.getElementById('toast');
+  const icon = t.querySelector('.toast-icon');
+  document.getElementById('toast-msg').textContent = msg;
+  icon.textContent = err ? '✕' : '✓';
+  icon.style.color = err ? 'var(--red)' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+
+/* ════════════════════════════════════════
+   VISIBILITY TOGGLE
+════════════════════════════════════════ */
+let valuesHidden = false;
+function toggleVisibility() {
+  valuesHidden = !valuesHidden;
+  const btn = document.getElementById('toggle-visibility');
+  btn.innerHTML = valuesHidden
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Mostrar valores`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Ocultar valores`;
+  updateHero();
+  renderInvestimentos();
+}
+function masked(v) { return valuesHidden ? '••••••' : fmt(v); }
+
+/* ════════════════════════════════════════
+   TABS
+════════════════════════════════════════ */
+let charts = {};
+function destroyChart(k) { if(charts[k]){charts[k].destroy();delete charts[k];} }
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  const tabs = ['meus','carteira','produtos','plataformas','simulador'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  if (name === 'carteira') { renderCarteira(); }
+  if (name === 'simulador') { simular(); }
+}
+
+/* ════════════════════════════════════════
+   HERO
+════════════════════════════════════════ */
+function updateHero() {
+  const total = investments.reduce((s,i) => s + i.aporte, 0);
+  const atual = investments.reduce((s,i) => s + i.atual, 0);
+  const ganho = atual - total;
+  const pct = total > 0 ? (ganho / total) * 100 : 0;
+
+  document.getElementById('h-total').textContent = masked(total);
+  document.getElementById('h-atual').textContent = masked(atual);
+  document.getElementById('h-total-ch').textContent = `${investments.length} ativo(s) cadastrado(s)`;
+  document.getElementById('h-atual-ch').textContent = 'posição atual da carteira';
+
+  const rentEl = document.getElementById('h-rent');
+  const rentAbsEl = document.getElementById('h-rent-abs');
+  rentEl.textContent = valuesHidden ? '••••' : (ganho >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+  rentEl.className = 'hcard-val ' + (ganho >= 0 ? 'green' : 'red');
+  rentAbsEl.textContent = valuesHidden ? '••••' : (ganho >= 0 ? '+' : '-') + fmt(ganho) + ' de ganho';
+  rentAbsEl.className = 'hcard-change ' + (ganho >= 0 ? 'up' : 'dn');
+}
+
+/* ════════════════════════════════════════
+   TIPO BADGES
+════════════════════════════════════════ */
+const tipoConfig = {
+  'Renda Fixa':     { badge: 'badge-rf',     icon: '🏦', color: '#1aab5e' },
+  'Renda Variável': { badge: 'badge-rv',     icon: '📈', color: '#3b82f6' },
+  'Cripto':         { badge: 'badge-crypto', icon: '₿',  color: '#f59e0b' },
+  'Fundo':          { badge: 'badge-fi',     icon: '🏢', color: '#7c3aed' },
+};
+
+/* ════════════════════════════════════════
+   ADD / DELETE / EDIT
+════════════════════════════════════════ */
+function addInvestimento() {
+  const nome   = document.getElementById('inv-nome').value.trim();
+  const tipo   = document.getElementById('inv-tipo').value;
+  const inst   = document.getElementById('inv-inst').value.trim();
+  const aporte = parseFloat(document.getElementById('inv-aporte').value);
+  const atual  = parseFloat(document.getElementById('inv-atual').value) || aporte;
+  const taxa   = document.getElementById('inv-taxa').value.trim();
+  const data   = document.getElementById('inv-data').value;
+
+  if (!nome || isNaN(aporte) || aporte <= 0) { showToast('Preencha nome e valor aportado.', true); return; }
+
+  investments.push({ id: uid(), nome, tipo, inst, aporte, atual, taxa, data: data || today() });
+  saveInv();
+  closeModal('modal-inv');
+  ['inv-nome','inv-inst','inv-aporte','inv-atual','inv-taxa'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inv-data').value = today();
+  updateHero();
+  renderInvestimentos();
+  showToast('Investimento adicionado!');
+}
+
+function deleteInvestimento(id) {
+  investments = investments.filter(i => i.id !== id);
+  saveInv();
+  updateHero();
+  renderInvestimentos();
+  showToast('Investimento removido.');
+}
+
+function openEdit(id) {
+  const inv = investments.find(i => i.id === id);
+  if (!inv) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-atual').value = inv.atual;
+  openModal('modal-edit');
+}
+
+function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  const val = parseFloat(document.getElementById('edit-atual').value);
+  if (isNaN(val) || val < 0) { showToast('Valor inválido.', true); return; }
+  const inv = investments.find(i => i.id === id);
+  if (inv) inv.atual = val;
+  saveInv();
+  closeModal('modal-edit');
+  updateHero();
+  renderInvestimentos();
+  showToast('Valor atualizado!');
+}
+
+/* ════════════════════════════════════════
+   RENDER INVESTIMENTOS
+════════════════════════════════════════ */
+function renderInvestimentos() {
+  const filterTipo = document.getElementById('filter-tipo')?.value || '';
+  let list = investments;
+  if (filterTipo) list = list.filter(i => i.tipo === filterTipo);
+
+  const el = document.getElementById('inv-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7 7-7z"/></svg>
+      <p>Nenhum investimento cadastrado</p>
+      <span>Conecte suas plataformas ou adicione manualmente seus investimentos.</span>
+      <br><button class="btn-primary" style="margin:16px auto 0;width:fit-content;" onclick="openModal('modal-inv')">+ Adicionar investimento</button>
+    </div>`;
+    return;
+  }
+
+  const totalAtual = list.reduce((s,i) => s + i.atual, 0);
+  el.innerHTML = list.map(inv => {
+    const cfg = tipoConfig[inv.tipo] || { badge:'badge-rf', icon:'📦', color:'#94a3b8' };
+    const ganho = inv.atual - inv.aporte;
+    const pct = inv.aporte > 0 ? (ganho / inv.aporte) * 100 : 0;
+    const alloc = totalAtual > 0 ? (inv.atual / totalAtual) * 100 : 0;
+    const d = inv.data ? new Date(inv.data+'T12:00:00').toLocaleDateString('pt-BR') : '—';
+    return `<div class="inv-item">
+      <div class="inv-icon" style="background:${cfg.color}18;">${cfg.icon}</div>
+      <div class="inv-info">
+        <div class="inv-name">${inv.nome}</div>
+        <div class="inv-meta">
+          <span class="badge ${cfg.badge}">${inv.tipo}</span>
+          ${inv.inst ? `<span>${inv.inst}</span>` : ''}
+          ${inv.taxa ? `<span style="color:var(--green);font-weight:600;">${inv.taxa}</span>` : ''}
+          <span>desde ${d}</span>
+        </div>
+      </div>
+      <div class="inv-values">
+        <div class="inv-current">${masked(inv.atual)}</div>
+        <div class="inv-gain ${ganho >= 0 ? 'pos' : 'neg'}">${valuesHidden ? '••••' : (ganho >= 0 ? '+' : '') + fmt(ganho) + ' (' + pct.toFixed(1) + '%)'}</div>
+        <div class="inv-bar-wrap"><div class="inv-bar" style="width:${alloc}%;background:${cfg.color};"></div></div>
+      </div>
+      <div class="inv-actions">
+        <button class="inv-action-btn" onclick="openEdit('${inv.id}')">Atualizar</button>
+        <button class="inv-action-btn danger" onclick="deleteInvestimento('${inv.id}')">Excluir</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   CARTEIRA
+════════════════════════════════════════ */
+function renderCarteira() {
+  renderCarteiraDonut();
+  renderEvolucaoChart();
+  renderAllocTable();
+}
+
+function renderCarteiraDonut() {
+  destroyChart('cart-donut');
+  const grouped = {};
+  investments.forEach(i => { grouped[i.tipo] = (grouped[i.tipo] || 0) + i.atual; });
+  const labels = Object.keys(grouped);
+  const vals = Object.values(grouped);
+  const colors = labels.map(l => (tipoConfig[l] || {color:'#94a3b8'}).color);
+  const total = vals.reduce((s,v) => s+v, 0);
+
+  const legend = document.getElementById('carteira-legend');
+  if (!labels.length) {
+    legend.innerHTML = '<div style="color:var(--text3);font-size:.8rem;">Sem dados</div>';
+    return;
+  }
+  legend.innerHTML = labels.map((l,i) => `<div class="legend-item">
+    <div class="legend-dot" style="background:${colors[i]}"></div>
+    <span class="legend-name">${l}</span>
+    <span class="legend-val">${Math.round(vals[i]/total*100)}%</span>
+  </div>`).join('');
+
+  const ctx = document.getElementById('chart-carteira-donut');
+  if (!ctx) return;
+  charts['cart-donut'] = new Chart(ctx, {
+    type:'doughnut',
+    data:{ labels, datasets:[{ data:vals, backgroundColor:colors, borderWidth:2, borderColor:'#fff', hoverOffset:6 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => ` ${c.label}: ${fmt(c.raw)}` } } } }
+  });
+}
+
+function renderEvolucaoChart() {
+  destroyChart('evolucao');
+  const ctx = document.getElementById('chart-evolucao');
+  if (!ctx) return;
+  const total = investments.reduce((s,i) => s+i.aporte, 0);
+  const atual = investments.reduce((s,i) => s+i.atual, 0);
+  // Simulated 12-month growth line
+  const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const base = total || 1000;
+  const growth = Array.from({length:12}, (_,i) => parseFloat((base * Math.pow(1 + 0.01, i) + (atual-total)*(i/11)).toFixed(2)));
+  charts.evolucao = new Chart(ctx, {
+    type:'line',
+    data:{ labels:months, datasets:[{
+      label:'Patrimônio', data:growth, borderColor:'#1aab5e',
+      backgroundColor:'rgba(26,171,94,.08)', fill:true, tension:.4, pointRadius:3
+    }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'Inter',size:11},color:'#7a9585'} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:'Inter',size:11},color:'#7a9585',callback:v=>'R$'+(v>=1000?(v/1000).toFixed(0)+'k':v)} }
+      }
+    }
+  });
+}
+
+function renderAllocTable() {
+  const tbody = document.getElementById('alloc-tbody');
+  const total = investments.reduce((s,i) => s+i.atual, 0);
+  if (!investments.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Nenhum investimento cadastrado</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = investments.map(inv => {
+    const cfg = tipoConfig[inv.tipo] || {badge:'badge-rf',color:'#94a3b8'};
+    const ganho = inv.atual - inv.aporte;
+    const pct = inv.aporte > 0 ? (ganho/inv.aporte*100) : 0;
+    const alloc = total > 0 ? (inv.atual/total*100) : 0;
+    return `<tr>
+      <td><strong>${inv.nome}</strong>${inv.inst ? `<div style="font-size:.74rem;color:var(--text3);">${inv.inst}</div>` : ''}</td>
+      <td><span class="badge ${cfg.badge}">${inv.tipo}</span></td>
+      <td>${fmt(inv.aporte)}</td>
+      <td>${fmt(inv.atual)}</td>
+      <td style="color:${ganho>=0?'var(--green)':'var(--red)'};font-weight:600;">${ganho>=0?'+':''}${fmt(ganho)} <span style="font-size:.74rem;">(${pct.toFixed(1)}%)</span></td>
+      <td>${alloc.toFixed(1)}%<div class="perc-bar"><div class="perc-fill" style="width:${alloc}%;background:${cfg.color};"></div></div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════
+   PRODUCT MODAL
+════════════════════════════════════════ */
+const productDetails = {
+  caixinha: { title:'Caixinhas', body:`<strong>O que é?</strong> As Caixinhas permitem organizar seu dinheiro por objetivos específicos — viagem, reserva de emergência, compra de imóvel — enquanto ele rende automaticamente a 100% do CDI.<br><br><strong>Vantagens:</strong> Liquidez diária, rendimento automático, organização por objetivo e sem carência.<br><br><strong>Rendimento atual:</strong> 100% do CDI (~13,65% a.a.)` },
+  rdb: { title:'RDB — Recibo de Depósito Bancário', body:`<strong>O que é?</strong> O RDB é um título de renda fixa emitido por instituições financeiras com rendimento pré-fixado ou pós-fixado atrelado ao CDI.<br><br><strong>Vantagens:</strong> Rendimento de 105% do CDI, proteção pelo FGC até R$ 250 mil, previsibilidade e segurança.<br><br><strong>Atenção:</strong> Não possui liquidez antecipada — o resgate ocorre no vencimento do título.` },
+  tesouro: { title:'Tesouro Direto', body:`<strong>O que é?</strong> Programa do governo federal que permite a compra de títulos públicos por pessoas físicas. É considerado o investimento mais seguro do Brasil.<br><br><strong>Tipos disponíveis:</strong> Tesouro Selic (liquidez diária), Tesouro IPCA+ (proteção inflação), Tesouro Prefixado.<br><br><strong>Rendimento estimado:</strong> IPCA + 6% ao ano` },
+  cdb: { title:'CDB — Certificado de Depósito Bancário', body:`<strong>O que é?</strong> Título emitido pelos bancos para captar recursos. Em troca, você recebe uma rentabilidade que pode chegar a 110% do CDI ou mais.<br><br><strong>Vantagens:</strong> Alta rentabilidade, proteção pelo FGC, diversas opções de prazo e liquidez.<br><br><strong>Tributação:</strong> Imposto de Renda regressivo de 22,5% (até 6 meses) a 15% (acima de 2 anos).` },
+  acoes: { title:'Ações', body:`<strong>O que é?</strong> Ao comprar ações você se torna sócio de uma empresa e participa dos seus resultados através de valorização e dividendos.<br><br><strong>Risco:</strong> Renda variável — o valor pode subir ou cair conforme o mercado.<br><br><strong>Recomendado para:</strong> Investidores com perfil moderado a arrojado e horizonte de longo prazo (3+ anos).` },
+  fiis: { title:'FIIs — Fundos de Investimento Imobiliário', body:`<strong>O que é?</strong> Os FIIs são fundos que investem em imóveis ou títulos imobiliários e distribuem rendimentos mensais aos cotistas.<br><br><strong>Vantagens:</strong> Rendimentos mensais isentos de IR para pessoa física, diversificação imobiliária com baixo capital inicial.<br><br><strong>Tributação:</strong> Ganho de capital na venda das cotas é tributado a 20%.` },
+};
+
+function openProductModal(key) {
+  const p = productDetails[key];
+  if (!p) return;
+  document.getElementById('prod-modal-title').textContent = p.title;
+  document.getElementById('prod-modal-body').innerHTML = p.body;
+  openModal('modal-produto');
+}
+
+/* ════════════════════════════════════════
+   SIMULADOR
+════════════════════════════════════════ */
+function updatePeriodo() {
+  const v = parseInt(document.getElementById('sim-periodo').value);
+  document.getElementById('sim-periodo-label').textContent = v >= 12 ? Math.floor(v/12) + ' ano(s) e ' + (v%12) + ' meses' : v + ' mes(es)';
+}
+function updateTaxa() {
+  document.getElementById('sim-taxa-label').textContent = parseFloat(document.getElementById('sim-taxa').value).toFixed(1) + '% a.a.';
+}
+
+let simChart = null;
+function simular() {
+  const inicial = parseFloat(document.getElementById('sim-inicial').value) || 0;
+  const mensal  = parseFloat(document.getElementById('sim-mensal').value) || 0;
+  const meses   = parseInt(document.getElementById('sim-periodo').value) || 12;
+  const taxaAA  = parseFloat(document.getElementById('sim-taxa').value) || 12;
+  const taxaMes = Math.pow(1 + taxaAA/100, 1/12) - 1;
+
+  let saldo = inicial;
+  const data = [inicial];
+  const labels = ['Início'];
+
+  for (let m = 1; m <= meses; m++) {
+    saldo = saldo * (1 + taxaMes) + mensal;
+    if (m % Math.max(1, Math.floor(meses/12)) === 0 || m === meses) {
+      data.push(parseFloat(saldo.toFixed(2)));
+      labels.push('M' + m);
+    }
+  }
+
+  const totalAportado = inicial + mensal * meses;
+  const rendimento    = saldo - totalAportado;
+  const aliquota      = meses <= 6 ? 0.225 : meses <= 12 ? 0.20 : meses <= 24 ? 0.175 : 0.15;
+  const ir            = Math.max(0, rendimento * aliquota);
+  const liquido       = saldo - ir;
+  const pct           = totalAportado > 0 ? ((liquido - totalAportado) / totalAportado * 100) : 0;
+
+  document.getElementById('sim-r-total').textContent  = fmt(totalAportado);
+  document.getElementById('sim-r-rend').textContent   = '+' + fmt(rendimento);
+  document.getElementById('sim-r-ir').textContent     = '-' + fmt(ir);
+  document.getElementById('sim-r-final').textContent  = fmt(liquido);
+  document.getElementById('sim-r-pct').textContent    = '+' + pct.toFixed(2) + '%';
+
+  destroyChart('sim');
+  const ctx = document.getElementById('chart-sim');
+  if (!ctx) return;
+  charts.sim = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[
+      { label:'Patrimônio', data, borderColor:'#1aab5e', backgroundColor:'rgba(26,171,94,.10)', fill:true, tension:.4, pointRadius:2 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'Inter',size:10},color:'#7a9585',maxTicksLimit:8} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{family:'Inter',size:10},color:'#7a9585',callback:v=>'R$'+(v>=1000?(v/1000).toFixed(0)+'k':v)} }
+      }
+    }
+  });
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+function init() {
+  loadInv();
+  document.getElementById('inv-data').value = today();
+  updatePeriodo();
+  updateTaxa();
+
+  // Demo data if empty
+  if (!investments.length) {
+    investments = [
+      { id:uid(), nome:'Tesouro Selic 2027', tipo:'Renda Fixa', inst:'Banco Inter', aporte:5000, atual:5420, taxa:'Selic', data:'2024-06-01' },
+      { id:uid(), nome:'CDB Nubank 110% CDI', tipo:'Renda Fixa', inst:'NuInvest', aporte:3000, atual:3280, taxa:'110% CDI', data:'2024-08-15' },
+      { id:uid(), nome:'PETR4', tipo:'Renda Variável', inst:'XP', aporte:2000, atual:2340, taxa:'', data:'2024-09-10' },
+      { id:uid(), nome:'HGLG11', tipo:'Fundo', inst:'XP', aporte:1500, atual:1620, taxa:'~9% a.a.', data:'2024-10-05' },
+    ];
+    saveInv();
+  }
+
+  updateHero();
+  renderInvestimentos();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
