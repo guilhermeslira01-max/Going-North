@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ── RESET & TOKENS ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
@@ -649,308 +650,276 @@ select.form-control{cursor:pointer;}
 
 <script>
 /* ════════════════════════════════════════
+   SUPABASE
+════════════════════════════════════════ */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://qesurszlqesjbtcpnjwz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
+);
+
+/* ════════════════════════════════════════
    AUTH GUARD
 ════════════════════════════════════════ */
 let currentUser = null;
 
-(function authGuard() {
-  try {
-    const s = JSON.parse(localStorage.getItem('gn_session') || 'null');
-    if (!s || !s.email) {
-      window.location.href = 'login.html';
-      return;
-    }
-    currentUser = s;
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return false; }
+  currentUser = session.user;
+  const name     = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
+  const firstName = name.split(' ')[0];
+  const initials  = name.split(' ').slice(0,2).map(w => w[0].toUpperCase()).join('');
+  document.getElementById('nav-username').textContent = firstName;
+  document.getElementById('nav-avatar').textContent   = initials;
+  return true;
+}
 
-    // Display name: use first name from full name, or email prefix
-    const displayName = s.name
-      ? s.name.split(' ')[0]
-      : s.email.split('@')[0];
-
-    // Avatar: initials from name or first letter of email
-    const initials = s.name
-      ? s.name.split(' ').slice(0, 2).map(w => w[0].toUpperCase()).join('')
-      : s.email[0].toUpperCase();
-
-    document.getElementById('nav-username').textContent = displayName;
-    document.getElementById('nav-avatar').textContent = initials;
-  } catch(e) {
-    window.location.href = 'login.html';
-  }
-})();
-
-function doLogout() {
-  localStorage.removeItem('gn_session');
+async function doLogout() {
+  await sb.auth.signOut();
   window.location.href = 'login.html';
 }
 
 /* ════════════════════════════════════════
-   STATE
+   STATE (memória local — carregado do banco)
 ════════════════════════════════════════ */
-let state = {
-  transactions: [],
-  goals: [],
-  parcelas: [],
-  historyPeriod: 'all',
-  currentYear: new Date().getFullYear()
-};
+let state = { transactions: [], goals: [], parcelas: [], historyPeriod: 'all', currentYear: new Date().getFullYear() };
 
-// Load from localStorage — chave por usuário
-function stateKey() {
-  return 'gn_state_' + (currentUser ? btoa(currentUser.email).replace(/=/g,'') : 'guest');
+/* ════════════════════════════════════════
+   DB — TRANSACTIONS
+════════════════════════════════════════ */
+async function dbLoadTransactions() {
+  const { data, error } = await sb.from('transactions').select('*').order('data', { ascending: false });
+  if (error) { console.error(error); return; }
+  state.transactions = (data || []).map(r => ({
+    id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
+    tipo: r.tipo, cat: r.cat, data: r.data
+  }));
 }
-function loadState() {
-  try {
-    const s = localStorage.getItem(stateKey());
-    if (s) state = { ...state, ...JSON.parse(s) };
-  } catch(e) {}
+async function dbAddTransaction(tx) {
+  const { data, error } = await sb.from('transactions').insert({
+    user_id: currentUser.id, descricao: tx.desc, valor: tx.valor,
+    tipo: tx.tipo, cat: tx.cat, data: tx.data
+  }).select().single();
+  if (error) { showToast('Erro ao salvar transação.', true); return null; }
+  return data.id;
 }
-function saveState() {
-  try { localStorage.setItem(stateKey(), JSON.stringify(state)); } catch(e) {}
+async function dbDeleteTransaction(id) {
+  const { error } = await sb.from('transactions').delete().eq('id', id);
+  if (error) showToast('Erro ao remover transação.', true);
+}
+
+/* ════════════════════════════════════════
+   DB — GOALS
+════════════════════════════════════════ */
+async function dbLoadGoals() {
+  const { data, error } = await sb.from('goals').select('*').order('created_at');
+  if (error) { console.error(error); return; }
+  state.goals = (data || []).map(r => ({
+    id: r.id, nome: r.nome, total: parseFloat(r.total),
+    atual: parseFloat(r.atual), prazo: r.prazo, cor: r.cor
+  }));
+}
+async function dbAddGoal(g) {
+  const { data, error } = await sb.from('goals').insert({
+    user_id: currentUser.id, nome: g.nome, total: g.total,
+    atual: g.atual || 0, prazo: g.prazo || null, cor: g.cor
+  }).select().single();
+  if (error) { showToast('Erro ao salvar meta.', true); return null; }
+  return data.id;
+}
+async function dbUpdateGoal(id, atual) {
+  const { error } = await sb.from('goals').update({ atual }).eq('id', id);
+  if (error) showToast('Erro ao atualizar meta.', true);
+}
+async function dbDeleteGoal(id) {
+  const { error } = await sb.from('goals').delete().eq('id', id);
+  if (error) showToast('Erro ao remover meta.', true);
+}
+
+/* ════════════════════════════════════════
+   DB — PARCELAS
+════════════════════════════════════════ */
+async function dbLoadParcelas() {
+  const { data, error } = await sb.from('installments').select('*').order('created_at');
+  if (error) { console.error(error); return; }
+  state.parcelas = (data || []).map(r => ({
+    id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
+    total: r.total, pagas: r.pagas, venc: r.venc, cat: r.cat, status: r.status
+  }));
+}
+async function dbAddParcela(p) {
+  const { data, error } = await sb.from('installments').insert({
+    user_id: currentUser.id, descricao: p.desc, valor: p.valor,
+    total: p.total, pagas: p.pagas, venc: p.venc, cat: p.cat, status: p.status
+  }).select().single();
+  if (error) { showToast('Erro ao salvar parcela.', true); return null; }
+  return data.id;
+}
+async function dbUpdateParcela(id, pagas, status) {
+  const { error } = await sb.from('installments').update({ pagas, status }).eq('id', id);
+  if (error) showToast('Erro ao atualizar parcela.', true);
+}
+async function dbDeleteParcela(id) {
+  const { error } = await sb.from('installments').delete().eq('id', id);
+  if (error) showToast('Erro ao remover parcela.', true);
 }
 
 /* ════════════════════════════════════════
    HELPERS
 ════════════════════════════════════════ */
-function fmt(v) {
-  return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function fmtSigned(v) {
-  return (v >= 0 ? '+ R$ ' : '− R$ ') + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-function today() {
-  return new Date().toISOString().split('T')[0];
-}
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+function fmt(v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtSigned(v) { return (v>=0?'+ R$ ':'− R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
 function showToast(msg, isError) {
   const t = document.getElementById('toast');
-  const icon = t.querySelector('.toast-icon');
   document.getElementById('toast-msg').textContent = msg;
-  icon.textContent = isError ? '✕' : '✓';
-  icon.style.color = isError ? 'var(--red)' : 'var(--green)';
+  t.querySelector('.toast-icon').textContent = isError ? '✕' : '✓';
+  t.querySelector('.toast-icon').style.color = isError ? 'var(--red)' : 'var(--green)';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
-function openModal(id) { document.getElementById(id).classList.add('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if(e.target === o) o.classList.remove('open'); });
-});
-
-/* ════════════════════════════════════════
-   TABS
-════════════════════════════════════════ */
-function switchTab(name) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  const tabs = ['overview','transactions','goals','parcelas','history'];
-  const idx = tabs.indexOf(name);
-  document.querySelectorAll('.tab')[idx].classList.add('active');
-  if (name === 'overview') { renderCharts(); }
-  if (name === 'transactions') { renderTransactions(); }
-  if (name === 'goals') { renderGoals(); renderGoalsChart(); }
-  if (name === 'parcelas') { renderParcelas(); }
-  if (name === 'history') { renderHistory(); renderHistoryChart(); }
-}
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
 
 /* ════════════════════════════════════════
    SUMMARY
 ════════════════════════════════════════ */
 function calcSummary() {
   const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  
-  const all = state.transactions;
-  const cur = all.filter(t => t.data.startsWith(ym));
-  
-  const rec = cur.filter(t => t.tipo === 'receita').reduce((s,t) => s + t.valor, 0);
-  const des = cur.filter(t => t.tipo === 'despesa').reduce((s,t) => s + t.valor, 0);
+  const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const cur = state.transactions.filter(t => t.data.startsWith(ym));
+  const rec = cur.filter(t=>t.tipo==='receita').reduce((s,t)=>s+t.valor,0);
+  const des = cur.filter(t=>t.tipo==='despesa').reduce((s,t)=>s+t.valor,0);
   const sal = rec - des;
-  const met = state.goals.reduce((s,g) => s + (g.atual || 0), 0);
-
+  const met = state.goals.reduce((s,g)=>s+(g.atual||0),0);
   document.getElementById('s-receitas').textContent = fmt(rec);
   document.getElementById('s-despesas').textContent = fmt(des);
-  document.getElementById('s-saldo').textContent = fmt(sal);
-  document.getElementById('s-saldo').className = 'scard-val ' + (sal >= 0 ? 'green' : 'red');
-  document.getElementById('s-metas').textContent = fmt(met);
+  document.getElementById('s-saldo').textContent    = fmt(sal);
+  document.getElementById('s-saldo').className      = 'scard-val '+(sal>=0?'green':'red');
+  document.getElementById('s-metas').textContent    = fmt(met);
 }
 
 /* ════════════════════════════════════════
    TRANSACTIONS
 ════════════════════════════════════════ */
-const catColors = {
-  'salário': '#1aab5e','freelance': '#0d9488','moradia': '#6366f1',
-  'alimentação': '#f97316','transporte': '#c8a96e','lazer': '#ec4899',
-  'saúde': '#3b82f6','investimento': '#1aab5e','outros': '#94a3b8'
-};
-const catIcons = {
-  'salário': '💼','freelance': '💻','moradia': '🏠',
-  'alimentação': '🍽️','transporte': '🚗','lazer': '🎬',
-  'saúde': '❤️','investimento': '📈','outros': '📦'
-};
+const catColors = { 'salário':'#1aab5e','freelance':'#0d9488','moradia':'#6366f1','alimentação':'#f97316','transporte':'#c8a96e','lazer':'#ec4899','saúde':'#3b82f6','investimento':'#1aab5e','outros':'#94a3b8' };
+const catIcons  = { 'salário':'💼','freelance':'💻','moradia':'🏠','alimentação':'🍽️','transporte':'🚗','lazer':'🎬','saúde':'❤️','investimento':'📈','outros':'📦' };
 
-function addTransaction() {
-  const desc = document.getElementById('tx-desc').value.trim();
+async function addTransaction() {
+  const desc  = document.getElementById('tx-desc').value.trim();
   const valor = parseFloat(document.getElementById('tx-valor').value);
-  const tipo = document.getElementById('tx-tipo-m').value;
-  const cat = document.getElementById('tx-cat-m').value;
-  const data = document.getElementById('tx-data').value;
-  if (!desc || isNaN(valor) || valor <= 0 || !data) {
-    showToast('Preencha todos os campos.', true); return;
-  }
-  const tx = { id: uid(), desc, valor, tipo, cat, data };
-  state.transactions.unshift(tx);
-  saveState();
+  const tipo  = document.getElementById('tx-tipo-m').value;
+  const cat   = document.getElementById('tx-cat-m').value;
+  const data  = document.getElementById('tx-data').value;
+  if (!desc || isNaN(valor) || valor<=0 || !data) { showToast('Preencha todos os campos.', true); return; }
+
+  const id = await dbAddTransaction({ desc, valor, tipo, cat, data });
+  if (!id) return;
+  state.transactions.unshift({ id, desc, valor, tipo, cat, data });
   closeModal('modal-tx');
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-valor').value = '';
-  document.getElementById('tx-data').value = '';
-  calcSummary();
-  renderRecentTx();
-  renderCharts();
+  document.getElementById('tx-data').value = todayStr();
+  calcSummary(); renderRecentTx(); renderCharts();
   showToast('Transação adicionada!');
 }
 
-function deleteTransaction(id) {
+async function deleteTransaction(id) {
+  await dbDeleteTransaction(id);
   state.transactions = state.transactions.filter(t => t.id !== id);
-  saveState();
-  calcSummary();
-  renderTransactions();
-  renderRecentTx();
-  renderCharts();
+  calcSummary(); renderTransactions(); renderRecentTx(); renderCharts();
   showToast('Transação removida.');
 }
 
-function renderTxItem(tx, showDelete = true) {
-  const color = catColors[tx.cat] || '#94a3b8';
-  const icon = catIcons[tx.cat] || '📦';
-  const d = new Date(tx.data + 'T12:00:00').toLocaleDateString('pt-BR');
-  const catClass = tx.tipo === 'receita' ? 'cat-receita' : (tx.cat === 'moradia' ? 'cat-fixo' : tx.cat === 'investimento' ? 'cat-meta' : 'cat-variavel');
+function renderTxItem(tx, showDelete=true) {
+  const color    = catColors[tx.cat] || '#94a3b8';
+  const icon     = catIcons[tx.cat]  || '📦';
+  const d        = new Date(tx.data+'T12:00:00').toLocaleDateString('pt-BR');
+  const catClass = tx.tipo==='receita' ? 'cat-receita' : tx.cat==='moradia' ? 'cat-fixo' : tx.cat==='investimento' ? 'cat-meta' : 'cat-variavel';
   return `<div class="tx-item" id="tx-${tx.id}">
     <div class="tx-dot" style="background:${color}22;">${icon}</div>
-    <div class="tx-info">
-      <div class="tx-name">${tx.desc}</div>
-      <div class="tx-meta">${d} <span class="tx-cat ${catClass}">${tx.cat}</span></div>
-    </div>
-    <div class="tx-amount ${tx.tipo === 'receita' ? 'pos' : 'neg'}">${tx.tipo === 'receita' ? '+' : '−'} ${fmt(tx.valor)}</div>
-    ${showDelete ? `<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-    </button>` : ''}
+    <div class="tx-info"><div class="tx-name">${tx.desc}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${tx.cat}</span></div></div>
+    <div class="tx-amount ${tx.tipo==='receita'?'pos':'neg'}">${tx.tipo==='receita'?'+':'−'} ${fmt(tx.valor)}</div>
+    ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
   </div>`;
 }
 
 function renderRecentTx() {
-  const el = document.getElementById('recent-tx-list');
-  const list = state.transactions.slice(0, 5);
-  if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação registrada ainda.</p><span>Clique em "Nova transação" para começar.</span></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="tx-list">${list.map(t => renderTxItem(t, false)).join('')}</div>`;
+  const el   = document.getElementById('recent-tx-list');
+  const list = state.transactions.slice(0,5);
+  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação registrada ainda.</p><span>Clique em "Nova transação" para começar.</span></div>`; return; }
+  el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t,false)).join('')}</div>`;
 }
 
 function renderTransactions() {
-  const search = (document.getElementById('tx-search')?.value || '').toLowerCase();
-  const tipo = document.getElementById('tx-tipo')?.value || '';
-  const cat = document.getElementById('tx-cat')?.value || '';
-  const month = document.getElementById('tx-month')?.value || '';
-  
+  const search = (document.getElementById('tx-search')?.value||'').toLowerCase();
+  const tipo   = document.getElementById('tx-tipo')?.value||'';
+  const cat    = document.getElementById('tx-cat')?.value||'';
+  const month  = document.getElementById('tx-month')?.value||'';
   let list = state.transactions;
-  if (search) list = list.filter(t => t.desc.toLowerCase().includes(search) || t.cat.includes(search));
-  if (tipo) list = list.filter(t => t.tipo === tipo);
-  if (cat) list = list.filter(t => t.cat === cat);
-  if (month) list = list.filter(t => t.data.startsWith(month));
-  
+  if (search) list = list.filter(t=>t.desc.toLowerCase().includes(search)||t.cat.includes(search));
+  if (tipo)   list = list.filter(t=>t.tipo===tipo);
+  if (cat)    list = list.filter(t=>t.cat===cat);
+  if (month)  list = list.filter(t=>t.data.startsWith(month));
   const el = document.getElementById('tx-list');
-  if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação encontrada.</p></div>`;
-    return;
-  }
-  el.innerHTML = `<div class="tx-list">${list.map(t => renderTxItem(t)).join('')}</div>`;
+  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação encontrada.</p></div>`; return; }
+  el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t)).join('')}</div>`;
 }
 
 /* ════════════════════════════════════════
    GOALS
 ════════════════════════════════════════ */
-function addGoal() {
-  const nome = document.getElementById('goal-nome').value.trim();
+async function addGoal() {
+  const nome  = document.getElementById('goal-nome').value.trim();
   const total = parseFloat(document.getElementById('goal-total').value);
-  const atual = parseFloat(document.getElementById('goal-atual').value) || 0;
+  const atual = parseFloat(document.getElementById('goal-atual').value)||0;
   const prazo = document.getElementById('goal-prazo').value;
-  const cor = document.getElementById('goal-cor').value;
-  if (!nome || isNaN(total) || total <= 0) { showToast('Preencha nome e valor total.', true); return; }
-  state.goals.push({ id: uid(), nome, total, atual, prazo, cor });
-  saveState();
+  const cor   = document.getElementById('goal-cor').value;
+  if (!nome||isNaN(total)||total<=0) { showToast('Preencha nome e valor total.', true); return; }
+  const id = await dbAddGoal({ nome, total, atual, prazo, cor });
+  if (!id) return;
+  state.goals.push({ id, nome, total, atual, prazo, cor });
   closeModal('modal-goal');
-  document.getElementById('goal-nome').value = '';
-  document.getElementById('goal-total').value = '';
-  document.getElementById('goal-atual').value = '';
-  document.getElementById('goal-prazo').value = '';
-  renderGoals();
-  renderGoalsChart();
-  calcSummary();
+  ['goal-nome','goal-total','goal-atual','goal-prazo'].forEach(i=>document.getElementById(i).value='');
+  renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Meta criada!');
 }
 
-function deleteGoal(id) {
-  state.goals = state.goals.filter(g => g.id !== id);
-  saveState();
-  renderGoals();
-  renderGoalsChart();
-  calcSummary();
+async function deleteGoal(id) {
+  await dbDeleteGoal(id);
+  state.goals = state.goals.filter(g=>g.id!==id);
+  renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Meta removida.');
 }
 
-function openAporte(id) {
-  document.getElementById('aporte-goal-id').value = id;
-  document.getElementById('aporte-valor').value = '';
-  openModal('modal-aporte');
-}
+function openAporte(id) { document.getElementById('aporte-goal-id').value=id; document.getElementById('aporte-valor').value=''; openModal('modal-aporte'); }
 
-function addAporte() {
-  const id = document.getElementById('aporte-goal-id').value;
+async function addAporte() {
+  const id  = document.getElementById('aporte-goal-id').value;
   const val = parseFloat(document.getElementById('aporte-valor').value);
-  if (isNaN(val) || val <= 0) { showToast('Informe um valor válido.', true); return; }
-  const g = state.goals.find(g => g.id === id);
+  if (isNaN(val)||val<=0) { showToast('Valor inválido.', true); return; }
+  const g = state.goals.find(g=>g.id===id);
   if (!g) return;
-  g.atual = Math.min(g.atual + val, g.total);
-  saveState();
+  g.atual = Math.min(g.atual+val, g.total);
+  await dbUpdateGoal(id, g.atual);
   closeModal('modal-aporte');
-  renderGoals();
-  renderGoalsChart();
-  calcSummary();
+  renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Aporte registrado!');
 }
 
 function renderGoals() {
   const el = document.getElementById('goals-list');
-  if (!state.goals.length) {
-    el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><p>Nenhuma meta criada ainda</p><span>Crie sua primeira meta financeira!</span></div>`;
-    return;
-  }
+  if (!state.goals.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><p>Nenhuma meta criada ainda</p></div>`; return; }
   el.innerHTML = state.goals.map(g => {
-    const pct = Math.min(100, Math.round((g.atual / g.total) * 100));
-    const prazoFmt = g.prazo ? new Date(g.prazo + 'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
+    const pct       = Math.min(100,Math.round((g.atual/g.total)*100));
+    const prazoFmt  = g.prazo ? new Date(g.prazo+'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
     return `<div class="goal-item">
-      <div class="goal-top">
-        <div>
-          <div class="goal-name">${g.nome}</div>
-          <div class="goal-vals">${fmt(g.atual)} de ${fmt(g.total)}</div>
-        </div>
-        <div class="goal-pct">${pct}%</div>
-      </div>
+      <div class="goal-top"><div><div class="goal-name">${g.nome}</div><div class="goal-vals">${fmt(g.atual)} de ${fmt(g.total)}</div></div><div class="goal-pct">${pct}%</div></div>
       <div class="goal-bar"><div class="goal-fill" style="width:${pct}%;background:${g.cor}"></div></div>
-      <div class="goal-deadline">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Prazo: ${prazoFmt}
-      </div>
-      <div class="goal-actions">
-        <button class="goal-btn" onclick="openAporte('${g.id}')">+ Aporte</button>
-        <button class="goal-btn danger" onclick="deleteGoal('${g.id}')">Excluir</button>
-      </div>
+      <div class="goal-deadline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Prazo: ${prazoFmt}</div>
+      <div class="goal-actions"><button class="goal-btn" onclick="openAporte('${g.id}')">+ Aporte</button><button class="goal-btn danger" onclick="deleteGoal('${g.id}')">Excluir</button></div>
     </div>`;
   }).join('');
 }
@@ -958,104 +927,73 @@ function renderGoals() {
 /* ════════════════════════════════════════
    PARCELAS
 ════════════════════════════════════════ */
-function addParcela() {
-  const desc = document.getElementById('p-desc').value.trim();
+async function addParcela() {
+  const desc  = document.getElementById('p-desc').value.trim();
   const valor = parseFloat(document.getElementById('p-valor').value);
   const total = parseInt(document.getElementById('p-total').value);
-  const pagas = parseInt(document.getElementById('p-pagas').value) || 0;
-  const venc = parseInt(document.getElementById('p-venc').value);
-  const cat = document.getElementById('p-cat').value;
-  const status = document.getElementById('p-status').value;
-  if (!desc || isNaN(valor) || valor <= 0 || isNaN(total) || total < 1) {
-    showToast('Preencha todos os campos obrigatórios.', true); return;
-  }
-  state.parcelas.push({ id: uid(), desc, valor, total, pagas, venc: venc || 10, cat, status });
-  saveState();
+  const pagas = parseInt(document.getElementById('p-pagas').value)||0;
+  const venc  = parseInt(document.getElementById('p-venc').value);
+  const cat   = document.getElementById('p-cat').value;
+  const status= document.getElementById('p-status').value;
+  if (!desc||isNaN(valor)||valor<=0||isNaN(total)||total<1) { showToast('Preencha todos os campos.', true); return; }
+  const id = await dbAddParcela({ desc, valor, total, pagas, venc: venc||10, cat, status });
+  if (!id) return;
+  state.parcelas.push({ id, desc, valor, total, pagas, venc: venc||10, cat, status });
   closeModal('modal-parcela');
-  ['p-desc','p-valor','p-total','p-pagas','p-venc'].forEach(id => document.getElementById(id).value = '');
+  ['p-desc','p-valor','p-total','p-pagas','p-venc'].forEach(i=>document.getElementById(i).value='');
   renderParcelas();
   showToast('Parcela adicionada!');
 }
 
-function pagarParcela(id) {
-  const p = state.parcelas.find(x => x.id === id);
-  if (!p || p.pagas >= p.total) return;
+async function pagarParcela(id) {
+  const p = state.parcelas.find(x=>x.id===id);
+  if (!p||p.pagas>=p.total) return;
   p.pagas++;
-  if (p.pagas >= p.total) p.status = 'quitada';
-  else p.status = 'ativa';
-  saveState();
+  if (p.pagas>=p.total) p.status='quitada'; else p.status='ativa';
+  await dbUpdateParcela(id, p.pagas, p.status);
   renderParcelas();
   showToast('Parcela registrada como paga!');
 }
 
-function deleteParcela(id) {
-  state.parcelas = state.parcelas.filter(p => p.id !== id);
-  saveState();
+async function deleteParcela(id) {
+  await dbDeleteParcela(id);
+  state.parcelas = state.parcelas.filter(p=>p.id!==id);
   renderParcelas();
   showToast('Parcela removida.');
 }
 
 function renderParcelas() {
   const el = document.getElementById('parcelas-list');
-  if (!state.parcelas.length) {
-    el.innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p><span>Adicione suas parcelas e compromissos fixos.</span></div>`;
-    document.getElementById('parcelas-resumo').innerHTML = '';
-    return;
-  }
-  
+  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; return; }
   const today = new Date().getDate();
   el.innerHTML = state.parcelas.map(p => {
-    const rest = p.total - p.pagas;
-    const pct = Math.round((p.pagas / p.total) * 100);
-    const statusClass = p.status === 'quitada' ? 'badge-quitada' : p.status === 'atrasada' ? 'badge-atrasada' : 'badge-ativa';
-    const statusLabel = p.status === 'quitada' ? 'Quitada' : p.status === 'atrasada' ? 'Atrasada' : 'Ativa';
-    const daysLeft = p.venc - today;
-    let vencClass = 'venc-ok', vencText = '';
-    if (p.status !== 'quitada') {
-      if (daysLeft < 0) { vencClass = 'venc-late'; vencText = `Vencida há ${Math.abs(daysLeft)} dia(s)`; }
-      else if (daysLeft <= 5) { vencClass = 'venc-warn'; vencText = `Vence em ${daysLeft} dia(s)`; }
-      else { vencClass = 'venc-ok'; vencText = `Vence dia ${p.venc}`; }
+    const rest = p.total-p.pagas;
+    const statusClass = p.status==='quitada'?'badge-quitada':p.status==='atrasada'?'badge-atrasada':'badge-ativa';
+    const statusLabel = p.status==='quitada'?'Quitada':p.status==='atrasada'?'Atrasada':'Ativa';
+    const daysLeft = p.venc-today;
+    let vencClass='venc-ok',vencText='';
+    if (p.status!=='quitada') {
+      if (daysLeft<0)      { vencClass='venc-late'; vencText=`Vencida há ${Math.abs(daysLeft)} dia(s)`; }
+      else if (daysLeft<=5){ vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
+      else                 { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
     }
     return `<div class="parcela-item">
-      <div style="font-size:1.4rem">${catIcons[p.cat] || '📦'}</div>
-      <div class="parcela-info">
-        <div class="parcela-name">${p.desc}</div>
-        <div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>
-        ${vencText ? `<div class="parcela-venc ${vencClass}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>` : ''}
-      </div>
-      <div class="parcela-right">
-        <div class="parcela-val">${fmt(p.valor)}/mês</div>
-        <div class="parcela-progress">${rest} restante(s) · ${fmt(p.valor * rest)} total</div>
-        <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">
-          ${p.status !== 'quitada' ? `<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>` : ''}
-          <button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button>
-        </div>
-      </div>
+      <div style="font-size:1.4rem">${catIcons[p.cat]||'📦'}</div>
+      <div class="parcela-info"><div class="parcela-name">${p.desc}</div><div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>${vencText?`<div class="parcela-venc ${vencClass}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>`:''}</div>
+      <div class="parcela-right"><div class="parcela-val">${fmt(p.valor)}/mês</div><div class="parcela-progress">${rest} restante(s) · ${fmt(p.valor*rest)} total</div>
+      <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">${p.status!=='quitada'?`<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}<button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button></div></div>
     </div>`;
   }).join('');
-
-  // Resumo
-  const ativas = state.parcelas.filter(p => p.status !== 'quitada');
-  const totalMes = ativas.reduce((s, p) => s + p.valor, 0);
-  const totalRest = ativas.reduce((s, p) => s + (p.valor * (p.total - p.pagas)), 0);
-  const atrasadas = state.parcelas.filter(p => p.status === 'atrasada').length;
-  
-  document.getElementById('parcelas-resumo').innerHTML = `
+  const ativas   = state.parcelas.filter(p=>p.status!=='quitada');
+  const totalMes = ativas.reduce((s,p)=>s+p.valor,0);
+  const totalRest= ativas.reduce((s,p)=>s+(p.valor*(p.total-p.pagas)),0);
+  const atrasadas= state.parcelas.filter(p=>p.status==='atrasada').length;
+  document.getElementById('parcelas-resumo').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <div class="scard" style="padding:14px;">
-        <div class="scard-label">Total mensal em parcelas</div>
-        <div class="scard-val red" style="font-size:1.2rem;margin-top:8px;">${fmt(totalMes)}</div>
-      </div>
-      <div class="scard" style="padding:14px;">
-        <div class="scard-label">Total restante</div>
-        <div class="scard-val" style="font-size:1.1rem;margin-top:8px;">${fmt(totalRest)}</div>
-      </div>
-      ${atrasadas > 0 ? `<div class="scard" style="padding:14px;border-color:rgba(239,68,68,.3)">
-        <div class="scard-label" style="color:var(--red)">⚠️ Parcelas atrasadas</div>
-        <div class="scard-val red" style="font-size:1.1rem;margin-top:8px;">${atrasadas}</div>
-      </div>` : ''}
+      <div class="scard" style="padding:14px;"><div class="scard-label">Total mensal em parcelas</div><div class="scard-val red" style="font-size:1.2rem;margin-top:8px;">${fmt(totalMes)}</div></div>
+      <div class="scard" style="padding:14px;"><div class="scard-label">Total restante</div><div class="scard-val" style="font-size:1.1rem;margin-top:8px;">${fmt(totalRest)}</div></div>
+      ${atrasadas>0?`<div class="scard" style="padding:14px;border-color:rgba(239,68,68,.3)"><div class="scard-label" style="color:var(--red)">⚠️ Parcelas atrasadas</div><div class="scard-val red" style="font-size:1.1rem;margin-top:8px;">${atrasadas}</div></div>`:''}
     </div>`;
-
   renderParcelasChart();
 }
 
@@ -1064,225 +1002,113 @@ function renderParcelas() {
 ════════════════════════════════════════ */
 function setPeriod(p, btn) {
   state.historyPeriod = p;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderHistory();
-  renderHistoryChart();
+  renderHistory(); renderHistoryChart();
 }
 
 function getHistoryList() {
-  let list = [...state.transactions].sort((a,b) => b.data.localeCompare(a.data));
+  let list = [...state.transactions].sort((a,b)=>b.data.localeCompare(a.data));
   const now = new Date();
-  if (state.historyPeriod === '3m') {
-    const d = new Date(now); d.setMonth(d.getMonth() - 3);
-    list = list.filter(t => new Date(t.data) >= d);
-  } else if (state.historyPeriod === '6m') {
-    const d = new Date(now); d.setMonth(d.getMonth() - 6);
-    list = list.filter(t => new Date(t.data) >= d);
-  } else if (state.historyPeriod === '1y') {
-    const d = new Date(now); d.setFullYear(d.getFullYear() - 1);
-    list = list.filter(t => new Date(t.data) >= d);
-  }
+  if (state.historyPeriod==='3m')  { const d=new Date(now);d.setMonth(d.getMonth()-3);  list=list.filter(t=>new Date(t.data)>=d); }
+  if (state.historyPeriod==='6m')  { const d=new Date(now);d.setMonth(d.getMonth()-6);  list=list.filter(t=>new Date(t.data)>=d); }
+  if (state.historyPeriod==='1y')  { const d=new Date(now);d.setFullYear(d.getFullYear()-1); list=list.filter(t=>new Date(t.data)>=d); }
   return list;
 }
 
 function renderHistory() {
   const list = getHistoryList();
   const wrap = document.getElementById('history-table-wrap');
-  if (!list.length) {
-    wrap.innerHTML = `<div class="empty-state"><p>Nenhuma transação no período selecionado.</p></div>`;
-    return;
-  }
-  wrap.innerHTML = `<table class="ext-table">
-    <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead>
-    <tbody>${list.map(t => `<tr>
+  if (!list.length) { wrap.innerHTML=`<div class="empty-state"><p>Nenhuma transação no período.</p></div>`; return; }
+  wrap.innerHTML=`<table class="ext-table"><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead>
+    <tbody>${list.map(t=>`<tr>
       <td>${new Date(t.data+'T12:00:00').toLocaleDateString('pt-BR')}</td>
       <td>${t.desc}</td>
-      <td><span class="tx-cat ${t.tipo === 'receita' ? 'cat-receita' : 'cat-variavel'}">${t.cat}</span></td>
-      <td>${t.tipo === 'receita' ? '⬆️ Receita' : '⬇️ Despesa'}</td>
-      <td style="text-align:right" class="tx-amount ${t.tipo === 'receita' ? 'pos' : 'neg'}">${t.tipo === 'receita' ? '+' : '−'} ${fmt(t.valor)}</td>
-    </tr>`).join('')}
-    </tbody>
-  </table>`;
+      <td><span class="tx-cat ${t.tipo==='receita'?'cat-receita':'cat-variavel'}">${t.cat}</span></td>
+      <td>${t.tipo==='receita'?'⬆️ Receita':'⬇️ Despesa'}</td>
+      <td style="text-align:right" class="tx-amount ${t.tipo==='receita'?'pos':'neg'}">${t.tipo==='receita'?'+':'−'} ${fmt(t.valor)}</td>
+    </tr>`).join('')}</tbody></table>`;
 }
 
 /* ════════════════════════════════════════
    CHARTS
 ════════════════════════════════════════ */
 let charts = {};
+function destroyChart(key) { if(charts[key]){charts[key].destroy();delete charts[key];} }
 
-function destroyChart(key) {
-  if (charts[key]) { charts[key].destroy(); delete charts[key]; }
-}
+function shiftYear(d) { state.currentYear+=d; document.getElementById('year-label').textContent=state.currentYear; renderMonthlyChart(); }
 
-function shiftYear(d) {
-  state.currentYear += d;
-  document.getElementById('year-label').textContent = state.currentYear;
-  renderMonthlyChart();
-}
-
-function renderCharts() {
-  renderMonthlyChart();
-  renderDonutChart();
-  renderRecentTx();
-}
+function renderCharts() { renderMonthlyChart(); renderDonutChart(); renderRecentTx(); }
 
 function renderMonthlyChart() {
   const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const year = state.currentYear;
-  const rec = months.map((_,i) => {
-    const ym = `${year}-${String(i+1).padStart(2,'0')}`;
-    return state.transactions.filter(t => t.tipo === 'receita' && t.data.startsWith(ym)).reduce((s,t) => s+t.valor, 0);
-  });
-  const des = months.map((_,i) => {
-    const ym = `${year}-${String(i+1).padStart(2,'0')}`;
-    return state.transactions.filter(t => t.tipo === 'despesa' && t.data.startsWith(ym)).reduce((s,t) => s+t.valor, 0);
-  });
-
+  const year   = state.currentYear;
+  const rec = months.map((_,i)=>{ const ym=`${year}-${String(i+1).padStart(2,'0')}`; return state.transactions.filter(t=>t.tipo==='receita'&&t.data.startsWith(ym)).reduce((s,t)=>s+t.valor,0); });
+  const des = months.map((_,i)=>{ const ym=`${year}-${String(i+1).padStart(2,'0')}`; return state.transactions.filter(t=>t.tipo==='despesa'&&t.data.startsWith(ym)).reduce((s,t)=>s+t.valor,0); });
   destroyChart('monthly');
   const ctx = document.getElementById('chart-monthly');
   if (!ctx) return;
-  charts.monthly = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: months,
-      datasets: [
-        { label: 'Receitas', data: rec, backgroundColor: 'rgba(26,171,94,.75)', borderRadius: 6, borderSkipped: false },
-        { label: 'Despesas', data: des, backgroundColor: 'rgba(239,68,68,.65)', borderRadius: 6, borderSkipped: false }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { font: { family: 'Inter', size: 11 }, color: '#3d5a47' } } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#7a9585' } },
-        y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#7a9585', callback: v => 'R$' + (v>=1000 ? (v/1000)+'k' : v) } }
-      }
-    }
-  });
+  charts.monthly = new Chart(ctx,{type:'bar',data:{labels:months,datasets:[{label:'Receitas',data:rec,backgroundColor:'rgba(26,171,94,.75)',borderRadius:6,borderSkipped:false},{label:'Despesas',data:des,backgroundColor:'rgba(239,68,68,.65)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{family:'Inter',size:11},color:'#3d5a47'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Inter',size:11},color:'#7a9585'}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{family:'Inter',size:11},color:'#7a9585',callback:v=>'R$'+(v>=1000?(v/1000)+'k':v)}}}}});
 }
 
 function renderDonutChart() {
   const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const despesas = state.transactions.filter(t => t.tipo === 'despesa' && t.data.startsWith(ym));
-  
-  const cats = {};
-  despesas.forEach(t => { cats[t.cat] = (cats[t.cat] || 0) + t.valor; });
-  const labels = Object.keys(cats);
-  const vals = Object.values(cats);
-  const colors = labels.map(l => catColors[l] || '#94a3b8');
-
+  const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const des = state.transactions.filter(t=>t.tipo==='despesa'&&t.data.startsWith(ym));
+  const cats= {};
+  des.forEach(t=>{ cats[t.cat]=(cats[t.cat]||0)+t.valor; });
+  const labels = Object.keys(cats); const vals = Object.values(cats);
+  const colors = labels.map(l=>catColors[l]||'#94a3b8');
   const legend = document.getElementById('donut-legend');
-  
-  if (!vals.length) {
-    destroyChart('donut');
-    document.getElementById('chart-donut').getContext('2d').clearRect(0,0,300,300);
-    legend.innerHTML = '<div style="color:var(--text3);font-size:.8rem;text-align:center;">Sem despesas no mês</div>';
-    return;
-  }
-
-  const total = vals.reduce((s,v) => s+v, 0);
-  legend.innerHTML = labels.map((l,i) => `<div class="legend-item">
-    <div class="legend-dot" style="background:${colors[i]}"></div>
-    <span class="legend-name">${l}</span>
-    <span class="legend-pct">${Math.round(vals[i]/total*100)}%</span>
-  </div>`).join('');
-
+  if (!vals.length) { destroyChart('donut'); legend.innerHTML='<div style="color:var(--text3);font-size:.8rem;text-align:center;">Sem despesas no mês</div>'; return; }
+  const total = vals.reduce((s,v)=>s+v,0);
+  legend.innerHTML = labels.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div><span class="legend-name">${l}</span><span class="legend-pct">${Math.round(vals[i]/total*100)}%</span></div>`).join('');
   destroyChart('donut');
   const ctx = document.getElementById('chart-donut');
   if (!ctx) return;
-  charts.donut = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '68%',
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)}` } } }
-    }
-  });
+  charts.donut = new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:2,borderColor:'#fff',hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.raw)}`}}}}});
 }
 
 function renderGoalsChart() {
   destroyChart('goals');
   const ctx = document.getElementById('chart-goals');
-  if (!ctx || !state.goals.length) return;
-  charts.goals = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: state.goals.map(g => g.nome.length > 12 ? g.nome.slice(0,12)+'…' : g.nome),
-      datasets: [
-        { label: 'Acumulado', data: state.goals.map(g => g.atual), backgroundColor: state.goals.map(g => g.cor+'cc'), borderRadius: 6, borderSkipped: false },
-        { label: 'Restante', data: state.goals.map(g => g.total - g.atual), backgroundColor: 'rgba(0,0,0,.07)', borderRadius: 6, borderSkipped: false }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-      plugins: { legend: { labels: { font: { family: 'Inter', size: 11 }, color: '#3d5a47' } } },
-      scales: {
-        x: { stacked: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Inter', size: 10 }, color: '#7a9585' } },
-        y: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#3d5a47' } }
-      }
-    }
-  });
+  if (!ctx||!state.goals.length) return;
+  charts.goals = new Chart(ctx,{type:'bar',data:{labels:state.goals.map(g=>g.nome.length>12?g.nome.slice(0,12)+'…':g.nome),datasets:[{label:'Acumulado',data:state.goals.map(g=>g.atual),backgroundColor:state.goals.map(g=>g.cor+'cc'),borderRadius:6,borderSkipped:false},{label:'Restante',data:state.goals.map(g=>g.total-g.atual),backgroundColor:'rgba(0,0,0,.07)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{labels:{font:{family:'Inter',size:11},color:'#3d5a47'}}},scales:{x:{stacked:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{family:'Inter',size:10},color:'#7a9585'}},y:{stacked:true,grid:{display:false},ticks:{font:{family:'Inter',size:11},color:'#3d5a47'}}}}});
 }
 
 function renderParcelasChart() {
   destroyChart('parcelas');
   const ctx = document.getElementById('chart-parcelas');
-  if (!ctx || !state.parcelas.length) return;
-  const labels = state.parcelas.map(p => p.desc.length > 12 ? p.desc.slice(0,12)+'…' : p.desc);
-  const vals = state.parcelas.map(p => p.valor);
-  charts.parcelas = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{ data: vals, backgroundColor: ['#1aab5e','#0d9488','#6366f1','#f97316','#c8a96e','#ec4899','#3b82f6','#ef4444'], borderWidth: 2, borderColor: '#fff' }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10 }, color: '#3d5a47', boxWidth: 10 } } }
-    }
-  });
+  if (!ctx||!state.parcelas.length) return;
+  charts.parcelas = new Chart(ctx,{type:'pie',data:{labels:state.parcelas.map(p=>p.desc.length>12?p.desc.slice(0,12)+'…':p.desc),datasets:[{data:state.parcelas.map(p=>p.valor),backgroundColor:['#1aab5e','#0d9488','#6366f1','#f97316','#c8a96e','#ec4899','#3b82f6','#ef4444'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},color:'#3d5a47',boxWidth:10}}}}});
 }
 
 function renderHistoryChart() {
-  const list = getHistoryList();
-  // Group by month
+  const list   = getHistoryList();
   const months = {};
-  list.forEach(t => {
-    const ym = t.data.slice(0,7);
-    if (!months[ym]) months[ym] = { rec: 0, des: 0 };
-    if (t.tipo === 'receita') months[ym].rec += t.valor;
-    else months[ym].des += t.valor;
-  });
-  const keys = Object.keys(months).sort();
-  const labels = keys.map(k => { const [y,m] = k.split('-'); return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1]+'/'+y.slice(2); });
-  const rec = keys.map(k => months[k].rec);
-  const des = keys.map(k => months[k].des);
-  const sal = keys.map(k => months[k].rec - months[k].des);
-
+  list.forEach(t=>{ const ym=t.data.slice(0,7); if(!months[ym]) months[ym]={rec:0,des:0}; if(t.tipo==='receita') months[ym].rec+=t.valor; else months[ym].des+=t.valor; });
+  const keys   = Object.keys(months).sort();
+  const labels = keys.map(k=>{ const [y,m]=k.split('-'); return ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(m)-1]+'/'+y.slice(2); });
   destroyChart('history');
   const ctx = document.getElementById('chart-history');
   if (!ctx) return;
-  charts.history = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Receitas', data: rec, borderColor: '#1aab5e', backgroundColor: 'rgba(26,171,94,.08)', fill: true, tension: .4, pointRadius: 4 },
-        { label: 'Despesas', data: des, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,.06)', fill: true, tension: .4, pointRadius: 4 },
-        { label: 'Saldo', data: sal, borderColor: '#6366f1', backgroundColor: 'transparent', borderDash: [4,3], tension: .4, pointRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { font: { family: 'Inter', size: 11 }, color: '#3d5a47' } } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#7a9585' } },
-        y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#7a9585', callback: v => 'R$'+(v>=1000?(v/1000).toFixed(1)+'k':v) } }
-      }
-    }
-  });
+  charts.history = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Receitas',data:keys.map(k=>months[k].rec),borderColor:'#1aab5e',backgroundColor:'rgba(26,171,94,.08)',fill:true,tension:.4,pointRadius:4},{label:'Despesas',data:keys.map(k=>months[k].des),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.06)',fill:true,tension:.4,pointRadius:4},{label:'Saldo',data:keys.map(k=>months[k].rec-months[k].des),borderColor:'#6366f1',backgroundColor:'transparent',borderDash:[4,3],tension:.4,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{family:'Inter',size:11},color:'#3d5a47'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'Inter',size:11},color:'#7a9585'}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{family:'Inter',size:11},color:'#7a9585',callback:v=>'R$'+(v>=1000?(v/1000).toFixed(1)+'k':v)}}}}});
+}
+
+/* ════════════════════════════════════════
+   TABS
+════════════════════════════════════════ */
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs=['overview','transactions','goals','parcelas','history'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  if (name==='overview')     renderCharts();
+  if (name==='transactions') renderTransactions();
+  if (name==='goals')        { renderGoals(); renderGoalsChart(); }
+  if (name==='parcelas')     renderParcelas();
+  if (name==='history')      { renderHistory(); renderHistoryChart(); }
 }
 
 /* ════════════════════════════════════════
@@ -1291,100 +1117,40 @@ function renderHistoryChart() {
 function exportPDF() {
   const list = getHistoryList();
   if (!list.length) { showToast('Sem transações para exportar.', true); return; }
-
-  const now = new Date().toLocaleDateString('pt-BR');
-  const rec = list.filter(t => t.tipo === 'receita').reduce((s,t) => s+t.valor, 0);
-  const des = list.filter(t => t.tipo === 'despesa').reduce((s,t) => s+t.valor, 0);
-  const sal = rec - des;
-
-  const rows = list.map(t => `
-    <tr>
-      <td>${new Date(t.data+'T12:00:00').toLocaleDateString('pt-BR')}</td>
-      <td>${t.desc}</td>
-      <td>${t.cat}</td>
-      <td>${t.tipo === 'receita' ? 'Receita' : 'Despesa'}</td>
-      <td style="text-align:right;color:${t.tipo === 'receita' ? '#1aab5e' : '#ef4444'};font-weight:600;">${t.tipo === 'receita' ? '+' : '−'} R$ ${Math.abs(t.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
-    </tr>`).join('');
-
-  const html = `<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8">
-  <style>
-    body{font-family:Arial,sans-serif;color:#0f2318;padding:32px;max-width:900px;margin:0 auto;}
-    h1{font-size:22px;margin-bottom:4px;}
-    .sub{color:#7a9585;font-size:13px;margin-bottom:24px;}
-    .cards{display:flex;gap:16px;margin-bottom:28px;}
-    .c{flex:1;border:1px solid #dde8e3;border-radius:12px;padding:14px 18px;}
-    .c-label{font-size:11px;color:#7a9585;text-transform:uppercase;font-weight:600;}
-    .c-val{font-size:20px;font-weight:700;margin-top:6px;}
-    .green{color:#1aab5e;}.red{color:#ef4444;}
-    table{width:100%;border-collapse:collapse;}
-    th{font-size:11px;color:#7a9585;text-align:left;padding:8px 10px;border-bottom:2px solid #dde8e3;text-transform:uppercase;font-weight:600;}
-    td{font-size:13px;padding:9px 10px;border-bottom:1px solid #f0f4f2;}
-    tr:hover td{background:#f7faf8;}
-    .footer{text-align:center;color:#7a9585;font-size:11px;margin-top:32px;border-top:1px solid #dde8e3;padding-top:16px;}
-  </style></head><body>
-  <h1>Going North — Extrato Financeiro</h1>
-  <div class="sub">Gerado em ${now} · ${list.length} transação(ões)</div>
-  <div class="cards">
-    <div class="c"><div class="c-label">Total Receitas</div><div class="c-val green">R$ ${rec.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
-    <div class="c"><div class="c-label">Total Despesas</div><div class="c-val red">R$ ${des.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
-    <div class="c"><div class="c-label">Saldo</div><div class="c-val ${sal>=0?'green':'red'}">${sal>=0?'+':'-'} R$ ${Math.abs(sal).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div>
-  </div>
-  <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead>
-  <tbody>${rows}</tbody></table>
-  <div class="footer">Going North — Controle Financeiro · goingNorth.com.br</div>
-  </body></html>`;
-
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => { win.print(); }, 400);
-  showToast('PDF gerado! Use Ctrl+P para salvar.');
+  const now  = new Date().toLocaleDateString('pt-BR');
+  const rec  = list.filter(t=>t.tipo==='receita').reduce((s,t)=>s+t.valor,0);
+  const des  = list.filter(t=>t.tipo==='despesa').reduce((s,t)=>s+t.valor,0);
+  const sal  = rec-des;
+  const rows = list.map(t=>`<tr><td>${new Date(t.data+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>${t.desc}</td><td>${t.cat}</td><td>${t.tipo==='receita'?'Receita':'Despesa'}</td><td style="text-align:right;color:${t.tipo==='receita'?'#1aab5e':'#ef4444'};font-weight:600;">${t.tipo==='receita'?'+':'-'} R$ ${Math.abs(t.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td></tr>`).join('');
+  const html = `<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;color:#0f2318;padding:32px;max-width:900px;margin:0 auto;}h1{font-size:22px;margin-bottom:4px;}.sub{color:#7a9585;font-size:13px;margin-bottom:24px;}.cards{display:flex;gap:16px;margin-bottom:28px;}.c{flex:1;border:1px solid #dde8e3;border-radius:12px;padding:14px 18px;}.c-label{font-size:11px;color:#7a9585;text-transform:uppercase;font-weight:600;}.c-val{font-size:20px;font-weight:700;margin-top:6px;}.green{color:#1aab5e;}.red{color:#ef4444;}table{width:100%;border-collapse:collapse;}th{font-size:11px;color:#7a9585;text-align:left;padding:8px 10px;border-bottom:2px solid #dde8e3;text-transform:uppercase;font-weight:600;}td{font-size:13px;padding:9px 10px;border-bottom:1px solid #f0f4f2;}.footer{text-align:center;color:#7a9585;font-size:11px;margin-top:32px;border-top:1px solid #dde8e3;padding-top:16px;}</style></head><body>
+    <h1>Going North — Extrato Financeiro</h1><div class="sub">Gerado em ${now} · ${list.length} transação(ões)</div>
+    <div class="cards"><div class="c"><div class="c-label">Total Receitas</div><div class="c-val green">R$ ${rec.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div><div class="c"><div class="c-label">Total Despesas</div><div class="c-val red">R$ ${des.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div><div class="c"><div class="c-label">Saldo</div><div class="c-val ${sal>=0?'green':'red'}">${sal>=0?'+':'-'} R$ ${Math.abs(sal).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div></div></div>
+    <table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="footer">Going North — Controle Financeiro</div></body></html>`;
+  const win = window.open('','_blank'); win.document.write(html); win.document.close();
+  setTimeout(()=>win.print(),400);
+  showToast('PDF gerado!');
 }
 
 /* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
-function init() {
-  loadState();
+async function init() {
+  const ok = await initAuth();
+  if (!ok) return;
 
-  // Set default date on modal
-  document.getElementById('tx-data').value = today();
+  document.getElementById('tx-data').value = todayStr();
 
-  // Seed demo data if empty
-  if (!state.transactions.length) {
-    const seed = [
-      { id: uid(), desc: 'Salário', valor: 6500, tipo: 'receita', cat: 'salário', data: '2025-03-05' },
-      { id: uid(), desc: 'Freelance Design', valor: 1300, tipo: 'receita', cat: 'freelance', data: '2025-03-10' },
-      { id: uid(), desc: 'Aluguel', valor: 1800, tipo: 'despesa', cat: 'moradia', data: '2025-03-01' },
-      { id: uid(), desc: 'Supermercado', valor: 780, tipo: 'despesa', cat: 'alimentação', data: '2025-03-08' },
-      { id: uid(), desc: 'Investimento CDB', valor: 1200, tipo: 'despesa', cat: 'investimento', data: '2025-03-15' },
-      { id: uid(), desc: 'Uber', valor: 120, tipo: 'despesa', cat: 'transporte', data: '2025-03-12' },
-      { id: uid(), desc: 'Cinema & Lazer', valor: 230, tipo: 'despesa', cat: 'lazer', data: '2025-03-18' },
-      { id: uid(), desc: 'Salário', valor: 6500, tipo: 'receita', cat: 'salário', data: '2025-02-05' },
-      { id: uid(), desc: 'Aluguel', valor: 1800, tipo: 'despesa', cat: 'moradia', data: '2025-02-01' },
-      { id: uid(), desc: 'Alimentação', valor: 650, tipo: 'despesa', cat: 'alimentação', data: '2025-02-10' },
-    ];
-    state.transactions = seed;
-  }
-  if (!state.goals.length) {
-    state.goals = [
-      { id: uid(), nome: 'Reserva de emergência', total: 20000, atual: 14800, prazo: '2025-12-31', cor: '#1aab5e' },
-      { id: uid(), nome: 'Viagem Europa', total: 15000, atual: 5700, prazo: '2026-06-30', cor: '#c8a96e' }
-    ];
-  }
-  if (!state.parcelas.length) {
-    state.parcelas = [
-      { id: uid(), desc: 'Financiamento Carro', valor: 1250, total: 48, pagas: 12, venc: 10, cat: 'transporte', status: 'ativa' },
-      { id: uid(), desc: 'Notebook Dell', valor: 380, total: 12, pagas: 5, venc: 15, cat: 'eletrônico', status: 'ativa' }
-    ];
-  }
-  saveState();
+  // Carrega todos os dados do banco em paralelo
+  showToast('Carregando dados...');
+  await Promise.all([dbLoadTransactions(), dbLoadGoals(), dbLoadParcelas()]);
 
   calcSummary();
   renderCharts();
 }
 
 document.addEventListener('DOMContentLoaded', init);
+</script>   
 </script>
 </body>
 </html>
