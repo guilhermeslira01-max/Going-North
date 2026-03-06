@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+l>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
 :root{
@@ -204,6 +205,17 @@ select.form-control{cursor:pointer;}
 /* ── SCROLL LIST ── */
 .scroll-list{max-height:380px;overflow-y:auto;padding-right:2px;}
 
+/* ── INDICADORES BAR ── */
+.ind-bar{background:var(--nav-bg);padding:8px 32px;display:flex;align-items:center;gap:0;overflow-x:auto;}
+.ind-item{display:flex;flex-direction:column;align-items:center;padding:0 20px;}
+.ind-label{font-size:.68rem;color:rgba(255,255,255,.45);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+.ind-val{font-size:.82rem;font-weight:700;color:#4ade80;font-family:var(--font-d);margin-top:1px;}
+.ind-sep{width:1px;height:28px;background:rgba(255,255,255,.10);flex-shrink:0;}
+.sync-wrap{margin-left:auto;padding-left:20px;}
+#btn-sync{background:rgba(26,171,94,.15);border:1px solid rgba(26,171,94,.3);color:#4ade80;padding:5px 14px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;white-space:nowrap;}
+#btn-sync:hover{background:rgba(26,171,94,.25);}
+#btn-sync:disabled{opacity:.6;cursor:wait;}
+
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){.hero-cards{grid-template-columns:1fr 1fr;}.products-grid{grid-template-columns:1fr 1fr;}.platform-grid{grid-template-columns:1fr 1fr;}.three-col{grid-template-columns:1fr;}}
 @media(max-width:700px){.hero-cards{grid-template-columns:1fr;}.two-col{grid-template-columns:1fr;}.products-grid{grid-template-columns:1fr;}.platform-grid{grid-template-columns:1fr;}.sim-grid{grid-template-columns:1fr;}.main{padding:16px;}.inv-hero{padding:24px 16px 36px;}.navbar{padding:0 16px;}.nav-links{display:none;}.form-row{grid-template-columns:1fr;}}
@@ -250,6 +262,22 @@ select.form-control{cursor:pointer;}
     </button>
   </div>
 </nav>
+
+<!-- ── INDICADORES BAR ── -->
+<div class="ind-bar" id="indicadores-bar-wrap">
+  <div style="display:flex;align-items:center;gap:0;flex:1;" id="indicadores-bar">
+    <div class="ind-item"><span class="ind-label">CDI</span><span class="ind-val">—</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">Selic</span><span class="ind-val">—</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">IPCA (12m)</span><span class="ind-val">—</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">Carregando...</span><span class="ind-val" style="color:rgba(255,255,255,.3);">⟳</span></div>
+  </div>
+  <div class="sync-wrap">
+    <button id="btn-sync" onclick="syncQuotes()">⟳ Atualizar cotações</button>
+  </div>
+</div>
 
 <!-- ── HERO BANNER ── -->
 <div class="inv-hero">
@@ -540,7 +568,7 @@ select.form-control{cursor:pointer;}
         <div class="sim-form">
           <div class="form-group">
             <label>Tipo de investimento</label>
-            <select class="form-control" id="sim-tipo" onchange="simular()">
+            <select class="form-control" id="sim-tipo" onchange="preencherTaxaReal()">
               <option value="cdi">Renda Fixa (% do CDI)</option>
               <option value="ipca">Tesouro IPCA+</option>
               <option value="selic">Tesouro Selic</option>
@@ -621,9 +649,13 @@ select.form-control{cursor:pointer;}
         <input class="form-control" id="inv-aporte" type="number" min="0" step="0.01" placeholder="0,00">
       </div>
       <div class="form-group">
-        <label>Valor atual (R$)</label>
-        <input class="form-control" id="inv-atual" type="number" min="0" step="0.01" placeholder="0,00">
+        <label>Qtd. de cotas <span style="font-weight:400;color:var(--text3);">(opcional)</span></label>
+        <input class="form-control" id="inv-qtd" type="number" min="0" step="any" placeholder="Ex: 10 cotas ou 0.005 BTC">
       </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Valor atual (R$) <span style="font-weight:400;color:var(--text3);">— deixe vazio para buscar via API</span></label>
+      <input class="form-control" id="inv-atual" type="number" min="0" step="0.01" placeholder="0,00 (preenchido automaticamente para ações/cripto)">
     </div>
     <div class="form-row" style="margin-bottom:14px;">
       <div class="form-group">
@@ -678,33 +710,73 @@ select.form-control{cursor:pointer;}
 
 <script>
 /* ════════════════════════════════════════
-   AUTH GUARD
+   SUPABASE + AUTH
 ════════════════════════════════════════ */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://qesurszlqesjbtcpnjwz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
+);
+
 let currentUser = null;
-(function() {
-  try {
-    const s = JSON.parse(localStorage.getItem('gn_session') || 'null');
-    if (!s || !s.email) { window.location.href = 'login.html'; return; }
-    currentUser = s;
-    const displayName = s.name ? s.name.split(' ')[0] : s.email.split('@')[0];
-    const initials = s.name ? s.name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('') : s.email[0].toUpperCase();
-    document.getElementById('nav-username').textContent = displayName;
-    document.getElementById('nav-avatar').textContent = initials;
-  } catch(e) { window.location.href = 'login.html'; }
-})();
-function doLogout() { localStorage.removeItem('gn_session'); window.location.href = 'login.html'; }
+
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return false; }
+  currentUser = session.user;
+  const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
+  const firstName = name.split(' ')[0];
+  const initials  = name.split(' ').slice(0,2).map(w => w[0].toUpperCase()).join('');
+  document.getElementById('nav-username').textContent = firstName;
+  document.getElementById('nav-avatar').textContent   = initials;
+  return true;
+}
+
+async function doLogout() { await sb.auth.signOut(); window.location.href = 'login.html'; }
 
 /* ════════════════════════════════════════
-   STATE
+   STATE + DB
 ════════════════════════════════════════ */
-function stateKey() { return 'gn_inv_' + (currentUser ? btoa(currentUser.email).replace(/=/g,'') : 'guest'); }
 let investments = [];
 
-function loadInv() {
-  try { investments = JSON.parse(localStorage.getItem(stateKey()) || '[]'); } catch(e) { investments = []; }
+async function loadInv() {
+  const { data, error } = await sb.from('investments').select('*').order('created_at');
+  if (error) { console.error('loadInv:', error); return; }
+  investments = (data || []).map(r => ({
+    id: r.id, nome: r.nome, nomeCompleto: r.nome_completo, tipo: r.tipo, inst: r.inst,
+    aporte: parseFloat(r.aporte), atual: parseFloat(r.atual), taxa: r.taxa, data: r.data,
+    cotas: r.cotas ? parseFloat(r.cotas) : null,
+    precoMedio:  r.preco_medio  ? parseFloat(r.preco_medio)  : null,
+    precoAtual:  r.preco_atual  ? parseFloat(r.preco_atual)  : null,
+    variacao24h: r.variacao_24h ? parseFloat(r.variacao_24h) : null,
+  }));
 }
-function saveInv() {
-  try { localStorage.setItem(stateKey(), JSON.stringify(investments)); } catch(e) {}
+
+async function dbAddInv(inv) {
+  const { data, error } = await sb.from('investments').insert({
+    user_id: currentUser.id, nome: inv.nome, nome_completo: inv.nomeCompleto||null,
+    tipo: inv.tipo, inst: inv.inst||null, aporte: inv.aporte, atual: inv.atual,
+    taxa: inv.taxa||null, data: inv.data||null, cotas: inv.cotas||null,
+    preco_medio: inv.precoMedio||null, preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null,
+  }).select().single();
+  if (error) { showToast('Erro ao salvar.', true); return null; }
+  return data.id;
+}
+
+async function dbUpdateInv(inv) {
+  await sb.from('investments').update({
+    atual: inv.atual, cotas: inv.cotas||null, preco_medio: inv.precoMedio||null,
+    preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null, nome_completo: inv.nomeCompleto||null,
+  }).eq('id', inv.id);
+}
+
+async function dbDeleteInv(id) {
+  const { error } = await sb.from('investments').delete().eq('id', id);
+  if (error) showToast('Erro ao remover.', true);
+}
+
+async function saveInv() {
+  await Promise.all(investments.map(inv => dbUpdateInv(inv)));
 }
 
 /* ════════════════════════════════════════
@@ -792,30 +864,36 @@ const tipoConfig = {
 /* ════════════════════════════════════════
    ADD / DELETE / EDIT
 ════════════════════════════════════════ */
-function addInvestimento() {
+async function addInvestimento() {
   const nome   = document.getElementById('inv-nome').value.trim();
   const tipo   = document.getElementById('inv-tipo').value;
   const inst   = document.getElementById('inv-inst').value.trim();
   const aporte = parseFloat(document.getElementById('inv-aporte').value);
+  const qtd    = parseFloat(document.getElementById('inv-qtd')?.value) || null;
   const atual  = parseFloat(document.getElementById('inv-atual').value) || aporte;
   const taxa   = document.getElementById('inv-taxa').value.trim();
   const data   = document.getElementById('inv-data').value;
 
   if (!nome || isNaN(aporte) || aporte <= 0) { showToast('Preencha nome e valor aportado.', true); return; }
 
-  investments.push({ id: uid(), nome, tipo, inst, aporte, atual, taxa, data: data || today() });
-  saveInv();
+  const inv = { nome, tipo, inst, aporte, atual, taxa, data: data || today() };
+  if (qtd && qtd > 0) { inv.cotas = qtd; inv.precoMedio = parseFloat((aporte / qtd).toFixed(6)); }
+
+  const id = await dbAddInv(inv);
+  if (!id) return;
+  inv.id = id;
+  investments.push(inv);
   closeModal('modal-inv');
-  ['inv-nome','inv-inst','inv-aporte','inv-atual','inv-taxa'].forEach(id => document.getElementById(id).value = '');
+  ['inv-nome','inv-inst','inv-aporte','inv-qtd','inv-atual','inv-taxa'].forEach(i => { const el = document.getElementById(i); if(el) el.value=''; });
   document.getElementById('inv-data').value = today();
   updateHero();
   renderInvestimentos();
-  showToast('Investimento adicionado!');
+  showToast('Investimento adicionado! Clique em "Atualizar cotações" para buscar o valor atual.');
 }
 
-function deleteInvestimento(id) {
+async function deleteInvestimento(id) {
+  await dbDeleteInv(id);
   investments = investments.filter(i => i.id !== id);
-  saveInv();
   updateHero();
   renderInvestimentos();
   showToast('Investimento removido.');
@@ -829,13 +907,12 @@ function openEdit(id) {
   openModal('modal-edit');
 }
 
-function saveEdit() {
+async function saveEdit() {
   const id = document.getElementById('edit-id').value;
   const val = parseFloat(document.getElementById('edit-atual').value);
   if (isNaN(val) || val < 0) { showToast('Valor inválido.', true); return; }
   const inv = investments.find(i => i.id === id);
-  if (inv) inv.atual = val;
-  saveInv();
+  if (inv) { inv.atual = val; await dbUpdateInv(inv); }
   closeModal('modal-edit');
   updateHero();
   renderInvestimentos();
@@ -1063,27 +1140,199 @@ function simular() {
 }
 
 /* ════════════════════════════════════════
+   CONFIG APIs
+════════════════════════════════════════ */
+const BRAPI_TOKEN = 'nkmxvyU4duvGAX1x5Fu9SM';
+const BRAPI_BASE  = 'https://brapi.dev/api';
+const BCB_BASE    = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs';
+const COINGECKO   = 'https://api.coingecko.com/api/v3';
+
+// Cache 5min
+const _cache = {};
+function setCache(key,data,ttl=300000){_cache[key]={data,exp:Date.now()+ttl};}
+function getCache(key){const c=_cache[key];return(c&&Date.now()<c.exp)?c.data:null;}
+
+/* ════════════════════════════════════════
+   API — BCB (CDI / Selic / IPCA)
+════════════════════════════════════════ */
+async function fetchIndicadores() {
+  const cached = getCache('ind'); if (cached) return cached;
+  try {
+    const [r1,r2,r3] = await Promise.all([
+      fetch(`${BCB_BASE}.12/dados/ultimos/1?formato=json`),
+      fetch(`${BCB_BASE}.432/dados/ultimos/1?formato=json`),
+      fetch(`${BCB_BASE}.433/dados/ultimos/12?formato=json`),
+    ]);
+    const [cdiJ,selicJ,ipcaJ] = await Promise.all([r1.json(),r2.json(),r3.json()]);
+    const data = {
+      cdi:   parseFloat(cdiJ[0]?.valor  || 13.65),
+      selic: parseFloat(selicJ[0]?.valor || 13.75),
+      ipca:  ipcaJ.reduce((s,m) => s + parseFloat(m.valor||0), 0),
+    };
+    setCache('ind', data, 600000);
+    return data;
+  } catch(e) {
+    return { cdi: 13.65, selic: 13.75, ipca: 4.83 };
+  }
+}
+
+/* ════════════════════════════════════════
+   API — BRAPI (Ações / FIIs)
+════════════════════════════════════════ */
+async function fetchQuotes(tickers) {
+  if (!tickers.length) return {};
+  const key = 'q_' + tickers.join(',');
+  const cached = getCache(key); if (cached) return cached;
+  try {
+    const res  = await fetch(`${BRAPI_BASE}/quote/${tickers.join(',')}?token=${BRAPI_TOKEN}&fundamental=false`);
+    const json = await res.json();
+    const map  = {};
+    (json.results||[]).forEach(r => {
+      map[r.symbol] = { price: r.regularMarketPrice, change: r.regularMarketChangePercent, name: r.longName||r.shortName||r.symbol };
+    });
+    setCache(key, map);
+    return map;
+  } catch(e) { return {}; }
+}
+
+/* ════════════════════════════════════════
+   API — CoinGecko (Cripto)
+════════════════════════════════════════ */
+const cryptoMap = {
+  bitcoin:'bitcoin',btc:'bitcoin',
+  ethereum:'ethereum',eth:'ethereum',
+  solana:'solana',sol:'solana',
+  bnb:'binancecoin',
+  xrp:'ripple',ripple:'ripple',
+  cardano:'cardano',ada:'cardano',
+  dogecoin:'dogecoin',doge:'dogecoin',
+  polkadot:'polkadot',dot:'polkadot',
+  avax:'avalanche-2',avalanche:'avalanche-2',
+};
+async function fetchCryptoPrices(names) {
+  if (!names.length) return {};
+  const ids = [...new Set(names.map(n => cryptoMap[n.toLowerCase()]).filter(Boolean))];
+  if (!ids.length) return {};
+  const key = 'cr_' + ids.join(',');
+  const cached = getCache(key); if (cached) return cached;
+  try {
+    const res  = await fetch(`${COINGECKO}/simple/price?ids=${ids.join(',')}&vs_currencies=brl&include_24hr_change=true`);
+    const json = await res.json();
+    const map  = {};
+    ids.forEach(id => { if (json[id]) map[id] = { price: json[id].brl, change: json[id].brl_24h_change }; });
+    setCache(key, map);
+    return map;
+  } catch(e) { return {}; }
+}
+
+/* ════════════════════════════════════════
+   DETECTAR TIPO DE ATIVO
+════════════════════════════════════════ */
+function detectTicker(inv) {
+  const nome = inv.nome.trim().toUpperCase();
+  if (/^[A-Z]{4}\d{1,2}$/.test(nome)) return { kind:'acao', ticker: nome };
+  const ck = inv.nome.trim().toLowerCase();
+  if (cryptoMap[ck]) return { kind:'cripto', id: cryptoMap[ck] };
+  return { kind:'manual' };
+}
+
+/* ════════════════════════════════════════
+   SINCRONIZAR COTAÇÕES
+════════════════════════════════════════ */
+async function syncQuotes() {
+  const btn = document.getElementById('btn-sync');
+  if (btn) { btn.disabled=true; btn.textContent='⟳ Atualizando...'; }
+  try {
+    const tickers  = [...new Set(investments.filter(i => detectTicker(i).kind==='acao').map(i => i.nome.trim().toUpperCase()))];
+    const cNames   = [...new Set(investments.filter(i => detectTicker(i).kind==='cripto').map(i => i.nome.trim().toLowerCase()))];
+    const [quotes, cryptos, ind] = await Promise.all([fetchQuotes(tickers), fetchCryptoPrices(cNames), fetchIndicadores()]);
+
+    let updated = 0;
+    investments.forEach(inv => {
+      const d = detectTicker(inv);
+      if (d.kind === 'acao') {
+        const q = quotes[d.ticker];
+        if (q) {
+          const cotas = inv.cotas || (inv.aporte / (inv.precoMedio || q.price));
+          inv.cotas = cotas; inv.precoMedio = inv.precoMedio || q.price;
+          inv.precoAtual = q.price; inv.variacao24h = q.change;
+          inv.atual = parseFloat((cotas * q.price).toFixed(2));
+          inv.nomeCompleto = q.name; updated++;
+        }
+      } else if (d.kind === 'cripto') {
+        const id = cryptoMap[inv.nome.trim().toLowerCase()];
+        const c  = cryptos[id];
+        if (c) {
+          const cotas = inv.cotas || (inv.aporte / (inv.precoMedio || c.price));
+          inv.cotas = cotas; inv.precoMedio = inv.precoMedio || c.price;
+          inv.precoAtual = c.price; inv.variacao24h = c.change;
+          inv.atual = parseFloat((cotas * c.price).toFixed(2)); updated++;
+        }
+      }
+    });
+
+    window._indicadores = ind;
+    saveInv(); updateHero(); renderInvestimentos(); renderIndicadoresBar(ind);
+    showToast(updated > 0 ? `✓ ${updated} ativo(s) atualizado(s) via API` : 'Cotações verificadas (sem ativos automáticos)');
+  } catch(e) {
+    showToast('Erro ao buscar cotações.', true);
+  } finally {
+    if (btn) { btn.disabled=false; btn.textContent='⟳ Atualizar cotações'; }
+  }
+}
+
+/* ════════════════════════════════════════
+   BARRA DE INDICADORES
+════════════════════════════════════════ */
+function renderIndicadoresBar(ind) {
+  const bar = document.getElementById('indicadores-bar');
+  if (!bar || !ind) return;
+  bar.innerHTML = `
+    <div class="ind-item"><span class="ind-label">CDI</span><span class="ind-val">${ind.cdi.toFixed(2)}% a.a.</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">Selic</span><span class="ind-val">${ind.selic.toFixed(2)}% a.a.</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">IPCA (12m)</span><span class="ind-val">${ind.ipca.toFixed(2)}%</span></div>
+    <div class="ind-sep"></div>
+    <div class="ind-item"><span class="ind-label">Atualizado às</span><span class="ind-val">${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
+}
+
+/* ════════════════════════════════════════
+   SIMULADOR — taxa real CDI/Selic
+════════════════════════════════════════ */
+async function preencherTaxaReal() {
+  const tipo = document.getElementById('sim-tipo').value;
+  const ind  = window._indicadores || await fetchIndicadores();
+  window._indicadores = ind;
+  let taxa = tipo === 'cdi' ? ind.cdi : tipo === 'selic' ? ind.selic : tipo === 'ipca' ? ind.ipca + 6 : 15;
+  document.getElementById('sim-taxa').value = Math.min(parseFloat(taxa.toFixed(2)), 30);
+  updateTaxa(); simular();
+}
+
+/* ════════════════════════════════════════
    INIT
 ════════════════════════════════════════ */
-function init() {
-  loadInv();
+async function init() {
+  const ok = await initAuth();
+  if (!ok) return;
+
   document.getElementById('inv-data').value = today();
-  updatePeriodo();
-  updateTaxa();
+  updatePeriodo(); updateTaxa();
 
-  // Demo data if empty
-  if (!investments.length) {
-    investments = [
-      { id:uid(), nome:'Tesouro Selic 2027', tipo:'Renda Fixa', inst:'Banco Inter', aporte:5000, atual:5420, taxa:'Selic', data:'2024-06-01' },
-      { id:uid(), nome:'CDB Nubank 110% CDI', tipo:'Renda Fixa', inst:'NuInvest', aporte:3000, atual:3280, taxa:'110% CDI', data:'2024-08-15' },
-      { id:uid(), nome:'PETR4', tipo:'Renda Variável', inst:'XP', aporte:2000, atual:2340, taxa:'', data:'2024-09-10' },
-      { id:uid(), nome:'HGLG11', tipo:'Fundo', inst:'XP', aporte:1500, atual:1620, taxa:'~9% a.a.', data:'2024-10-05' },
-    ];
-    saveInv();
-  }
-
+  // Carrega do banco Supabase
+  await loadInv();
   updateHero();
   renderInvestimentos();
+
+  // Indicadores reais do BCB
+  const ind = await fetchIndicadores();
+  window._indicadores = ind;
+  renderIndicadoresBar(ind);
+  document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
+  updateTaxa();
+
+  // Sincroniza cotações
+  syncQuotes();
 }
 
 document.addEventListener('DOMContentLoaded', init);
