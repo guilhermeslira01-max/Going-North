@@ -1,4 +1,4 @@
-l>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
@@ -720,7 +720,16 @@ const sb = createClient(
 
 let currentUser = null;
 
+const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
 async function initAuth() {
+  // Modo de preview local — pula autenticação
+  if (IS_DEV) {
+    currentUser = { id: 'dev-user', email: 'dev@preview.local', user_metadata: { name: 'Preview Dev' } };
+    document.getElementById('nav-username').textContent = 'Preview';
+    document.getElementById('nav-avatar').textContent   = 'PV';
+    return true;
+  }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return false; }
   currentUser = session.user;
@@ -739,7 +748,26 @@ async function doLogout() { await sb.auth.signOut(); window.location.href = 'log
 ════════════════════════════════════════ */
 let investments = [];
 
+// ── DEV helpers ──
+function devKey(k) { return 'gn_dev_inv_' + k; }
+function devLoad(k) { try { return JSON.parse(localStorage.getItem(devKey(k)) || '[]'); } catch(e) { return []; } }
+function devSave(k, v) { localStorage.setItem(devKey(k), JSON.stringify(v)); }
+function devUid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
 async function loadInv() {
+  if (IS_DEV) {
+    const saved = devLoad('investments');
+    if (saved.length) { investments = saved; return; }
+    // Seed data para preview
+    investments = [
+      { id: devUid(), nome:'PETR4',              tipo:'Renda Variável', inst:'XP',          aporte:2000, atual:2000, taxa:'',      data:'2024-09-10', cotas:50,   precoMedio:40    },
+      { id: devUid(), nome:'HGLG11',             tipo:'Fundo',          inst:'XP',          aporte:1500, atual:1500, taxa:'',      data:'2024-10-05', cotas:10,   precoMedio:150   },
+      { id: devUid(), nome:'Bitcoin',            tipo:'Cripto',         inst:'Binance',     aporte:3000, atual:3000, taxa:'',      data:'2024-11-01', cotas:0.05, precoMedio:60000 },
+      { id: devUid(), nome:'Tesouro Selic 2027', tipo:'Renda Fixa',     inst:'Banco Inter', aporte:5000, atual:5420, taxa:'Selic', data:'2024-06-01'  },
+    ];
+    devSave('investments', investments);
+    return;
+  }
   const { data, error } = await sb.from('investments').select('*').order('created_at');
   if (error) { console.error('loadInv:', error); return; }
   investments = (data || []).map(r => ({
@@ -753,6 +781,10 @@ async function loadInv() {
 }
 
 async function dbAddInv(inv) {
+  if (IS_DEV) {
+    const id = devUid(); const list = devLoad('investments');
+    list.push({ ...inv, id }); devSave('investments', list); return id;
+  }
   const { data, error } = await sb.from('investments').insert({
     user_id: currentUser.id, nome: inv.nome, nome_completo: inv.nomeCompleto||null,
     tipo: inv.tipo, inst: inv.inst||null, aporte: inv.aporte, atual: inv.atual,
@@ -764,6 +796,7 @@ async function dbAddInv(inv) {
 }
 
 async function dbUpdateInv(inv) {
+  if (IS_DEV) { const list = devLoad('investments'); const i = list.findIndex(x=>x.id===inv.id); if(i>=0) list[i]={...list[i],...inv}; devSave('investments',list); return; }
   await sb.from('investments').update({
     atual: inv.atual, cotas: inv.cotas||null, preco_medio: inv.precoMedio||null,
     preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null, nome_completo: inv.nomeCompleto||null,
@@ -771,11 +804,13 @@ async function dbUpdateInv(inv) {
 }
 
 async function dbDeleteInv(id) {
+  if (IS_DEV) { devSave('investments', devLoad('investments').filter(x=>x.id!==id)); return; }
   const { error } = await sb.from('investments').delete().eq('id', id);
   if (error) showToast('Erro ao remover.', true);
 }
 
 async function saveInv() {
+  if (IS_DEV) { devSave('investments', investments); return; }
   await Promise.all(investments.map(inv => dbUpdateInv(inv)));
 }
 
