@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Going North — Notícias</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.10);
+  --teal:#0d9488;--gold:#c8a96e;--red:#ef4444;
+  --bg:#f0f4f2;--surface:#fff;--surface2:#f7faf8;
+  --border:rgba(0,0,0,.07);
+  --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
+  --nav:#0f2318;
+  --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
+  --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 6px 28px rgba(0,0,0,.11);
+  --r-md:14px;--r-lg:20px;--r-xl:28px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:99px;}
+
+/* ── NAVBAR ── */
+.navbar{background:var(--nav);padding:0 32px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
+.nav-logo-icon{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.nav-links{display:flex;align-items:center;gap:4px;flex:1;}
+.nav-links a{color:rgba(255,255,255,.7);font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:7px;transition:all .2s;}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.07);}
+.nav-links a.active{color:#fff;background:var(--green);font-weight:600;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.85);font-size:.88rem;font-weight:500;}
+.nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;font-family:var(--font-d);}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font-b);}
+.btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--nav) 0%,#0a2b1a 60%,#071e12 100%);padding:40px 32px 52px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-100px;right:-80px;width:600px;height:600px;background:radial-gradient(circle,rgba(26,171,94,.13) 0%,transparent 65%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-40px;left:5%;width:350px;height:350px;background:radial-gradient(circle,rgba(13,148,136,.09) 0%,transparent 65%);pointer-events:none;}
+.hero-inner{max-width:1300px;margin:0 auto;}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(26,171,94,.15);border:1px solid rgba(26,171,94,.3);border-radius:20px;padding:5px 14px;font-size:.75rem;font-weight:600;color:#4ade80;margin-bottom:18px;letter-spacing:.04em;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.hero h1{font-family:var(--font-d);font-size:2.2rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:12px;}
+.hero h1 span{color:#4ade80;}
+.hero p{color:rgba(255,255,255,.55);font-size:.9rem;line-height:1.7;max-width:500px;margin-bottom:28px;}
+.hero-filters{display:flex;flex-wrap:wrap;gap:8px;}
+.hero-filter{padding:7px 18px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);background:transparent;transition:all .2s;font-family:var(--font-b);}
+.hero-filter:hover{border-color:var(--green);color:#fff;}
+.hero-filter.active{background:var(--green);border-color:var(--green);color:#fff;}
+
+/* ── TICKER ── */
+.ticker-wrap{background:rgba(26,171,94,.06);border-bottom:1px solid rgba(26,171,94,.15);padding:8px 0;overflow:hidden;white-space:nowrap;}
+.ticker-inner{display:inline-flex;gap:40px;animation:tickerScroll 30s linear infinite;}
+.ticker-inner:hover{animation-play-state:paused;}
+@keyframes tickerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;color:var(--text2);}
+.ticker-val{color:var(--text3);font-weight:400;}
+.ticker-up{color:var(--green);}
+.ticker-down{color:var(--red);}
+
+/* ── MAIN LAYOUT ── */
+.main{max-width:1300px;margin:0 auto;padding:28px 32px 60px;display:grid;grid-template-columns:1fr 340px;gap:28px;}
+
+/* ── NEWS SECTION ── */
+.news-section{}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.sec-title{font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
+.sec-dot{width:8px;height:8px;border-radius:2px;background:var(--green);}
+.sec-count{font-size:.78rem;color:var(--text3);font-weight:400;margin-left:4px;}
+.btn-refresh{background:var(--green-light);border:none;color:var(--green);padding:6px 14px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:var(--font-b);transition:all .2s;}
+.btn-refresh:hover{background:var(--green);color:#fff;}
+.btn-refresh.loading svg{animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── NEWS DESTAQUE ── */
+.news-featured{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px;cursor:pointer;transition:all .25s;display:grid;grid-template-columns:1fr 1fr;}
+.news-featured:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.news-featured-img{min-height:220px;background:linear-gradient(135deg,#0f2318,#1a4731);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.news-featured-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.news-featured-img-fallback{font-size:3.5rem;position:relative;z-index:1;}
+.news-featured-body{padding:24px;}
+.news-source-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.news-source{font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;}
+.news-time{font-size:.71rem;color:var(--text3);}
+.news-featured-title{font-family:var(--font-d);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:10px;}
+.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.news-read-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;transition:background .2s;}
+.news-read-btn:hover{background:var(--green-h);}
+
+/* ── NEWS LIST ── */
+.news-list{display:flex;flex-direction:column;gap:12px;}
+.news-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:1fr 80px;gap:14px;align-items:start;}
+.news-card:hover{border-color:var(--green);box-shadow:var(--shadow);}
+.news-card-cat{font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-card-meta{font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;}
+.news-card-img{width:80px;height:68px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#e2f0e9,#c5dfd1);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden;}
+.news-card-img img{width:100%;height:100%;object-fit:cover;}
+
+/* ── LOADING / EMPTY ── */
+.news-skeleton{display:flex;flex-direction:column;gap:12px;}
+.skel{background:linear-gradient(90deg,var(--surface2) 25%,#e8f0eb 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-lg);}
+@keyframes shimmer{to{background-position:-200% 0;}}
+.skel-feat{height:220px;}
+.skel-card{height:100px;}
+.empty-news{text-align:center;padding:40px;color:var(--text3);}
+.empty-news svg{margin-bottom:12px;opacity:.4;}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:20px;}
+
+/* ── CANAL CARD ── */
+.canal-card{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);}
+.canal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.canal-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);}
+.canal-tab-row{display:flex;gap:4px;padding:14px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.canal-tab{flex:1;padding:6px;border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .2s;font-family:var(--font-b);text-align:center;}
+.canal-tab.active{background:var(--green);color:#fff;}
+.canal-list{padding:12px 14px;display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;}
+.canal-item{border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s;border:1.5px solid transparent;}
+.canal-item:hover{border-color:var(--green);}
+.canal-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#0f2318,#1a4731);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.canal-thumb iframe{width:100%;height:100%;border:none;position:absolute;inset:0;}
+.canal-thumb-fallback{font-size:2rem;}
+.canal-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);transition:opacity .2s;}
+.canal-play svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
+.canal-item:hover .canal-play{opacity:0;}
+.canal-meta{padding:8px 10px;}
+.canal-vtitle{font-size:.78rem;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.canal-vch{font-size:.7rem;color:var(--text3);}
+
+/* ── INDICADORES CARD ── */
+.ind-card{background:var(--surface);border-radius:var(--r-xl);padding:20px;box-shadow:var(--shadow);}
+.ind-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.ind-list{display:flex;flex-direction:column;gap:10px;}
+.ind-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:10px;}
+.ind-name{font-size:.8rem;font-weight:600;color:var(--text2);}
+.ind-val{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--green);}
+.ind-sub{font-size:.7rem;color:var(--text3);margin-top:1px;}
+
+/* ── VIDEO MODAL ── */
+.video-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.video-overlay.open{display:flex;}
+.video-modal{background:#000;border-radius:var(--r-lg);overflow:hidden;width:100%;max-width:800px;position:relative;animation:popIn .25s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+.video-modal iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
+.video-modal-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1rem;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.video-modal-close:hover{background:rgba(255,255,255,.3);}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;}
+.page-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.page-btn:hover,.page-btn.active{background:var(--green);border-color:var(--green);color:#fff;}
+.page-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--nav);color:#fff;padding:13px 20px;border-radius:12px;font-size:.86rem;font-weight:500;box-shadow:var(--shadow-md);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{color:var(--green);}
+
+@media(max-width:1000px){.main{grid-template-columns:1fr;}.news-featured{grid-template-columns:1fr;}.news-featured-img{min-height:160px;}}
+@media(max-width:680px){.main{padding:16px 16px 48px;}.hero{padding:28px 16px 44px;}.navbar{padding:0 16px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    Going <span style="color:var(--green);margin-left:4px;">North</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="investimentos.html">Investimentos</a>
+    <a href="educacao.html">Educação</a>
+    <a href="noticias.html" class="active">Notícias</a>
+    <a href="consultoria.html">Consultoria</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span id="nav-username">...</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><span class="live-dot"></span>Ao vivo · Atualizado agora</div>
+    <h1>Fique por dentro do<br>mercado <span>financeiro</span></h1>
+    <p>Notícias em tempo real, vídeos dos maiores canais de finanças do Brasil e os principais indicadores do mercado.</p>
+    <div class="hero-filters">
+      <button class="hero-filter active" onclick="setCategoria('', this)">Todas</button>
+      <button class="hero-filter" onclick="setCategoria('economia', this)">Economia</button>
+      <button class="hero-filter" onclick="setCategoria('investimentos', this)">Investimentos</button>
+      <button class="hero-filter" onclick="setCategoria('bolsa', this)">Bolsa</button>
+      <button class="hero-filter" onclick="setCategoria('cripto', this)">Cripto</button>
+      <button class="hero-filter" onclick="setCategoria('renda fixa', this)">Renda Fixa</button>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item">IBOVESPA <span class="ticker-val" id="tick-ibov">carregando...</span></span>
+    <span class="ticker-item">CDI <span class="ticker-val" id="tick-cdi">--</span></span>
+    <span class="ticker-item">SELIC <span class="ticker-val" id="tick-selic">--</span></span>
+    <span class="ticker-item">IPCA 12m <span class="ticker-val" id="tick-ipca">--</span></span>
+    <span class="ticker-item">USD/BRL <span class="ticker-val" id="tick-usd">--</span></span>
+    <span class="ticker-item">BITCOIN <span class="ticker-val" id="tick-btc">--</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">IBOVESPA <span class="ticker-val">carregando...</span></span>
+    <span class="ticker-item">CDI <span class="ticker-val">--</span></span>
+    <span class="ticker-item">SELIC <span class="ticker-val">--</span></span>
+    <span class="ticker-item">IPCA 12m <span class="ticker-val">--</span></span>
+    <span class="ticker-item">USD/BRL <span class="ticker-val">--</span></span>
+    <span class="ticker-item">BITCOIN <span class="ticker-val">--</span></span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- NEWS COLUMN -->
+  <div class="news-section">
+    <div class="sec-head">
+      <div class="sec-title">
+        <div class="sec-dot"></div>
+        Últimas notícias
+        <span class="sec-count" id="news-count"></span>
+      </div>
+      <button class="btn-refresh" id="btn-refresh" onclick="loadNews()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Atualizar
+      </button>
+    </div>
+    <div id="news-container">
+      <div class="news-skeleton">
+        <div class="skel skel-feat"></div>
+        <div class="skel skel-card"></div>
+        <div class="skel skel-card"></div>
+        <div class="skel skel-card"></div>
+      </div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- INDICADORES -->
+    <div class="ind-card">
+      <div class="ind-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Indicadores do mercado
+      </div>
+      <div class="ind-list" id="ind-list">
+        <div class="ind-item"><div><div class="ind-name">CDI</div><div class="ind-sub">ao ano</div></div><div class="ind-val" id="ind-cdi">--</div></div>
+        <div class="ind-item"><div><div class="ind-name">Selic</div><div class="ind-sub">ao ano</div></div><div class="ind-val" id="ind-selic">--</div></div>
+        <div class="ind-item"><div><div class="ind-name">IPCA</div><div class="ind-sub">últimos 12 meses</div></div><div class="ind-val" id="ind-ipca">--</div></div>
+        <div class="ind-item"><div><div class="ind-name">Bitcoin</div><div class="ind-sub">em BRL</div></div><div class="ind-val" id="ind-btc">--</div></div>
+        <div class="ind-item"><div><div class="ind-name">Dólar</div><div class="ind-sub">compra</div></div><div class="ind-val" id="ind-usd">--</div></div>
+      </div>
+    </div>
+
+    <!-- CANAIS -->
+    <div class="canal-card">
+      <div class="canal-head">
+        <div class="canal-title">📺 Canais de finanças</div>
+      </div>
+      <div class="canal-tab-row" id="canal-tabs"></div>
+      <div class="canal-list" id="canal-list"></div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="video-overlay" id="video-overlay" onclick="closeVideo(event)">
+  <div class="video-modal" id="video-modal">
+    <button class="video-modal-close" onclick="document.getElementById('video-overlay').classList.remove('open')">✕</button>
+    <iframe id="video-iframe" allowfullscreen allow="autoplay"></iframe>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+/* ══════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════ */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://qesurszlqesjbtcpnjwz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
+);
+const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+(async function() {
+  if (IS_DEV) {
+    document.getElementById('nav-username').textContent = 'Preview';
+    document.getElementById('nav-avatar').textContent = 'PV';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+  const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
+  document.getElementById('nav-username').textContent = name.split(' ')[0];
+  document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
+})();
+
+async function doLogout() {
+  if (!IS_DEV) await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+/* ══════════════════════════════════════
+   GNEWS API
+══════════════════════════════════════ */
+const GNEWS_KEY = '96227d727885f04bace320ff8244fe5d';
+const GNEWS_BASE = 'https://gnews.io/api/v4';
+
+let allNews = [];
+let currentPage = 1;
+const PAGE_SIZE = 6;
+let currentCat = '';
+
+const catQueries = {
+  '': 'finanças OR investimento OR economia OR bolsa de valores Brasil',
+  'economia': 'economia brasileira OR PIB OR inflação IPCA',
+  'investimentos': 'investimentos OR ações OR fundos imobiliários',
+  'bolsa': 'Ibovespa OR B3 OR ações bolsa',
+  'cripto': 'bitcoin OR ethereum OR criptomoeda',
+  'renda fixa': 'tesouro direto OR CDB OR renda fixa',
+};
+
+function setCategoria(cat, btn) {
+  currentCat = cat;
+  currentPage = 1;
+  document.querySelectorAll('.hero-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadNews();
+}
+
+async function loadNews() {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('loading');
+  document.getElementById('news-container').innerHTML = `
+    <div class="news-skeleton">
+      <div class="skel skel-feat"></div>
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+    </div>`;
+
+  const query = encodeURIComponent(catQueries[currentCat] || catQueries['']);
+  const url = `${GNEWS_BASE}/search?q=${query}&lang=pt&country=br&max=10&apikey=${GNEWS_KEY}`;
+
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    if (!data.articles || data.articles.length === 0) {
+      document.getElementById('news-container').innerHTML = `
+        <div class="empty-news">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+          <p>Nenhuma notícia encontrada.<br>Tente outra categoria.</p>
+        </div>`;
+      document.getElementById('pagination').innerHTML = '';
+      btn.classList.remove('loading');
+      return;
+    }
+
+    allNews = data.articles;
+    document.getElementById('news-count').textContent = `· ${allNews.length} notícias`;
+    renderNews();
+  } catch(e) {
+    document.getElementById('news-container').innerHTML = `
+      <div class="empty-news">
+        <p>Erro ao carregar notícias. Verifique sua conexão.</p>
+      </div>`;
+  }
+  btn.classList.remove('loading');
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return `${m}min atrás`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h atrás`;
+  return `${Math.floor(h/24)}d atrás`;
+}
+
+function catLabel(url) {
+  if (!url) return 'Finanças';
+  if (url.includes('cripto')||url.includes('bitcoin')) return 'Cripto';
+  if (url.includes('acao')||url.includes('bolsa')||url.includes('b3')) return 'Bolsa';
+  if (url.includes('economia')) return 'Economia';
+  if (url.includes('investimento')) return 'Investimentos';
+  return 'Finanças';
+}
+
+function renderNews() {
+  const start   = (currentPage - 1) * PAGE_SIZE;
+  const page    = allNews.slice(start, start + PAGE_SIZE);
+  const [feat, ...rest] = page;
+
+  if (!feat) return;
+
+  const featHtml = `
+    <div class="news-featured" onclick="window.open('${feat.url}','_blank')">
+      <div class="news-featured-img">
+        ${feat.image
+          ? `<img src="${feat.image}" alt="" onerror="this.style.display='none'">`
+          : `<span class="news-featured-img-fallback">📰</span>`}
+      </div>
+      <div class="news-featured-body">
+        <div class="news-source-row">
+          <span class="news-source">${feat.source?.name || 'Notícia'}</span>
+          <span class="news-time">${timeAgo(feat.publishedAt)}</span>
+        </div>
+        <div class="news-featured-title">${feat.title}</div>
+        <div class="news-featured-desc">${feat.description || ''}</div>
+        <span class="news-read-btn">Ler notícia completa →</span>
+      </div>
+    </div>`;
+
+  const cardsHtml = rest.map(n => `
+    <div class="news-card" onclick="window.open('${n.url}','_blank')">
+      <div>
+        <div class="news-card-cat">${n.source?.name || 'Finanças'}</div>
+        <div class="news-card-title">${n.title}</div>
+        <div class="news-card-meta">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${timeAgo(n.publishedAt)}
+        </div>
+      </div>
+      <div class="news-card-img">
+        ${n.image
+          ? `<img src="${n.image}" alt="" onerror="this.style.display='none'">`
+          : '📰'}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('news-container').innerHTML = featHtml + `<div class="news-list">${cardsHtml}</div>`;
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(allNews.length / PAGE_SIZE);
+  if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  let html = `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">‹</button>`;
+  for (let i = 1; i <= total; i++) {
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" ${currentPage===total?'disabled':''} onclick="goPage(${currentPage+1})">›</button>`;
+  document.getElementById('pagination').innerHTML = html;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderNews();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════
+   INDICADORES (BCB + CoinGecko)
+══════════════════════════════════════ */
+async function loadIndicadores() {
+  try {
+    const [cdiRes, selicRes, ipcaRes] = await Promise.all([
+      fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados/ultimos/1?formato=json'),
+      fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json'),
+      fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json'),
+    ]);
+    const [cdi, selic, ipcaArr] = await Promise.all([cdiRes.json(), selicRes.json(), ipcaRes.json()]);
+    const cdiVal   = parseFloat(cdi[0]?.valor || 0);
+    const selicVal = parseFloat(selic[0]?.valor || 0);
+    const ipcaVal  = ipcaArr.reduce((s, x) => s + parseFloat(x.valor || 0), 0);
+
+    document.getElementById('ind-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
+    document.getElementById('ind-selic').textContent = selicVal.toFixed(2) + '% a.a.';
+    document.getElementById('ind-ipca').textContent  = ipcaVal.toFixed(2) + '%';
+
+    // Ticker
+    document.getElementById('tick-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
+    document.getElementById('tick-selic').textContent = selicVal.toFixed(2) + '% a.a.';
+    document.getElementById('tick-ipca').textContent  = ipcaVal.toFixed(2) + '%';
+  } catch(e) { console.warn('BCB err:', e); }
+
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true');
+    const d = await r.json();
+    const btc = d.bitcoin?.brl;
+    const chg = d.bitcoin?.brl_24h_change;
+    if (btc) {
+      const fmt = 'R$ ' + btc.toLocaleString('pt-BR', {maximumFractionDigits:0});
+      const chgFmt = (chg >= 0 ? '+' : '') + chg?.toFixed(2) + '%';
+      const cls = chg >= 0 ? 'ticker-up' : 'ticker-down';
+      document.getElementById('ind-btc').textContent = fmt;
+      document.getElementById('tick-btc').innerHTML = `${fmt} <span class="${cls}">${chgFmt}</span>`;
+    }
+  } catch(e) {}
+
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+    const d = await r.json();
+    const usd = parseFloat(d.USDBRL?.bid);
+    if (usd) {
+      const fmt = 'R$ ' + usd.toFixed(2);
+      document.getElementById('ind-usd').textContent  = fmt;
+      document.getElementById('tick-usd').textContent = fmt;
+    }
+  } catch(e) {}
+
+  try {
+    const r = await fetch('https://brapi.dev/api/quote/^BVSP?token=nkmxvyU4duvGAX1x5Fu9SM');
+    const d = await r.json();
+    const ibov = d.results?.[0];
+    if (ibov) {
+      const val = ibov.regularMarketPrice?.toLocaleString('pt-BR', {maximumFractionDigits:0});
+      const chg = ibov.regularMarketChangePercent?.toFixed(2);
+      const cls = ibov.regularMarketChangePercent >= 0 ? 'ticker-up' : 'ticker-down';
+      document.getElementById('tick-ibov').innerHTML = `${val} pts <span class="${cls}">${chg >= 0 ? '+' : ''}${chg}%</span>`;
+    }
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════
+   CANAIS DO YOUTUBE
+══════════════════════════════════════ */
+const canais = [
+  {
+    nome: 'Primo Rico',
+    id: 'primorico',
+    cor: '#1aab5e',
+    videos: [
+      { id: 'g_oD-oGeNgc', title: 'Como investir do ZERO em 2025 — Guia completo' },
+      { id: 'lQaEPHKxrqg', title: 'Tesouro Direto: tudo que você precisa saber' },
+      { id: 'Y4s4q8wBjbE', title: 'Como montar uma carteira de investimentos' },
+    ]
+  },
+  {
+    nome: 'Nath Finanças',
+    id: 'nathfinancas',
+    cor: '#ec4899',
+    videos: [
+      { id: 'oNFKFMD1tGs', title: 'Organize suas finanças em 5 passos simples' },
+      { id: 'ZSNUzMqwMaI', title: 'Reserva de emergência: quanto guardar e onde' },
+      { id: 'VxVkiJfXs6I', title: 'Como sair das dívidas de uma vez por todas' },
+    ]
+  },
+  {
+    nome: 'Primo Pobre',
+    id: 'primopobre',
+    cor: '#f97316',
+    videos: [
+      { id: 'iH-TdUkFNgI', title: 'Ações para iniciantes: como começar na bolsa' },
+      { id: 'Roh9OjHEWsQ', title: 'FIIs: renda mensal com fundos imobiliários' },
+      { id: 'bJCBqGI3BYE', title: 'CDB vs Tesouro Direto: qual rende mais?' },
+    ]
+  }
+];
+
+let activeCanalIdx = 0;
+
+function renderCanalTabs() {
+  document.getElementById('canal-tabs').innerHTML = canais.map((c, i) => `
+    <button class="canal-tab ${i === activeCanalIdx ? 'active' : ''}" onclick="switchCanal(${i})">${c.nome}</button>
+  `).join('');
+}
+
+function switchCanal(idx) {
+  activeCanalIdx = idx;
+  document.querySelectorAll('.canal-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  renderCanalVideos();
+}
+
+function renderCanalVideos() {
+  const canal = canais[activeCanalIdx];
+  document.getElementById('canal-list').innerHTML = canal.videos.map(v => `
+    <div class="canal-item" onclick="openVideo('${v.id}')">
+      <div class="canal-thumb">
+        <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="${v.title}" style="width:100%;height:100%;object-fit:cover;">
+        <div class="canal-play">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="rgba(255,255,255,.9)"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,.5)"/><polygon points="10,8 16,12 10,16" fill="white"/></svg>
+        </div>
+      </div>
+      <div class="canal-meta">
+        <div class="canal-vtitle">${v.title}</div>
+        <div class="canal-vch" style="color:${canal.cor}">${canal.nome}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   VIDEO PLAYER
+══════════════════════════════════════ */
+function openVideo(videoId) {
+  document.getElementById('video-iframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  document.getElementById('video-overlay').classList.add('open');
+}
+
+function closeVideo(e) {
+  if (e.target === document.getElementById('video-overlay')) {
+    document.getElementById('video-overlay').classList.remove('open');
+    document.getElementById('video-iframe').src = '';
+  }
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+async function init() {
+  renderCanalTabs();
+  renderCanalVideos();
+  await Promise.all([loadNews(), loadIndicadores()]);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
