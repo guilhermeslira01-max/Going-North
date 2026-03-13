@@ -1188,21 +1188,21 @@ function exportPDF() {
           td { padding: 10px; border-bottom: 1px solid #eee; font-size: 12px; }
           .summary { display: flex; gap: 20px; margin-bottom: 20px; }
           .card-pdf { border: 1px solid #eee; padding: 10px; border-radius: 8px; flex: 1; }
-        </style>
-      </head>
+        <\/style>
+      <\/head>
       <body>
-        <h1>Going North — Extrato</h1>
-        <p>Gerado em ${now}</p>
+        <h1>Going North — Extrato<\/h1>
+        <p>Gerado em ${now}<\/p>
         <div class="summary">
-          <div class="card-pdf"><b>Receitas:</b> R$ ${rec.toLocaleString('pt-BR')}</div>
-          <div class="card-pdf"><b>Despesas:</b> R$ ${des.toLocaleString('pt-BR')}</div>
-        </div>
+          <div class="card-pdf"><b>Receitas:<\/b> R$ ${rec.toLocaleString('pt-BR')}<\/div>
+          <div class="card-pdf"><b>Despesas:<\/b> R$ ${des.toLocaleString('pt-BR')}<\/div>
+        <\/div>
         <table>
-          <thead><tr><th>Data</th><th>Desc</th><th>Cat</th><th>Tipo</th><th style="text-align:right">Valor</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </body>
-    </html>`;
+          <thead><tr><th>Data<\/th><th>Desc<\/th><th>Cat<\/th><th>Tipo<\/th><th style="text-align:right">Valor<\/th><\/tr><\/thead>
+          <tbody>${rows}<\/tbody>
+        <\/table>
+      <\/body>
+    <\/html>`;
 
   const win = window.open('', '_blank');
   win.document.write(htmlContent);
