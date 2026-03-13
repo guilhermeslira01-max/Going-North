@@ -9,6 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* stylelint-disable */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
 :root{
   --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.12);--green-glow:rgba(26,171,94,.25);
@@ -146,7 +147,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .form-control:focus{border-color:var(--green);}
 select.form-control{cursor:pointer;}
 .range-wrap{display:flex;flex-direction:column;gap:8px;}
-.range-input{-webkit-appearance:none;width:100%;height:4px;border-radius:20px;background:var(--border);outline:none;cursor:pointer;}
+.range-input{appearance: none; -webkit-apperance: none; width: 100%; height: 4px; background: var(--border); outline: none; cursor: pointer;}
 .range-input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 0 3px rgba(26,171,94,.2);}
 .range-labels{display:flex;justify-content:space-between;font-size:.74rem;color:var(--text3);}
 
@@ -182,6 +183,7 @@ select.form-control{cursor:pointer;}
 .modal-overlay.open{display:flex;}
 .modal{background:#fff;border-radius:var(--r-xl);padding:32px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:slideUp .25s ease;}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
 .modal h3{font-family:var(--font-d);font-size:1.1rem;font-weight:700;margin-bottom:20px;color:var(--text);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
@@ -205,16 +207,24 @@ select.form-control{cursor:pointer;}
 /* ── SCROLL LIST ── */
 .scroll-list{max-height:380px;overflow-y:auto;padding-right:2px;}
 
-/* ── INDICADORES BAR ── */
-.ind-bar{background:var(--nav-bg);padding:8px 32px;display:flex;align-items:center;gap:0;overflow-x:auto;}
-.ind-item{display:flex;flex-direction:column;align-items:center;padding:0 20px;}
-.ind-label{font-size:.68rem;color:rgba(255,255,255,.45);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
-.ind-val{font-size:.82rem;font-weight:700;color:#4ade80;font-family:var(--font-d);margin-top:1px;}
-.ind-sep{width:1px;height:28px;background:rgba(255,255,255,.10);flex-shrink:0;}
-.sync-wrap{margin-left:auto;padding-left:20px;}
-#btn-sync{background:rgba(26,171,94,.15);border:1px solid rgba(26,171,94,.3);color:#4ade80;padding:5px 14px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;white-space:nowrap;}
-#btn-sync:hover{background:rgba(26,171,94,.25);}
-#btn-sync:disabled{opacity:.6;cursor:wait;}
+/* ── TICKER BAR ── */
+.ticker-wrap{background:#0a1c10;border-bottom:1px solid rgba(26,171,94,.15);overflow:hidden;height:36px;display:flex;align-items:center;position:relative;}
+.ticker-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:60px;background:linear-gradient(90deg,#0a1c10,transparent);z-index:2;pointer-events:none;}
+.ticker-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:60px;background:linear-gradient(270deg,#0a1c10,transparent);z-index:2;pointer-events:none;}
+.ticker-track{display:flex;align-items:center;gap:0;animation:tickerScroll 60s linear infinite;white-space:nowrap;}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ticker-item{display:inline-flex;align-items:center;gap:7px;padding:0 22px;border-right:1px solid rgba(255,255,255,.07);font-size:.76rem;}
+.ticker-name{font-weight:700;color:rgba(255,255,255,.6);font-family:var(--font-d);letter-spacing:.03em;font-size:.72rem;}
+.ticker-price{font-weight:700;color:#fff;font-family:var(--font-d);}
+.ticker-chg{font-weight:700;font-size:.71rem;}
+.ticker-chg.up{color:#4ade80;}
+.ticker-chg.dn{color:#f87171;}
+.ticker-chg.neu{color:rgba(255,255,255,.4);}
+.ticker-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.ticker-dot.up{background:#4ade80;}
+.ticker-dot.dn{background:#f87171;}
+.ticker-dot.neu{background:rgba(255,255,255,.3);}
 
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){.hero-cards{grid-template-columns:1fr 1fr;}.products-grid{grid-template-columns:1fr 1fr;}.platform-grid{grid-template-columns:1fr 1fr;}.three-col{grid-template-columns:1fr;}}
@@ -247,7 +257,7 @@ select.form-control{cursor:pointer;}
     <a href="dashboard.html">Dashboard</a>
     <a href="investimentos.html" class="active">Investimentos</a>
     <a href="educacao.html">Educação</a>
-    <a href="consultoria.html">Consultoria</a>
+    <a href="noticias.html">Notícias</a>
     <a href="sobre.html">Sobre</a>
     <a href="contato.html">Contato</a>
   </div>
@@ -263,19 +273,16 @@ select.form-control{cursor:pointer;}
   </div>
 </nav>
 
-<!-- ── INDICADORES BAR ── -->
-<div class="ind-bar" id="indicadores-bar-wrap">
-  <div style="display:flex;align-items:center;gap:0;flex:1;" id="indicadores-bar">
-    <div class="ind-item"><span class="ind-label">CDI</span><span class="ind-val">—</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">Selic</span><span class="ind-val">—</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">IPCA (12m)</span><span class="ind-val">—</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">Carregando...</span><span class="ind-val" style="color:rgba(255,255,255,.3);">⟳</span></div>
-  </div>
-  <div class="sync-wrap">
-    <button id="btn-sync" onclick="syncQuotes()">⟳ Atualizar cotações</button>
+<!-- ── TICKER BAR ── -->
+<div class="ticker-wrap" id="ticker-wrap">
+  <div class="ticker-track" id="ticker-track">
+    <!-- preenchido via JS -->
+    <div class="ticker-item"><span class="ticker-name">IBOVESPA</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">DÓLAR</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">BITCOIN</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">CDI</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">SELIC</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">IPCA</span><span class="ticker-price">—</span><span class="ticker-chg neu">—</span></div>
   </div>
 </div>
 
@@ -291,6 +298,14 @@ select.form-control{cursor:pointer;}
         <button class="btn-ghost-light" id="toggle-visibility" onclick="toggleVisibility()">
           <svg id="vis-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           Ocultar valores
+        </button>
+        <button class="btn-ghost-light" id="btn-sync" onclick="syncQuotes()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          Atualizar cotações
+        </button>
+        <button class="btn-ghost-light" onclick="exportPDFInv()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Exportar PDF
         </button>
         <button class="btn-primary" onclick="openModal('modal-inv')">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -741,7 +756,10 @@ async function initAuth() {
   return true;
 }
 
-async function doLogout() { await sb.auth.signOut(); window.location.href = 'login.html'; }
+async function doLogout() {
+  if (!IS_DEV) await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
 
 /* ════════════════════════════════════════
    STATE + DB
@@ -1276,7 +1294,7 @@ function detectTicker(inv) {
 ════════════════════════════════════════ */
 async function syncQuotes() {
   const btn = document.getElementById('btn-sync');
-  if (btn) { btn.disabled=true; btn.textContent='⟳ Atualizando...'; }
+  if (btn) { btn.disabled=true; btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .7s linear infinite"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Atualizando...'; }
   try {
     const tickers  = [...new Set(investments.filter(i => detectTicker(i).kind==='acao').map(i => i.nome.trim().toUpperCase()))];
     const cNames   = [...new Set(investments.filter(i => detectTicker(i).kind==='cripto').map(i => i.nome.trim().toLowerCase()))];
@@ -1307,29 +1325,148 @@ async function syncQuotes() {
     });
 
     window._indicadores = ind;
-    saveInv(); updateHero(); renderInvestimentos(); renderIndicadoresBar(ind);
+    saveInv(); updateHero(); renderInvestimentos();
+    // atualiza ticker com cotações recentes incluindo ativos da carteira
+    buildTickerData(ind).then(renderTicker);
     showToast(updated > 0 ? `✓ ${updated} ativo(s) atualizado(s) via API` : 'Cotações verificadas (sem ativos automáticos)');
   } catch(e) {
     showToast('Erro ao buscar cotações.', true);
   } finally {
-    if (btn) { btn.disabled=false; btn.textContent='⟳ Atualizar cotações'; }
+    if (btn) { btn.disabled=false; btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Atualizar cotações'; }
   }
 }
 
 /* ════════════════════════════════════════
-   BARRA DE INDICADORES
+   TICKER BAR — cotações em tempo real
 ════════════════════════════════════════ */
-function renderIndicadoresBar(ind) {
-  const bar = document.getElementById('indicadores-bar');
-  if (!bar || !ind) return;
-  bar.innerHTML = `
-    <div class="ind-item"><span class="ind-label">CDI</span><span class="ind-val">${ind.cdi.toFixed(2)}% a.a.</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">Selic</span><span class="ind-val">${ind.selic.toFixed(2)}% a.a.</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">IPCA (12m)</span><span class="ind-val">${ind.ipca.toFixed(2)}%</span></div>
-    <div class="ind-sep"></div>
-    <div class="ind-item"><span class="ind-label">Atualizado às</span><span class="ind-val">${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span></div>`;
+const AWESOME_API = 'https://economia.awesomeapi.com.br/json/last/USD-BRL';
+
+async function buildTickerData(ind) {
+  const items = [];
+
+  // BCB indicadores
+  if (ind) {
+    items.push({ name:'CDI',       price: ind.cdi.toFixed(2)+'% a.a.',  chg: null });
+    items.push({ name:'SELIC',     price: ind.selic.toFixed(2)+'% a.a.',chg: null });
+    items.push({ name:'IPCA 12m',  price: ind.ipca.toFixed(2)+'%',      chg: null });
+  }
+
+  // Dólar (AwesomeAPI)
+  try {
+    const res  = await fetch(AWESOME_API);
+    const json = await res.json();
+    const usd  = json['USDBRL'];
+    if (usd) {
+      const chg = parseFloat(usd.pctChange);
+      items.push({ name:'DÓLAR', price:'R$'+parseFloat(usd.bid).toFixed(2), chg });
+    }
+  } catch(e) {}
+
+  // Bitcoin (CoinGecko)
+  try {
+    const res  = await fetch(`${COINGECKO}/simple/price?ids=bitcoin,ethereum&vs_currencies=brl&include_24hr_change=true`);
+    const json = await res.json();
+    if (json.bitcoin) items.push({ name:'BITCOIN', price:'R$'+json.bitcoin.brl.toLocaleString('pt-BR'), chg: json.bitcoin.brl_24h_change });
+    if (json.ethereum) items.push({ name:'ETHEREUM', price:'R$'+json.ethereum.brl.toLocaleString('pt-BR'), chg: json.ethereum.brl_24h_change });
+  } catch(e) {}
+
+  // Ações do portfólio do usuário (BRAPI)
+  const tickers = [...new Set(investments.filter(i => detectTicker(i).kind==='acao').map(i => i.nome.trim().toUpperCase()))].slice(0,8);
+  if (tickers.length) {
+    try {
+      const quotes = await fetchQuotes(tickers);
+      tickers.forEach(t => {
+        if (quotes[t]) items.push({ name: t, price: 'R$'+quotes[t].price.toFixed(2), chg: quotes[t].change });
+      });
+    } catch(e) {}
+  }
+
+  return items;
+}
+
+function renderTicker(items) {
+  if (!items.length) return;
+  const fmt = (item) => {
+    const cls  = item.chg === null ? 'neu' : item.chg >= 0 ? 'up' : 'dn';
+    const sign = item.chg === null ? '' : item.chg >= 0 ? '+' : '';
+    const chgTxt = item.chg === null ? '' : ` ${sign}${item.chg.toFixed(2)}%`;
+    return `<div class="ticker-item">
+      ${item.chg !== null ? `<span class="ticker-dot ${cls}"></span>` : ''}
+      <span class="ticker-name">${item.name}</span>
+      <span class="ticker-price">${item.price}</span>
+      ${chgTxt ? `<span class="ticker-chg ${cls}">${chgTxt}</span>` : ''}
+    </div>`;
+  };
+  // duplica para loop infinito contínuo
+  const html = items.map(fmt).join('') + items.map(fmt).join('');
+  document.getElementById('ticker-track').innerHTML = html;
+
+  // ajusta velocidade: 80px por segundo, min 30s
+  const totalPx = items.length * 180;
+  const dur = Math.max(30, totalPx / 80);
+  document.getElementById('ticker-track').style.animationDuration = dur + 's';
+}
+
+/* ════════════════════════════════════════
+   EXPORTAR PDF — Carteira
+════════════════════════════════════════ */
+function exportPDFInv() {
+  if (!investments.length) { showToast('Sem investimentos para exportar.', true); return; }
+
+  const now   = new Date().toLocaleDateString('pt-BR');
+  const total = investments.reduce((s,i) => s + (i.aporte||0), 0);
+  const atual = investments.reduce((s,i) => s + (i.atual||i.aporte||0), 0);
+  const ganho = atual - total;
+  const rent  = total > 0 ? ((ganho/total)*100).toFixed(2) : '0.00';
+
+  const rows = investments.map(inv => {
+    const a = inv.atual || inv.aporte || 0;
+    const g = a - (inv.aporte||0);
+    const pct = inv.aporte > 0 ? ((g/inv.aporte)*100).toFixed(2) : '0.00';
+    const cor = g >= 0 ? '#1aab5e' : '#ef4444';
+    const sinal = g >= 0 ? '+' : '';
+    return `<tr>
+      <td>${inv.nome}</td>
+      <td>${inv.tipo||'—'}</td>
+      <td>${inv.inst||'—'}</td>
+      <td>R$ ${(inv.aporte||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      <td>R$ ${a.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      <td style="color:${cor};font-weight:600;">${sinal}R$ ${Math.abs(g).toLocaleString('pt-BR',{minimumFractionDigits:2})} (${sinal}${pct}%)</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<html><head><title>Carteira — Going North<\/title>
+  <style>
+    body{font-family:sans-serif;color:#0f2318;padding:28px;}
+    h1{font-size:1.4rem;margin-bottom:4px;}
+    p{font-size:.85rem;color:#7a9585;margin-bottom:20px;}
+    .summary{display:flex;gap:16px;margin-bottom:24px;}
+    .scard{border:1px solid #e2e8f0;border-radius:8px;padding:12px 18px;flex:1;}
+    .scard b{display:block;font-size:.75rem;color:#7a9585;margin-bottom:4px;}
+    .scard span{font-size:1.1rem;font-weight:700;}
+    table{width:100%;border-collapse:collapse;}
+    th{font-size:.72rem;color:#7a9585;text-align:left;padding:8px 10px;border-bottom:2px solid #eee;text-transform:uppercase;}
+    td{font-size:.82rem;padding:9px 10px;border-bottom:1px solid #f0f0f0;}
+    tr:hover td{background:#f7faf8;}
+  <\/style><\/head><body>
+  <h1>Going North — Carteira de Investimentos<\/h1>
+  <p>Gerado em ${now}<\/p>
+  <div class="summary">
+    <div class="scard"><b>Total investido<\/b><span>R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
+    <div class="scard"><b>Valor atual<\/b><span>R$ ${atual.toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
+    <div class="scard"><b>Ganho/Perda<\/b><span style="color:${ganho>=0?'#1aab5e':'#ef4444'}">${ganho>=0?'+':''}R$ ${Math.abs(ganho).toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
+    <div class="scard"><b>Rentabilidade<\/b><span style="color:${parseFloat(rent)>=0?'#1aab5e':'#ef4444'}">${parseFloat(rent)>=0?'+':''}${rent}%<\/span><\/div>
+  <\/div>
+  <table>
+    <thead><tr><th>Ativo<\/th><th>Tipo<\/th><th>Instituição<\/th><th>Aportado<\/th><th>Valor atual<\/th><th>Ganho/Perda<\/th><\/tr><\/thead>
+    <tbody>${rows}<\/tbody>
+  <\/table>
+  <\/body><\/html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
 }
 
 /* ════════════════════════════════════════
@@ -1354,7 +1491,6 @@ async function init() {
   document.getElementById('inv-data').value = today();
   updatePeriodo(); updateTaxa();
 
-  // Carrega do banco Supabase
   await loadInv();
   updateHero();
   renderInvestimentos();
@@ -1362,11 +1498,14 @@ async function init() {
   // Indicadores reais do BCB
   const ind = await fetchIndicadores();
   window._indicadores = ind;
-  renderIndicadoresBar(ind);
   document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
   updateTaxa();
 
-  // Sincroniza cotações
+  // Ticker animado com todos os dados
+  const tickerItems = await buildTickerData(ind);
+  renderTicker(tickerItems);
+
+  // Sincroniza cotações dos ativos
   syncQuotes();
 }
 
