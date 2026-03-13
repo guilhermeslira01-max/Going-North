@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Going North — Contato</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* stylelint-disable */
+
+/* ── GLOBAL POLISH ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+::selection{background:rgba(26,171,94,.18);color:var(--text);}
+*{-webkit-tap-highlight-color:transparent;}
+:root{
+  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.10);--green-glow:rgba(26,171,94,.22);
+  --teal:#0d9488;--gold:#c8a96e;
+  --bg:#f0f4f2;--surface:#fff;--surface2:#f7faf8;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.04);
+  --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
+  --nav:#0f2318;
+  --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;--font-s:'Lora',serif;
+  --shadow:0 2px 10px rgba(0,0,0,.06);--shadow-md:0 6px 24px rgba(0,0,0,.09);--shadow-lg:0 12px 40px rgba(0,0,0,.12);
+  --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;font-family:var(--font-b);}
+img{max-width:100%;height:auto;display:block;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:99px;}
+
+/* ── NAVBAR ── */
+.navbar{background:var(--nav);padding:0 32px;display:flex;align-items:center;height:62px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.05);}
+.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.05rem;margin-right:28px;white-space:nowrap;flex-shrink:0;}
+.nav-logo-icon{width:34px;height:34px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;overflow:hidden;}
+.nav-links a{color:rgba(255,255,255,.62);font-size:.82rem;font-weight:500;padding:6px 12px;border-radius:7px;transition:all .18s;white-space:nowrap;}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.08);}
+.nav-links a.active{color:#fff;background:var(--green);font-weight:600;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.82);font-size:.86rem;font-weight:500;}
+.nav-avatar{width:30px;height:30px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;font-family:var(--font-d);flex-shrink:0;}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);padding:5px 11px;border-radius:7px;font-size:.78rem;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px;}
+.btn-logout:hover{border-color:rgba(255,255,255,.28);color:#fff;}
+@media(max-width:1080px){.nav-links a:last-child{display:none;}}
+@media(max-width:960px){.nav-links a:nth-last-child(-n+2){display:none;}}
+@media(max-width:820px){.nav-links{display:none;}}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--nav);color:#fff;padding:12px 18px;border-radius:11px;font-size:.84rem;font-weight:500;box-shadow:var(--shadow-lg);z-index:10000;transform:translateY(70px);opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:8px;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{color:var(--green);flex-shrink:0;}
+
+/* ── PAGE STYLES ── */
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--nav) 0%,#0d3320 55%,#0a2b1a 100%);padding:52px 32px 64px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-80px;right:-60px;width:500px;height:500px;background:radial-gradient(circle,rgba(26,171,94,.15) 0%,transparent 65%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-60px;left:8%;width:380px;height:380px;background:radial-gradient(circle,rgba(13,148,136,.10) 0%,transparent 65%);pointer-events:none;}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(26,171,94,.15);border:1px solid rgba(26,171,94,.3);border-radius:20px;padding:5px 14px;font-size:.75rem;font-weight:600;color:#4ade80;margin-bottom:18px;letter-spacing:.04em;}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero h1{font-family:var(--font-d);font-size:2.4rem;font-weight:800;color:#fff;line-height:1.15;margin-bottom:16px;}
+.hero h1 span{color:#4ade80;}
+.hero-sub{color:rgba(255,255,255,.6);font-size:.95rem;line-height:1.75;margin-bottom:32px;}
+.hero-cards{display:flex;flex-direction:column;gap:12px;}
+.hero-contact-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);border-radius:var(--r-lg);padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .25s;}
+.hero-contact-card:hover{background:rgba(255,255,255,.10);border-color:rgba(26,171,94,.4);transform:translateX(4px);}
+.hcc-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;}
+.hcc-label{font-size:.73rem;color:rgba(255,255,255,.45);font-weight:500;margin-bottom:2px;}
+.hcc-val{font-size:.9rem;color:#fff;font-weight:600;}
+.hcc-arrow{margin-left:auto;color:rgba(255,255,255,.3);transition:all .2s;}
+.hero-contact-card:hover .hcc-arrow{color:var(--green);transform:translateX(3px);}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:40px 32px 80px;display:grid;grid-template-columns:1fr 420px;gap:32px;}
+
+/* ── FORM CARD ── */
+.form-card{background:var(--surface);border-radius:var(--r-xl);padding:36px;box-shadow:var(--shadow-md);}
+.form-card-title{font-family:var(--font-d);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:6px;}
+.form-card-sub{font-size:.86rem;color:var(--text3);margin-bottom:28px;line-height:1.6;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:7px;letter-spacing:.02em;}
+.form-control{width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:10px;font-size:.88rem;font-family:var(--font-b);color:var(--text);background:var(--surface2);outline:none;transition:all .2s;}
+.form-control::placeholder{color:var(--text3);}
+.form-control:focus{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(26,171,94,.08);}
+textarea.form-control{resize:vertical;min-height:130px;line-height:1.6;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9585' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+.char-count{text-align:right;font-size:.72rem;color:var(--text3);margin-top:4px;}
+.btn-submit{width:100%;padding:14px;border-radius:11px;background:var(--green);border:none;color:#fff;font-size:.93rem;font-weight:700;font-family:var(--font-d);cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:9px;letter-spacing:.01em;margin-top:4px;}
+.btn-submit:hover{background:var(--green-h);transform:translateY(-1px);box-shadow:0 6px 24px var(--green-glow);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-submit .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.btn-submit.loading .spinner{display:block;}
+.btn-submit.loading .btn-text{display:none;}
+.success-state{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;gap:16px;}
+.success-state.show{display:flex;}
+.success-icon{width:64px;height:64px;border-radius:50%;background:rgba(26,171,94,.12);display:flex;align-items:center;justify-content:center;animation:popIn .4s ease;}
+@keyframes popIn{from{transform:scale(0);}to{transform:scale(1);}}
+.success-state h3{font-family:var(--font-d);font-size:1.2rem;font-weight:700;color:var(--text);}
+.success-state p{font-size:.86rem;color:var(--text3);line-height:1.6;}
+.btn-reset{background:var(--green-light);border:none;color:var(--green);padding:10px 22px;border-radius:9px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s;margin-top:4px;}
+.btn-reset:hover{background:var(--green);color:#fff;}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:20px;}
+
+/* ── SOCIAL CARD ── */
+.social-card{background:var(--surface);border-radius:var(--r-xl);padding:24px;box-shadow:var(--shadow);}
+.card-title{font-family:var(--font-d);font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.social-links{display:flex;flex-direction:column;gap:10px;}
+.social-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .22s;}
+.social-item:hover{transform:translateX(4px);}
+.social-item.instagram:hover{border-color:#e1306c;background:rgba(225,48,108,.04);}
+.social-item.linkedin:hover{border-color:#0077b5;background:rgba(0,119,181,.04);}
+.social-item.whatsapp:hover{border-color:#25d366;background:rgba(37,211,102,.04);}
+.social-item.email:hover{border-color:var(--green);background:var(--green-light);}
+.social-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.social-info{flex:1;}
+.social-name{font-size:.86rem;font-weight:600;color:var(--text);}
+.social-handle{font-size:.75rem;color:var(--text3);margin-top:1px;}
+.social-arrow{color:var(--text3);transition:transform .2s;}
+.social-item:hover .social-arrow{transform:translateX(3px);}
+
+/* ── FAQ CARD ── */
+.faq-card{background:var(--surface);border-radius:var(--r-xl);padding:24px;box-shadow:var(--shadow);}
+.faq-list{display:flex;flex-direction:column;gap:8px;}
+.faq-item{border:1.5px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s;}
+.faq-item.open{border-color:rgba(26,171,94,.25);}
+.faq-question{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:12px;font-size:.86rem;font-weight:600;color:var(--text);transition:background .15s;}
+.faq-question:hover{background:var(--surface2);}
+.faq-item.open .faq-question{background:rgba(26,171,94,.05);color:var(--green);}
+.faq-chevron{width:18px;height:18px;flex-shrink:0;transition:transform .25s;}
+.faq-item.open .faq-chevron{transform:rotate(180deg);}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:.82rem;color:var(--text3);line-height:1.7;padding:0 16px;}
+.faq-item.open .faq-answer{max-height:300px;padding:0 16px 14px;}
+
+/* ── TOAST ── */
+
+@media(max-width:1000px){.hero-inner{grid-template-columns:1fr;gap:28px;}.main{grid-template-columns:1fr;}.hero{padding:40px 20px 48px;}}
+@media(max-width:680px){.hero{padding:32px 16px 44px;}.main{padding:24px 16px 60px;}.form-row{grid-template-columns:1fr;}.navbar{padding:0 16px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    Going <span style="color:var(--green);margin-left:4px;">North</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="investimentos.html">Investimentos</a>
+    <a href="educacao.html">Educação</a>
+    <a href="noticias.html">Notícias</a>
+    <a href="sobre.html">Sobre</a>
+    <a href="contato.html" class="active">Contato</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span id="nav-username">...</span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-tag"><span class="hero-dot"></span>Estamos aqui para ajudar</div>
+      <h1>Fala com a<br>gente! <span>😊</span></h1>
+      <p class="hero-sub">Tem alguma dúvida, sugestão ou precisa de ajuda com o Going North? A nossa equipe está sempre pronta para te atender com carinho.</p>
+    </div>
+    <div class="hero-cards">
+      <div class="hero-contact-card" onclick="document.getElementById('form-card').scrollIntoView({behavior:'smooth'})">
+        <div class="hcc-icon" style="background:rgba(26,171,94,.15);">✉️</div>
+        <div>
+          <div class="hcc-label">E-mail de suporte</div>
+          <div class="hcc-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a7d4d2d7c8d5d3c2e7c0c8cec9c0c9c8d5d3cf89c4c8ca89c5d5">[email&#160;protected]</a></div>
+        </div>
+        <div class="hcc-arrow">→</div>
+      </div>
+      <div class="hero-contact-card" onclick="openWhatsApp()">
+        <div class="hcc-icon" style="background:rgba(37,211,102,.12);">💬</div>
+        <div>
+          <div class="hcc-label">WhatsApp</div>
+          <div class="hcc-val">Atendimento rápido</div>
+        </div>
+        <div class="hcc-arrow">→</div>
+      </div>
+      <div class="hero-contact-card" onclick="window.open('https://instagram.com/goingnorth','_blank')">
+        <div class="hcc-icon" style="background:rgba(225,48,108,.10);">📸</div>
+        <div>
+          <div class="hcc-label">Instagram</div>
+          <div class="hcc-val">@goingnorth</div>
+        </div>
+        <div class="hcc-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- FORM -->
+  <div class="form-card" id="form-card">
+    <div id="form-content">
+      <div class="form-card-title">Envie sua mensagem 👋</div>
+      <div class="form-card-sub">Preencha o formulário abaixo e retornamos em até 24h. Nenhuma pergunta é pequena demais!</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Seu nome</label>
+          <input class="form-control" id="f-nome" type="text" placeholder="Pedro Henrique">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input class="form-control" id="f-email" type="email" placeholder="seu@email.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Assunto</label>
+        <select class="form-control form-select" id="f-assunto">
+          <option value="">Selecione o assunto...</option>
+          <option value="duvida">Dúvida sobre o produto</option>
+          <option value="bug">Reportar um problema técnico</option>
+          <option value="sugestao">Sugestão de melhoria</option>
+          <option value="financeiro">Dúvida financeira</option>
+          <option value="parceria">Parceria ou negócios</option>
+          <option value="outro">Outro assunto</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Mensagem</label>
+        <textarea class="form-control" id="f-msg" placeholder="Escreva sua mensagem aqui... Quanto mais detalhes, melhor podemos ajudar!" maxlength="800" oninput="updateCount()"></textarea>
+        <div class="char-count"><span id="char-count">0</span>/800</div>
+      </div>
+
+      <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+        <span class="btn-text">Enviar mensagem</span>
+        <div class="spinner"></div>
+        <svg class="send-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+
+    <div class="success-state" id="success-state">
+      <div class="success-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3>Mensagem enviada! 🎉</h3>
+      <p>Recebemos seu contato e retornaremos em breve no e-mail informado. Obrigado por falar com a gente!</p>
+      <button class="btn-reset" onclick="resetForm()">Enviar outra mensagem</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- REDES SOCIAIS -->
+    <div class="social-card">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Nossas redes sociais
+      </div>
+      <div class="social-links">
+
+        <div class="social-item instagram" onclick="window.open('https://instagram.com/goingnorth','_blank')">
+          <div class="social-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <div class="social-info">
+            <div class="social-name">Instagram</div>
+            <div class="social-handle">@goingnorth</div>
+          </div>
+          <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="social-item linkedin" onclick="window.open('https://linkedin.com/company/goingnorth','_blank')">
+          <div class="social-icon" style="background:#0077b5;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" fill="#fff"/></svg>
+          </div>
+          <div class="social-info">
+            <div class="social-name">LinkedIn</div>
+            <div class="social-handle">Going North</div>
+          </div>
+          <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="social-item whatsapp" onclick="openWhatsApp()">
+          <div class="social-icon" style="background:#25d366;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </div>
+          <div class="social-info">
+            <div class="social-name">WhatsApp</div>
+            <div class="social-handle">Atendimento rápido</div>
+          </div>
+          <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="social-item email" onclick="window.location.href='mailto:suporte@goingnorth.com.br'">
+          <div class="social-icon" style="background:var(--green);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="social-info">
+            <div class="social-name">E-mail</div>
+            <div class="social-handle"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="afdcdadfc0dddbcaefc8c0c6c1c8c1c0dddbc781ccc0c281cddd">[email&#160;protected]</a></div>
+          </div>
+          <svg class="social-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-card">
+      <div class="card-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Perguntas frequentes
+      </div>
+      <div class="faq-list" id="faq-list"></div>
+    </div>
+
+  </aside>
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+/* ══════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════ */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://qesurszlqesjbtcpnjwz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
+);
+const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+(async function() {
+  if (IS_DEV) {
+    document.getElementById('nav-username').textContent = 'Preview';
+    document.getElementById('nav-avatar').textContent = 'PV';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+  const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
+  const u = document.getElementById('f-nome');
+  if (u && !u.value) u.value = name;
+  document.getElementById('nav-username').textContent = name.split(' ')[0];
+  document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
+})();
+
+async function doLogout() {
+  if (!IS_DEV) await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+/* ══════════════════════════════════════
+   FORM
+══════════════════════════════════════ */
+function updateCount() {
+  const val = document.getElementById('f-msg').value;
+  document.getElementById('char-count').textContent = val.length;
+}
+
+async function submitForm() {
+  const nome    = document.getElementById('f-nome').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const assunto = document.getElementById('f-assunto').value;
+  const msg     = document.getElementById('f-msg').value.trim();
+
+  if (!nome)    { showToast('Informe seu nome.', true); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('E-mail inválido.', true); return; }
+  if (!assunto) { showToast('Selecione o assunto.', true); return; }
+  if (!msg || msg.length < 10) { showToast('Mensagem muito curta.', true); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  // Simula envio (substituir por integração real de e-mail se necessário)
+  await new Promise(r => setTimeout(r, 1800));
+
+  btn.classList.remove('loading'); btn.disabled = false;
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-state').classList.add('show');
+}
+
+function resetForm() {
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-assunto').value = '';
+  document.getElementById('f-msg').value = '';
+  document.getElementById('char-count').textContent = '0';
+  document.getElementById('form-content').style.display = 'block';
+  document.getElementById('success-state').classList.remove('show');
+}
+
+/* ══════════════════════════════════════
+   WHATSAPP
+══════════════════════════════════════ */
+function openWhatsApp() {
+  const msg = encodeURIComponent('Olá! Vim pelo Going North e gostaria de tirar uma dúvida.');
+  window.open(`https://wa.me/5500000000000?text=${msg}`, '_blank');
+}
+
+/* ══════════════════════════════════════
+   FAQ
+══════════════════════════════════════ */
+const faqs = [
+  {
+    q: 'O Going North é gratuito?',
+    a: 'Sim! O plano básico do Going North é totalmente gratuito. Você tem acesso ao dashboard, controle de transações, metas e muito mais sem pagar nada.'
+  },
+  {
+    q: 'Meus dados financeiros estão seguros?',
+    a: 'Absolutamente. Utilizamos criptografia de ponta e o banco de dados Supabase (PostgreSQL) com Row Level Security — o que significa que somente você tem acesso aos seus dados. Nunca compartilhamos informações com terceiros.'
+  },
+  {
+    q: 'Posso acessar de qualquer dispositivo?',
+    a: 'Sim! Como o Going North é uma aplicação web, você pode acessar de qualquer navegador — computador, celular ou tablet — e seus dados ficam sincronizados em tempo real.'
+  },
+  {
+    q: 'Como funciona a integração com investimentos?',
+    a: 'Conectamos com APIs reais (Brapi, CoinGecko e Banco Central) para buscar cotações de ações, FIIs e criptomoedas automaticamente. Para renda fixa, você informa os valores manualmente.'
+  },
+  {
+    q: 'Posso exportar meus dados?',
+    a: 'Sim! No dashboard, na aba Histórico, você pode exportar um extrato completo em PDF com todas as suas transações do período desejado.'
+  },
+  {
+    q: 'Com que frequência as notícias são atualizadas?',
+    a: 'As notícias são buscadas em tempo real da GNews API sempre que você acessa ou atualiza a página de Notícias, garantindo que você veja sempre as informações mais recentes do mercado financeiro.'
+  },
+];
+
+function renderFAQ() {
+  document.getElementById('faq-list').innerHTML = faqs.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <div class="faq-question" onclick="toggleFAQ(${i})">
+        <span>${f.q}</span>
+        <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-answer">${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFAQ(i) {
+  const item = document.getElementById('faq-' + i);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.querySelector('.toast-icon').textContent = isError ? '✕' : '✓';
+  t.querySelector('.toast-icon').style.color = isError ? '#ef4444' : 'var(--green)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
