@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-</head>
+    <!-- stylelint-disable -->
 <body>
 
     <!-- ── BACKGROUND LAYERS ── -->
@@ -30,7 +30,7 @@
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="investimentos.html">Investimentos</a></li>
                     <li><a href="educacao.html">Educação</a></li>
-                    <li><a href="consultoria.html">Consultoria</a></li>
+                    <li><a href="noticias.html">Notícias</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="contato.html">Contato</a></li>
                 </ul>
@@ -96,7 +96,7 @@
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="9" y="2" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="2" y="9" width="5" height="5" rx="1.2" fill="rgba(255,255,255,0.6)"/><rect x="9" y="9" width="5" height="5" rx="1.2" fill="#22c55e"/></svg>
                             Dashboard
                         </div>
-                        <span class="dc-date">Março 2025</span>
+                        <span class="dc-date">Março 2026</span>
                     </div>
                     <div class="dc-balance">
                         <div class="dc-balance-label">Patrimônio Total</div>
@@ -497,14 +497,13 @@
                         <a href="dashboard.html">Dashboard</a>
                         <a href="investimentos.html">Investimentos</a>
                         <a href="educacao.html">Educação</a>
-                        <a href="#planos">Planos</a>
+                        <a href="noticias.html">Notícias</a>
                     </div>
                     <div class="footer-col">
                         <div class="footer-col-title">Empresa</div>
                         <a href="sobre.html">Sobre nós</a>
-                        <a href="consultoria.html">Consultoria</a>
                         <a href="contato.html">Contato</a>
-                        <a href="#">Blog</a>
+                        <a href="noticias.html">Notícias</a>
                     </div>
                     <div class="footer-col">
                         <div class="footer-col-title">Legal</div>
@@ -516,7 +515,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>© 2025 Going North. Todos os direitos reservados.</span>
+                <span>© 2026 Going North. Todos os direitos reservados.</span>
                 <div class="footer-socials">
                     <a href="#" aria-label="Instagram">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
@@ -536,8 +535,10 @@
     // ── Active nav link ──
     (function () {
         const page = window.location.pathname.split('/').pop() || 'index.html';
+        const current = page === '' ? 'index.html' : page;
         document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === page);
+            const href = link.getAttribute('href');
+            link.classList.toggle('active', href === current || (current === 'index.html' && href === 'index.html'));
         });
     })();
 
