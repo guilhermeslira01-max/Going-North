@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Going North — Entrar</title>
+<link rel="icon" type="image/png" href="images/logo.png">
+<link rel="shortcut icon" type="image/png" href="images/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -204,10 +206,14 @@ body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;ali
 </div>
 
 <script>
-/* ── SUPABASE via Cloudflare Worker ── */
-const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
+/* ── SUPABASE ──
+   Auth (login/register/reset) vai DIRETO para o Supabase.
+   O Worker só é usado para queries de banco nas outras páginas.
+── */
+const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
-const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ── AUTO-REDIRECT se já logado ── */
 (async function() {
