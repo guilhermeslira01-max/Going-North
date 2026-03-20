@@ -11,12 +11,12 @@
 /* stylelint-disable */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.10);--green-glow:rgba(26,171,94,.25);
+  --green:#368547;--green-h:#13834a;--green-light:rgba(54,133,71,.10);--green-glow:rgba(54,133,71,.25);
   --teal:#0d9488;--gold:#c8a96e;--red:#ef4444;
   --bg:#f0f4f2;--surface:#fff;--surface2:#f7faf8;
   --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.04);
   --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
-  --nav:#0f2318;
+  --nav:#003333;
   --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;--font-s:'Lora',serif;
   --r-md:14px;--r-lg:20px;--r-xl:28px;
   --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 6px 28px rgba(0,0,0,.10);
@@ -29,8 +29,11 @@ a{text-decoration:none;color:inherit;}
 
 /* ── NAVBAR ── */
 .navbar{background:var(--nav);padding:0 32px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
-.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
-.nav-logo-icon{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.nav-logo{display:flex;align-items:center;gap:6px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
+.nav-logo-icon{width:40px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-role-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;}
+.badge-admin{background:#c8a96e;color:#0f2318;}
+.badge-pro{background:var(--green);color:#fff;}
 .nav-links{display:flex;align-items:center;gap:4px;flex:1;}
 .nav-links a{color:rgba(255,255,255,.7);font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:7px;transition:all .2s;}
 .nav-links a:hover{color:#fff;background:rgba(255,255,255,.07);}
@@ -42,7 +45,7 @@ a{text-decoration:none;color:inherit;}
 .btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(135deg,var(--nav) 0%,#0d3320 55%,#0a2b1a 100%);padding:48px 32px 56px;position:relative;overflow:hidden;}
+.hero{background:linear-gradient(135deg,var(--nav) 0%,#003d2a 55%,#002b1e 100%);padding:48px 32px 56px;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;top:-80px;right:-60px;width:500px;height:500px;background:radial-gradient(circle,rgba(26,171,94,.15) 0%,transparent 65%);pointer-events:none;}
 .hero::after{content:'';position:absolute;bottom:-60px;left:10%;width:400px;height:400px;background:radial-gradient(circle,rgba(13,148,136,.10) 0%,transparent 65%);pointer-events:none;}
 .hero-inner{max-width:1300px;margin:0 auto;}
@@ -164,9 +167,9 @@ a{text-decoration:none;color:inherit;}
 <nav class="navbar">
   <div class="nav-logo">
     <div class="nav-logo-icon">
-      <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <img src="images/logo.png" alt="Going North" style="height:34px;width:auto;display:block;">
     </div>
-    Going <span style="color:var(--green);margin-left:4px;">North</span>
+    Going<span style="color:var(--green);margin-left:2px;">North</span>
   </div>
   <div class="nav-links">
     <a href="index.html">Home</a>
@@ -181,6 +184,7 @@ a{text-decoration:none;color:inherit;}
     <div class="nav-user">
       <div class="nav-avatar" id="nav-avatar">?</div>
       <span id="nav-username">...</span>
+      <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
     </div>
     <button class="btn-logout" onclick="doLogout()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -268,24 +272,45 @@ a{text-decoration:none;color:inherit;}
 /* ══════════════════════════════════════
    SUPABASE + AUTH
 ══════════════════════════════════════ */
+const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
 const { createClient } = supabase;
-const sb = createClient(
-  'https://qesurszlqesjbtcpnjwz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
-);
+const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+let currentUser = null;
+
+function isAdmin() { return currentUser?.role === 'admin'; }
+function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
+
+function applyRoleBadge() {
+  const badge = document.getElementById('nav-role-badge');
+  if (!badge) return;
+  if (isAdmin()) {
+    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
+  } else if (isPro()) {
+    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
+  }
+}
 
 (async function() {
   if (IS_DEV) {
+    currentUser = { id: 'dev-user', role: 'admin' };
     document.getElementById('nav-username').textContent = 'Preview';
     document.getElementById('nav-avatar').textContent = 'PV';
+    applyRoleBadge();
     return;
   }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
+  currentUser = session.user;
   const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
   document.getElementById('nav-username').textContent = name.split(' ')[0];
   document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  try {
+    const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
+    currentUser.role = data?.role || 'free';
+  } catch(e) { currentUser.role = 'free'; }
+  applyRoleBadge();
 })();
 
 async function doLogout() {
@@ -297,20 +322,13 @@ async function doLogout() {
    ANTHROPIC API (artigos gerados por IA)
 ══════════════════════════════════════ */
 async function callAI(prompt, maxTokens = 1500) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch(WORKER_URL + '/api/ai', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: maxTokens,
-      system: `Você é um educador financeiro brasileiro especialista, escrevendo para o app Going North. 
-Escreva em português brasileiro, de forma clara, didática e acessível para iniciantes, mas com profundidade suficiente para ser útil.
-Sempre formate a resposta em HTML puro (sem markdown) usando: <h2>, <h3>, <p>, <ul><li>, <strong>, e <div class="highlight"> para destaques importantes.
-Seja prático e dê exemplos reais com valores em reais (R$). Nunca use blocos de código ou triple backticks.`,
+      system: `Você é um educador financeiro brasileiro especialista, escrevendo para o app Going North. Escreva em português brasileiro, de forma clara, didática e acessível para iniciantes, mas com profundidade suficiente para ser útil. Sempre formate a resposta em HTML puro (sem markdown) usando: <h2>, <h3>, <p>, <ul><li>, <strong>, e <div class="highlight"> para destaques importantes. Seja prático e dê exemplos reais com valores em reais (R$). Nunca use blocos de código ou triple backticks.`,
       messages: [{ role: 'user', content: prompt }]
     })
   });
@@ -337,8 +355,8 @@ const trilhas = [
     icon: '🌱',
     badge: 'COMEÇANDO DO ZERO',
     desc: 'Tudo que você precisa saber para organizar suas finanças e dar os primeiros passos.',
-    cor: '#1aab5e',
-    corBg: 'rgba(26,171,94,.10)',
+    cor: '#368547',
+    corBg: 'rgba(54,133,71,.10)',
     tempo: '~4h de leitura',
     topicos: [
       'Como montar um orçamento pessoal',
@@ -422,7 +440,7 @@ function renderFeatured() {
   const [main, ...sides] = featuredTopics;
   const bannerGrad = main.bg || 'linear-gradient(135deg,#0f2318,#1a4731)';
   document.getElementById('featured-grid').innerHTML = `
-    <div class="featured-main" onclick="openArticle('${main.tema}','#1aab5e','${main.cat.toUpperCase()}')">
+    <div class="featured-main" onclick="openArticle('${main.tema}','#368547','${main.cat.toUpperCase()}')">
       <div class="featured-banner" style="background:${bannerGrad};">
         <span class="featured-banner-icon">${main.icon}</span>
       </div>
@@ -438,7 +456,7 @@ function renderFeatured() {
     </div>
     <div class="featured-side">
       ${sides.map(s => `
-        <div class="side-article" onclick="openArticle('${s.tema}','#1aab5e','${s.cat.toUpperCase()}')">
+        <div class="side-article" onclick="openArticle('${s.tema}','#368547','${s.cat.toUpperCase()}')">
           <div class="side-article-icon">${s.icon}</div>
           <div>
             <div class="side-article-title">${s.title}</div>
@@ -508,7 +526,7 @@ function closeReader(e) {
 function searchTopic() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
-  openArticle(q, '#1aab5e', 'PESQUISA');
+  openArticle(q, '#368547', 'PESQUISA');
 }
 
 /* ══════════════════════════════════════
