@@ -105,7 +105,7 @@ a{text-decoration:none;color:inherit;}
 .news-source{font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;}
 .news-time{font-size:.71rem;color:var(--text3);}
 .news-featured-title{font-family:var(--font-d);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:10px;}
-.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp:3; overflow: hidden;}
+.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;}
 .news-read-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;transition:background .2s;}
 .news-read-btn:hover{background:var(--green-h);}
 
@@ -114,7 +114,7 @@ a{text-decoration:none;color:inherit;}
 .news-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:1fr 80px;gap:14px;align-items:start;}
 .news-card:hover{border-color:var(--green);box-shadow:var(--shadow);}
 .news-card-cat{font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
-.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display: -webkit-box;-webkit-line-clamp: 2; line-clamp:2; -webkit-box-orient: vertical;overflow: hidden; text-overflow: ellipsis;}
+.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display: -webkit-box;-webkit-line-clamp: 2;line-clamp: 2; -webkit-box-orient: vertical;overflow: hidden; text-overflow: ellipsis;}
 .news-card-meta{font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;}
 .news-card-img{width:80px;height:68px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#e2f0e9,#c5dfd1);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden;}
 .news-card-img img{width:100%;height:100%;object-fit:cover;}
@@ -327,7 +327,17 @@ function applyRoleBadge() {
     applyRoleBadge();
     return;
   }
-  const { data: { session } } = await sb.auth.getSession();
+
+  // Tenta getSession; se falhar aguarda onAuthStateChange (até 4s)
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    session = await new Promise(resolve => {
+      const timeout = setTimeout(() => resolve(null), 4000);
+      const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
+        if (s) { clearTimeout(timeout); subscription.unsubscribe(); resolve(s); }
+      });
+    });
+  }
   if (!session) { window.location.href = 'login.html'; return; }
   currentUser = session.user;
   const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
