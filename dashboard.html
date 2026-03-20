@@ -9,17 +9,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* stylelint-disable */
 /* ── RESET & TOKENS ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
 :root{
-  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.12);--green-glow:rgba(26,171,94,.22);
+  --green:#368547;--green-h:#13834a;--green-light:rgba(54,133,71,.12);--green-glow:rgba(54,133,71,.22);
   --teal:#0d9488;--teal-light:rgba(13,148,136,.12);
   --red:#ef4444;--red-light:rgba(239,68,68,.10);
   --gold:#c8a96e;--gold-light:rgba(200,169,110,.12);
   --bg:#f0f4f2;--surface:#ffffff;--surface2:#f7faf8;
   --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.04);
   --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
-  --nav-bg:#0f2318;--nav-text:rgba(255,255,255,.75);
+  --nav-bg:#003333;--nav-text:rgba(255,255,255,.75);
   --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:28px;
   --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 4px 24px rgba(0,0,0,.10);
   --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
@@ -34,8 +35,8 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 
 /* ── NAVBAR ── */
 .navbar{background:var(--nav-bg);padding:0 32px;display:flex;align-items:center;gap:0;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
-.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
-.nav-logo svg{background:var(--green);border-radius:9px;padding:4px;}
+.nav-logo{display:flex;align-items:center;gap:6px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
+.nav-logo-icon{width:40px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-links{display:flex;align-items:center;gap:4px;flex:1;}
 .nav-links a{color:var(--nav-text);font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:7px;transition:all .2s;}
 .nav-links a:hover{color:#fff;background:rgba(255,255,255,.07);}
@@ -43,7 +44,10 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
 .nav-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.85);font-size:.88rem;font-weight:500;}
 .nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:.75rem;font-weight:700;color:#fff;}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.nav-role-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;}
+.badge-admin{background:var(--gold);color:#0f2318;}
+.badge-pro{background:var(--green);color:#fff;}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font-b);}
 .btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
 
 /* ── LAYOUT ── */
@@ -224,17 +228,17 @@ select.form-control{cursor:pointer;}
 <!-- ── NAVBAR ── -->
 <nav class="navbar">
   <div class="nav-logo">
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    Going <span style="color:var(--green);margin-left:4px;">North</span>
+    <div class="nav-logo-icon">
+      <img src="images/logo.png" alt="Going North" style="height:34px;width:auto;display:block;">
+    </div>
+    Going<span style="color:var(--green);margin-left:2px;">North</span>
   </div>
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="dashboard.html" class="active">Dashboard</a>
     <a href="investimentos.html">Investimentos</a>
     <a href="educacao.html">Educação</a>
-    <a href="consultoria.html">Consultoria</a>
+    <a href="noticias.html">Notícias</a>
     <a href="sobre.html">Sobre</a>
     <a href="contato.html">Contato</a>
   </div>
@@ -242,6 +246,7 @@ select.form-control{cursor:pointer;}
     <div class="nav-user">
       <div class="nav-avatar" id="nav-avatar">?</div>
       <span id="nav-username">Carregando...</span>
+      <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
     </div>
     <button class="btn-logout" onclick="doLogout()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -337,7 +342,7 @@ select.form-control{cursor:pointer;}
           </div>
           <div class="month-nav">
             <button onclick="shiftYear(-1)">‹</button>
-            <span id="year-label">2025</span>
+            <span id="year-label">2026</span>
             <button onclick="shiftYear(1)">›</button>
           </div>
         </div>
@@ -650,42 +655,72 @@ select.form-control{cursor:pointer;}
 
 <script>
 /* ════════════════════════════════════════
-   SUPABASE
+   SUPABASE via Cloudflare Worker
 ════════════════════════════════════════ */
+const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
 const { createClient } = supabase;
-const sb = createClient(
-  'https://qesurszlqesjbtcpnjwz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
-);
+const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 
 /* ════════════════════════════════════════
-   AUTH GUARD
+   AUTH + ROLE GUARD
 ════════════════════════════════════════ */
 let currentUser = null;
 
 const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
+function isAdmin() { return currentUser?.role === 'admin'; }
+function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
+function isFree()  { return currentUser?.role === 'free'; }
+
+async function loadUserRole() {
+  if (IS_DEV) { currentUser.role = 'admin'; return; }
+  try {
+    const { data } = await sb
+      .from('profiles')
+      .select('role')
+      .eq('id', currentUser.id)
+      .single();
+    currentUser.role = data?.role || 'free';
+  } catch(e) { currentUser.role = 'free'; }
+}
+
+function applyRoleBadge() {
+  const badge = document.getElementById('nav-role-badge');
+  if (!badge) return;
+  if (isAdmin()) {
+    badge.textContent = 'Admin';
+    badge.className = 'nav-role-badge badge-admin';
+    badge.style.display = 'inline-flex';
+  } else if (isPro()) {
+    badge.textContent = 'Pro';
+    badge.className = 'nav-role-badge badge-pro';
+    badge.style.display = 'inline-flex';
+  }
+}
+
 async function initAuth() {
-  // Modo de preview local — pula autenticação
   if (IS_DEV) {
-    currentUser = { id: 'dev-user', email: 'dev@preview.local', user_metadata: { name: 'Preview Dev' } };
+    currentUser = { id: 'dev-user', email: 'dev@preview.local', user_metadata: { name: 'Preview Dev' }, role: 'admin' };
     document.getElementById('nav-username').textContent = 'Preview';
     document.getElementById('nav-avatar').textContent   = 'PV';
+    applyRoleBadge();
     return true;
   }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return false; }
   currentUser = session.user;
-  const name     = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
+  const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
   const firstName = name.split(' ')[0];
   const initials  = name.split(' ').slice(0,2).map(w => w[0].toUpperCase()).join('');
   document.getElementById('nav-username').textContent = firstName;
   document.getElementById('nav-avatar').textContent   = initials;
+  await loadUserRole();
+  applyRoleBadge();
   return true;
 }
 
 async function doLogout() {
-  await sb.auth.signOut();
+  if (!IS_DEV) await sb.auth.signOut();
   window.location.href = 'login.html';
 }
 
@@ -1165,40 +1200,44 @@ function exportPDF() {
   const sal = rec - des;
 
   const rows = list.map(t => {
-    const v = Math.abs(t.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2});
-    const color = t.tipo === 'receita' ? '#1aab5e' : '#ef4444';
+    const v     = Math.abs(t.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+    const color = t.tipo === 'receita' ? '#368547' : '#ef4444';
     const sinal = t.tipo === 'receita' ? '+' : '-';
     return `<tr>
-              <td>${new Date(t.data + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
-              <td>${t.desc}</td>
-              <td>${t.cat}</td>
-              <td>${t.tipo === 'receita' ? 'Receita' : 'Despesa'}</td>
-              <td style="text-align:right; color:${color}; font-weight:600;">${sinal} R$ ${v}</td>
-            </tr>`;
+      <td>${new Date(t.data + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${t.desc}</td>
+      <td>${t.cat}</td>
+      <td>${t.tipo === 'receita' ? 'Receita' : 'Despesa'}</td>
+      <td style="text-align:right;color:${color};font-weight:600;">${sinal} R$ ${v}</td>
+    </tr>`;
   }).join('');
 
   const htmlContent = `
     <html>
       <head>
-        <title>Extrato - Going North</title>
+        <title>Extrato - Going North<\/title>
         <style>
           body { font-family: sans-serif; color: #0f2318; padding: 20px; }
+          h1 { font-size: 1.3rem; margin-bottom: 4px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { text-align: left; border-bottom: 2px solid #eee; padding: 10px; font-size: 12px; }
+          th { text-align: left; border-bottom: 2px solid #eee; padding: 10px; font-size: 12px; color: #7a9585; text-transform: uppercase; }
           td { padding: 10px; border-bottom: 1px solid #eee; font-size: 12px; }
-          .summary { display: flex; gap: 20px; margin-bottom: 20px; }
-          .card-pdf { border: 1px solid #eee; padding: 10px; border-radius: 8px; flex: 1; }
+          .summary { display: flex; gap: 20px; margin: 16px 0 24px; }
+          .card-pdf { border: 1px solid #eee; padding: 12px 16px; border-radius: 8px; flex: 1; }
+          .card-pdf b { display: block; font-size: 11px; color: #7a9585; margin-bottom: 4px; }
+          .card-pdf span { font-size: 1.1rem; font-weight: 700; }
         <\/style>
       <\/head>
       <body>
         <h1>Going North — Extrato<\/h1>
-        <p>Gerado em ${now}<\/p>
+        <p style="color:#7a9585;font-size:13px;">Gerado em ${now}<\/p>
         <div class="summary">
-          <div class="card-pdf"><b>Receitas:<\/b> R$ ${rec.toLocaleString('pt-BR')}<\/div>
-          <div class="card-pdf"><b>Despesas:<\/b> R$ ${des.toLocaleString('pt-BR')}<\/div>
+          <div class="card-pdf"><b>Receitas<\/b><span style="color:#368547;">R$ ${rec.toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
+          <div class="card-pdf"><b>Despesas<\/b><span style="color:#ef4444;">R$ ${des.toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
+          <div class="card-pdf"><b>Saldo<\/b><span style="color:${sal>=0?'#368547':'#ef4444'};">${sal>=0?'+':'-'} R$ ${Math.abs(sal).toLocaleString('pt-BR',{minimumFractionDigits:2})}<\/span><\/div>
         <\/div>
         <table>
-          <thead><tr><th>Data<\/th><th>Desc<\/th><th>Cat<\/th><th>Tipo<\/th><th style="text-align:right">Valor<\/th><\/tr><\/thead>
+          <thead><tr><th>Data<\/th><th>Descrição<\/th><th>Categoria<\/th><th>Tipo<\/th><th style="text-align:right">Valor<\/th><\/tr><\/thead>
           <tbody>${rows}<\/tbody>
         <\/table>
       <\/body>
@@ -1221,22 +1260,18 @@ async function init() {
     const dataInput = document.getElementById('tx-data');
     if (dataInput) dataInput.value = todayStr();
 
-    console.log("Iniciando carregamento de dados...");
-    
-    // Tenta carregar os dados
     await Promise.all([
-      dbLoadTransactions().catch(e => console.error("Erro Transações:", e)),
-      dbLoadGoals().catch(e => console.error("Erro Metas:", e)),
-      dbLoadParcelas().catch(e => console.error("Erro Parcelas:", e))
+      dbLoadTransactions().catch(e => console.warn("Transações:", e)),
+      dbLoadGoals().catch(e => console.warn("Metas:", e)),
+      dbLoadParcelas().catch(e => console.warn("Parcelas:", e))
     ]);
 
     calcSummary();
     renderCharts();
-    console.log("Dashboard renderizado com sucesso!");
     
   } catch (error) {
-    console.error("Erro fatal no init:", error);
-    showToast("Erro ao carregar dashboard. Verifique o console.", true);
+    console.error("Erro ao carregar dashboard:", error);
+    showToast("Erro ao carregar dashboard.", true);
   }
 }
 
