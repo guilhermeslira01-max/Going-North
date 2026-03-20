@@ -732,8 +732,13 @@ select.form-control{cursor:pointer;}
    SUPABASE + AUTH
 ════════════════════════════════════════ */
 const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
+const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
-const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
+// sb = cliente direto para AUTH (getSession, signOut)
+// sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
+const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
+const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 
 let currentUser = null;
 
@@ -745,7 +750,7 @@ function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
   try {
-    const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
+    const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
   } catch(e) { currentUser.role = 'free'; }
 }
@@ -811,7 +816,7 @@ async function loadInv() {
     devSave('investments', investments);
     return;
   }
-  const { data, error } = await sb.from('investments').select('*').order('created_at');
+  const { data, error } = await sbDb.from('investments').select('*').order('created_at');
   if (error) { console.error('loadInv:', error); return; }
   investments = (data || []).map(r => ({
     id: r.id, nome: r.nome, nomeCompleto: r.nome_completo, tipo: r.tipo, inst: r.inst,
@@ -828,7 +833,7 @@ async function dbAddInv(inv) {
     const id = devUid(); const list = devLoad('investments');
     list.push({ ...inv, id }); devSave('investments', list); return id;
   }
-  const { data, error } = await sb.from('investments').insert({
+  const { data, error } = await sbDb.from('investments').insert({
     user_id: currentUser.id, nome: inv.nome, nome_completo: inv.nomeCompleto||null,
     tipo: inv.tipo, inst: inv.inst||null, aporte: inv.aporte, atual: inv.atual,
     taxa: inv.taxa||null, data: inv.data||null, cotas: inv.cotas||null,
@@ -840,7 +845,7 @@ async function dbAddInv(inv) {
 
 async function dbUpdateInv(inv) {
   if (IS_DEV) { const list = devLoad('investments'); const i = list.findIndex(x=>x.id===inv.id); if(i>=0) list[i]={...list[i],...inv}; devSave('investments',list); return; }
-  await sb.from('investments').update({
+  await sbDb.from('investments').update({
     atual: inv.atual, cotas: inv.cotas||null, preco_medio: inv.precoMedio||null,
     preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null, nome_completo: inv.nomeCompleto||null,
   }).eq('id', inv.id);
@@ -848,7 +853,7 @@ async function dbUpdateInv(inv) {
 
 async function dbDeleteInv(id) {
   if (IS_DEV) { devSave('investments', devLoad('investments').filter(x=>x.id!==id)); return; }
-  const { error } = await sb.from('investments').delete().eq('id', id);
+  const { error } = await sbDb.from('investments').delete().eq('id', id);
   if (error) showToast('Erro ao remover.', true);
 }
 
