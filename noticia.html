@@ -8,14 +8,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+/* stylelint-disable */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --green:#1aab5e;--green-h:#13834a;--green-light:rgba(26,171,94,.10);
+  --green:#368547;--green-h:#13834a;--green-light:rgba(54,133,71,.10);
   --teal:#0d9488;--gold:#c8a96e;--red:#ef4444;
   --bg:#f0f4f2;--surface:#fff;--surface2:#f7faf8;
   --border:rgba(0,0,0,.07);
   --text:#0f2318;--text2:#3d5a47;--text3:#7a9585;
-  --nav:#0f2318;
+  --nav:#003333;
   --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
   --shadow:0 2px 12px rgba(0,0,0,.07);--shadow-md:0 6px 28px rgba(0,0,0,.11);
   --r-md:14px;--r-lg:20px;--r-xl:28px;
@@ -28,8 +29,11 @@ a{text-decoration:none;color:inherit;}
 
 /* ── NAVBAR ── */
 .navbar{background:var(--nav);padding:0 32px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
-.nav-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
-.nav-logo-icon{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.nav-logo{display:flex;align-items:center;gap:6px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
+.nav-logo-icon{width:40px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-role-badge{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase;}
+.badge-admin{background:#c8a96e;color:#0f2318;}
+.badge-pro{background:var(--green);color:#fff;}
 .nav-links{display:flex;align-items:center;gap:4px;flex:1;}
 .nav-links a{color:rgba(255,255,255,.7);font-size:.84rem;font-weight:500;padding:6px 14px;border-radius:7px;transition:all .2s;}
 .nav-links a:hover{color:#fff;background:rgba(255,255,255,.07);}
@@ -41,7 +45,7 @@ a{text-decoration:none;color:inherit;}
 .btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
 
 /* ── HERO ── */
-.hero{background:linear-gradient(135deg,var(--nav) 0%,#0a2b1a 60%,#071e12 100%);padding:40px 32px 52px;position:relative;overflow:hidden;}
+.hero{background:linear-gradient(135deg,var(--nav) 0%,#003d2a 60%,#002b1e 100%);padding:40px 32px 52px;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;top:-100px;right:-80px;width:600px;height:600px;background:radial-gradient(circle,rgba(26,171,94,.13) 0%,transparent 65%);pointer-events:none;}
 .hero::after{content:'';position:absolute;bottom:-40px;left:5%;width:350px;height:350px;background:radial-gradient(circle,rgba(13,148,136,.09) 0%,transparent 65%);pointer-events:none;}
 .hero-inner{max-width:1300px;margin:0 auto;}
@@ -57,20 +61,28 @@ a{text-decoration:none;color:inherit;}
 .hero-filter.active{background:var(--green);border-color:var(--green);color:#fff;}
 
 /* ── TICKER ── */
-.ticker-wrap{background:rgba(26,171,94,.06);border-bottom:1px solid rgba(26,171,94,.15);padding:8px 0;overflow:hidden;white-space:nowrap;}
-.ticker-inner{display:inline-flex;gap:40px;animation:tickerScroll 30s linear infinite;}
-.ticker-inner:hover{animation-play-state:paused;}
-@keyframes tickerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.ticker-item{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;color:var(--text2);}
-.ticker-val{color:var(--text3);font-weight:400;}
-.ticker-up{color:var(--green);}
-.ticker-down{color:var(--red);}
+.ticker-wrap{background:#001a1a;border-bottom:1px solid rgba(54,133,71,.15);overflow:hidden;height:36px;display:flex;align-items:center;position:relative;}
+.ticker-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:60px;background:linear-gradient(90deg,#001a1a,transparent);z-index:2;pointer-events:none;}
+.ticker-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:60px;background:linear-gradient(270deg,#001a1a,transparent);z-index:2;pointer-events:none;}
+.ticker-track{display:flex;align-items:center;gap:0;animation:tickerScroll 60s linear infinite;white-space:nowrap;}
+.ticker-track:hover{animation-play-state:paused;}
+@keyframes tickerScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ticker-item{display:inline-flex;align-items:center;gap:7px;padding:0 22px;border-right:1px solid rgba(255,255,255,.07);font-size:.76rem;}
+.ticker-name{font-weight:700;color:rgba(255,255,255,.6);font-family:var(--font-d);letter-spacing:.03em;font-size:.72rem;}
+.ticker-price{font-weight:700;color:#fff;font-family:var(--font-d);}
+.ticker-chg{font-weight:700;font-size:.71rem;}
+.ticker-chg.up{color:#4ade80;}
+.ticker-chg.dn{color:#f87171;}
+.ticker-chg.neu{color:rgba(255,255,255,.4);}
+.ticker-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.ticker-dot.up{background:#4ade80;}
+.ticker-dot.dn{background:#f87171;}
+.ticker-dot.neu{background:rgba(255,255,255,.3);}
 
 /* ── MAIN LAYOUT ── */
 .main{max-width:1300px;margin:0 auto;padding:28px 32px 60px;display:grid;grid-template-columns:1fr 340px;gap:28px;}
 
 /* ── NEWS SECTION ── */
-.news-section{}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
 .sec-title{font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
 .sec-dot{width:8px;height:8px;border-radius:2px;background:var(--green);}
@@ -91,7 +103,7 @@ a{text-decoration:none;color:inherit;}
 .news-source{font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;}
 .news-time{font-size:.71rem;color:var(--text3);}
 .news-featured-title{font-family:var(--font-d);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:10px;}
-.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;}
 .news-read-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;transition:background .2s;}
 .news-read-btn:hover{background:var(--green-h);}
 
@@ -100,7 +112,7 @@ a{text-decoration:none;color:inherit;}
 .news-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:1fr 80px;gap:14px;align-items:start;}
 .news-card:hover{border-color:var(--green);box-shadow:var(--shadow);}
 .news-card-cat{font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
-.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display: -webkit-box;-webkit-line-clamp: 2; line-clamp: 2;-webkit-box-orient: vertical;overflow: hidden; text-overflow: ellipsis;}
 .news-card-meta{font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;}
 .news-card-img{width:80px;height:68px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#e2f0e9,#c5dfd1);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden;}
 .news-card-img img{width:100%;height:100%;object-fit:cover;}
@@ -117,25 +129,19 @@ a{text-decoration:none;color:inherit;}
 /* ── SIDEBAR ── */
 .sidebar{display:flex;flex-direction:column;gap:20px;}
 
-/* ── CANAL CARD ── */
-.canal-card{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);}
-.canal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.canal-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);}
-.canal-tab-row{display:flex;gap:4px;padding:14px 16px;background:var(--surface2);border-bottom:1px solid var(--border);}
-.canal-tab{flex:1;padding:6px;border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text3);transition:all .2s;font-family:var(--font-b);text-align:center;}
-.canal-tab.active{background:var(--green);color:#fff;}
-.canal-list{padding:12px 14px;display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;}
-.canal-item{border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s;border:1.5px solid transparent;}
-.canal-item:hover{border-color:var(--green);}
-.canal-thumb{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#0f2318,#1a4731);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-.canal-thumb iframe{width:100%;height:100%;border:none;position:absolute;inset:0;}
-.canal-thumb-fallback{font-size:2rem;}
-.canal-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);transition:opacity .2s;}
-.canal-play svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
-.canal-item:hover .canal-play{opacity:0;}
-.canal-meta{padding:8px 10px;}
-.canal-vtitle{font-size:.78rem;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.canal-vch{font-size:.7rem;color:var(--text3);}
+/* ── JORNAIS CARD ── */
+.jornal-card{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);}
+.jornal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);}
+.jornal-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);}
+.jornal-list{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.jornal-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .2s;text-decoration:none;}
+.jornal-item:hover{border-color:var(--green);background:#fff;box-shadow:var(--shadow);}
+.jornal-logo{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;font-weight:800;font-family:var(--font-d);}
+.jornal-info{flex:1;min-width:0;}
+.jornal-name{font-size:.84rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+.jornal-desc{font-size:.72rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jornal-arrow{color:var(--text3);transition:color .2s;flex-shrink:0;}
+.jornal-item:hover .jornal-arrow{color:var(--green);}
 
 /* ── INDICADORES CARD ── */
 .ind-card{background:var(--surface);border-radius:var(--r-xl);padding:20px;box-shadow:var(--shadow);}
@@ -145,15 +151,6 @@ a{text-decoration:none;color:inherit;}
 .ind-name{font-size:.8rem;font-weight:600;color:var(--text2);}
 .ind-val{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--green);}
 .ind-sub{font-size:.7rem;color:var(--text3);margin-top:1px;}
-
-/* ── VIDEO MODAL ── */
-.video-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
-.video-overlay.open{display:flex;}
-.video-modal{background:#000;border-radius:var(--r-lg);overflow:hidden;width:100%;max-width:800px;position:relative;animation:popIn .25s ease;}
-@keyframes popIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
-.video-modal iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
-.video-modal-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1rem;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;transition:background .2s;}
-.video-modal-close:hover{background:rgba(255,255,255,.3);}
 
 /* ── PAGINATION ── */
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;}
@@ -176,9 +173,9 @@ a{text-decoration:none;color:inherit;}
 <nav class="navbar">
   <div class="nav-logo">
     <div class="nav-logo-icon">
-      <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <img src="images/logo.png" alt="Going North" style="height:34px;width:auto;display:block;">
     </div>
-    Going <span style="color:var(--green);margin-left:4px;">North</span>
+    Going<span style="color:var(--green);margin-left:2px;">North</span>
   </div>
   <div class="nav-links">
     <a href="index.html">Home</a>
@@ -186,12 +183,14 @@ a{text-decoration:none;color:inherit;}
     <a href="investimentos.html">Investimentos</a>
     <a href="educacao.html">Educação</a>
     <a href="noticias.html" class="active">Notícias</a>
-    <a href="consultoria.html">Consultoria</a>
+    <a href="sobre.html">Sobre</a>
+    <a href="contato.html">Contato</a>
   </div>
   <div class="nav-right">
     <div class="nav-user">
       <div class="nav-avatar" id="nav-avatar">?</div>
       <span id="nav-username">...</span>
+      <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
     </div>
     <button class="btn-logout" onclick="doLogout()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
@@ -219,20 +218,13 @@ a{text-decoration:none;color:inherit;}
 
 <!-- TICKER -->
 <div class="ticker-wrap">
-  <div class="ticker-inner" id="ticker">
-    <span class="ticker-item">IBOVESPA <span class="ticker-val" id="tick-ibov">carregando...</span></span>
-    <span class="ticker-item">CDI <span class="ticker-val" id="tick-cdi">--</span></span>
-    <span class="ticker-item">SELIC <span class="ticker-val" id="tick-selic">--</span></span>
-    <span class="ticker-item">IPCA 12m <span class="ticker-val" id="tick-ipca">--</span></span>
-    <span class="ticker-item">USD/BRL <span class="ticker-val" id="tick-usd">--</span></span>
-    <span class="ticker-item">BITCOIN <span class="ticker-val" id="tick-btc">--</span></span>
-    <!-- duplicate for seamless loop -->
-    <span class="ticker-item">IBOVESPA <span class="ticker-val">carregando...</span></span>
-    <span class="ticker-item">CDI <span class="ticker-val">--</span></span>
-    <span class="ticker-item">SELIC <span class="ticker-val">--</span></span>
-    <span class="ticker-item">IPCA 12m <span class="ticker-val">--</span></span>
-    <span class="ticker-item">USD/BRL <span class="ticker-val">--</span></span>
-    <span class="ticker-item">BITCOIN <span class="ticker-val">--</span></span>
+  <div class="ticker-track" id="ticker-track">
+    <div class="ticker-item"><span class="ticker-name">CDI</span><span class="ticker-price">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">SELIC</span><span class="ticker-price">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">IPCA 12m</span><span class="ticker-price">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">DÓLAR</span><span class="ticker-price">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">BITCOIN</span><span class="ticker-price">—</span></div>
+    <div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-price">—</span></div>
   </div>
 </div>
 
@@ -281,25 +273,17 @@ a{text-decoration:none;color:inherit;}
       </div>
     </div>
 
-    <!-- CANAIS -->
-    <div class="canal-card">
-      <div class="canal-head">
-        <div class="canal-title">📺 Canais de finanças</div>
+    <!-- JORNAIS INFORMATIVOS -->
+    <div class="jornal-card">
+      <div class="jornal-head">
+        <div class="jornal-title">🗞️ Jornais e portais</div>
       </div>
-      <div class="canal-tab-row" id="canal-tabs"></div>
-      <div class="canal-list" id="canal-list"></div>
+      <div class="jornal-list" id="jornal-list"></div>
     </div>
 
   </aside>
 </div>
 
-<!-- VIDEO MODAL -->
-<div class="video-overlay" id="video-overlay" onclick="closeVideo(event)">
-  <div class="video-modal" id="video-modal">
-    <button class="video-modal-close" onclick="document.getElementById('video-overlay').classList.remove('open')">✕</button>
-    <iframe id="video-iframe" allowfullscreen allow="autoplay"></iframe>
-  </div>
-</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
@@ -308,24 +292,45 @@ a{text-decoration:none;color:inherit;}
 /* ══════════════════════════════════════
    SUPABASE + AUTH
 ══════════════════════════════════════ */
+const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
 const { createClient } = supabase;
-const sb = createClient(
-  'https://qesurszlqesjbtcpnjwz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
-);
+const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+let currentUser = null;
+
+function isAdmin() { return currentUser?.role === 'admin'; }
+function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
+
+function applyRoleBadge() {
+  const badge = document.getElementById('nav-role-badge');
+  if (!badge) return;
+  if (isAdmin()) {
+    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
+  } else if (isPro()) {
+    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
+  }
+}
 
 (async function() {
   if (IS_DEV) {
+    currentUser = { id: 'dev-user', role: 'admin' };
     document.getElementById('nav-username').textContent = 'Preview';
     document.getElementById('nav-avatar').textContent = 'PV';
+    applyRoleBadge();
     return;
   }
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
+  currentUser = session.user;
   const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
   document.getElementById('nav-username').textContent = name.split(' ')[0];
   document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
+  try {
+    const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
+    currentUser.role = data?.role || 'free';
+  } catch(e) { currentUser.role = 'free'; }
+  applyRoleBadge();
 })();
 
 async function doLogout() {
@@ -484,9 +489,12 @@ function goPage(p) {
 }
 
 /* ══════════════════════════════════════
-   INDICADORES (BCB + CoinGecko)
+   INDICADORES + TICKER DINÂMICO
 ══════════════════════════════════════ */
 async function loadIndicadores() {
+  const items = [];
+
+  // BCB — CDI, Selic, IPCA
   try {
     const [cdiRes, selicRes, ipcaRes] = await Promise.all([
       fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados/ultimos/1?formato=json'),
@@ -498,134 +506,102 @@ async function loadIndicadores() {
     const selicVal = parseFloat(selic[0]?.valor || 0);
     const ipcaVal  = ipcaArr.reduce((s, x) => s + parseFloat(x.valor || 0), 0);
 
+    // Sidebar
     document.getElementById('ind-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
     document.getElementById('ind-selic').textContent = selicVal.toFixed(2) + '% a.a.';
     document.getElementById('ind-ipca').textContent  = ipcaVal.toFixed(2) + '%';
 
     // Ticker
-    document.getElementById('tick-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
-    document.getElementById('tick-selic').textContent = selicVal.toFixed(2) + '% a.a.';
-    document.getElementById('tick-ipca').textContent  = ipcaVal.toFixed(2) + '%';
-  } catch(e) { console.warn('BCB err:', e); }
-
-  try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true');
-    const d = await r.json();
-    const btc = d.bitcoin?.brl;
-    const chg = d.bitcoin?.brl_24h_change;
-    if (btc) {
-      const fmt = 'R$ ' + btc.toLocaleString('pt-BR', {maximumFractionDigits:0});
-      const chgFmt = (chg >= 0 ? '+' : '') + chg?.toFixed(2) + '%';
-      const cls = chg >= 0 ? 'ticker-up' : 'ticker-down';
-      document.getElementById('ind-btc').textContent = fmt;
-      document.getElementById('tick-btc').innerHTML = `${fmt} <span class="${cls}">${chgFmt}</span>`;
-    }
+    items.push({ name:'CDI',      price: cdiVal.toFixed(2)+'% a.a.',  chg: null });
+    items.push({ name:'SELIC',    price: selicVal.toFixed(2)+'% a.a.',chg: null });
+    items.push({ name:'IPCA 12m', price: ipcaVal.toFixed(2)+'%',      chg: null });
   } catch(e) {}
 
+  // Dólar
   try {
     const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
     const d = await r.json();
     const usd = parseFloat(d.USDBRL?.bid);
+    const chg = parseFloat(d.USDBRL?.pctChange || 0);
     if (usd) {
-      const fmt = 'R$ ' + usd.toFixed(2);
-      document.getElementById('ind-usd').textContent  = fmt;
-      document.getElementById('tick-usd').textContent = fmt;
+      document.getElementById('ind-usd').textContent = 'R$ ' + usd.toFixed(2);
+      items.push({ name:'DÓLAR', price:'R$'+usd.toFixed(2), chg });
     }
   } catch(e) {}
 
+  // Bitcoin
   try {
-    const r = await fetch('https://brapi.dev/api/quote/^BVSP?token=nkmxvyU4duvGAX1x5Fu9SM');
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl&include_24hr_change=true');
+    const d = await r.json();
+    if (d.bitcoin) {
+      const fmt = 'R$ ' + d.bitcoin.brl.toLocaleString('pt-BR', {maximumFractionDigits:0});
+      document.getElementById('ind-btc').textContent = fmt;
+      items.push({ name:'BITCOIN',  price:'R$'+d.bitcoin.brl.toLocaleString('pt-BR'),  chg: d.bitcoin.brl_24h_change });
+    }
+    if (d.ethereum) {
+      items.push({ name:'ETHEREUM', price:'R$'+d.ethereum.brl.toLocaleString('pt-BR'), chg: d.ethereum.brl_24h_change });
+    }
+  } catch(e) {}
+
+  // IBOVESPA
+  try {
+    const r = await fetch('https://brapi.dev/api/quote/%5EBVSP?token=nkmxvyU4duvGAX1x5Fu9SM');
     const d = await r.json();
     const ibov = d.results?.[0];
     if (ibov) {
       const val = ibov.regularMarketPrice?.toLocaleString('pt-BR', {maximumFractionDigits:0});
-      const chg = ibov.regularMarketChangePercent?.toFixed(2);
-      const cls = ibov.regularMarketChangePercent >= 0 ? 'ticker-up' : 'ticker-down';
-      document.getElementById('tick-ibov').innerHTML = `${val} pts <span class="${cls}">${chg >= 0 ? '+' : ''}${chg}%</span>`;
+      items.push({ name:'IBOV', price: val+' pts', chg: ibov.regularMarketChangePercent });
     }
   } catch(e) {}
+
+  renderTicker(items);
+}
+
+function renderTicker(items) {
+  if (!items.length) return;
+  const fmt = (item) => {
+    const cls    = item.chg === null ? 'neu' : item.chg >= 0 ? 'up' : 'dn';
+    const sign   = item.chg === null ? '' : item.chg >= 0 ? '+' : '';
+    const chgTxt = item.chg === null ? '' : ` ${sign}${item.chg.toFixed(2)}%`;
+    return `<div class="ticker-item">
+      ${item.chg !== null ? `<span class="ticker-dot ${cls}"></span>` : ''}
+      <span class="ticker-name">${item.name}</span>
+      <span class="ticker-price">${item.price}</span>
+      ${chgTxt ? `<span class="ticker-chg ${cls}">${chgTxt}</span>` : ''}
+    </div>`;
+  };
+  const html = items.map(fmt).join('') + items.map(fmt).join('');
+  document.getElementById('ticker-track').innerHTML = html;
+  const dur = Math.max(30, items.length * 180 / 80);
+  document.getElementById('ticker-track').style.animationDuration = dur + 's';
 }
 
 /* ══════════════════════════════════════
-   CANAIS DO YOUTUBE
+   JORNAIS INFORMATIVOS
 ══════════════════════════════════════ */
-const canais = [
-  {
-    nome: 'Primo Rico',
-    id: 'primorico',
-    cor: '#1aab5e',
-    videos: [
-      { id: 'g_oD-oGeNgc', title: 'Como investir do ZERO em 2025 — Guia completo' },
-      { id: 'lQaEPHKxrqg', title: 'Tesouro Direto: tudo que você precisa saber' },
-      { id: 'Y4s4q8wBjbE', title: 'Como montar uma carteira de investimentos' },
-    ]
-  },
-  {
-    nome: 'Nath Finanças',
-    id: 'nathfinancas',
-    cor: '#ec4899',
-    videos: [
-      { id: 'oNFKFMD1tGs', title: 'Organize suas finanças em 5 passos simples' },
-      { id: 'ZSNUzMqwMaI', title: 'Reserva de emergência: quanto guardar e onde' },
-      { id: 'VxVkiJfXs6I', title: 'Como sair das dívidas de uma vez por todas' },
-    ]
-  },
-  {
-    nome: 'Primo Pobre',
-    id: 'primopobre',
-    cor: '#f97316',
-    videos: [
-      { id: 'iH-TdUkFNgI', title: 'Ações para iniciantes: como começar na bolsa' },
-      { id: 'Roh9OjHEWsQ', title: 'FIIs: renda mensal com fundos imobiliários' },
-      { id: 'bJCBqGI3BYE', title: 'CDB vs Tesouro Direto: qual rende mais?' },
-    ]
-  }
+const jornais = [
+  { nome: 'Valor Econômico',   desc: 'O principal jornal de negócios do Brasil',          url: 'https://valor.globo.com',             logo: 'VE', bg: '#003366', color: '#fff' },
+  { nome: 'InfoMoney',          desc: 'Notícias de finanças, bolsa e investimentos',       url: 'https://www.infomoney.com.br',         logo: 'IM', bg: '#e8f5e9', color: '#368547' },
+  { nome: 'Exame',              desc: 'Economia, negócios e política financeira',          url: 'https://exame.com/economia',           logo: 'EX', bg: '#1a1a2e', color: '#fff' },
+  { nome: 'CNN Brasil Business',desc: 'Cobertura econômica e mercado financeiro',          url: 'https://www.cnnbrasil.com.br/economy', logo: 'CN', bg: '#cc0000', color: '#fff' },
+  { nome: 'Folha — Mercado',    desc: 'Seção de mercado do maior jornal do país',          url: 'https://www1.folha.uol.com.br/mercado', logo: 'FS', bg: '#003580', color: '#fff' },
+  { nome: 'G1 Economia',        desc: 'Economia para o público em geral',                  url: 'https://g1.globo.com/economia',        logo: 'G1', bg: '#e30613', color: '#fff' },
+  { nome: 'Money Times',        desc: 'Finanças, mercados e criptomoedas',                 url: 'https://www.moneytimes.com.br',        logo: 'MT', bg: '#001a1a', color: '#4ade80' },
+  { nome: 'Broadcast',          desc: 'Agência de notícias econômico-financeiras',         url: 'https://broadcast.com.br',             logo: 'BC', bg: '#f0a500', color: '#fff' },
 ];
 
-let activeCanalIdx = 0;
-
-function renderCanalTabs() {
-  document.getElementById('canal-tabs').innerHTML = canais.map((c, i) => `
-    <button class="canal-tab ${i === activeCanalIdx ? 'active' : ''}" onclick="switchCanal(${i})">${c.nome}</button>
-  `).join('');
-}
-
-function switchCanal(idx) {
-  activeCanalIdx = idx;
-  document.querySelectorAll('.canal-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
-  renderCanalVideos();
-}
-
-function renderCanalVideos() {
-  const canal = canais[activeCanalIdx];
-  document.getElementById('canal-list').innerHTML = canal.videos.map(v => `
-    <div class="canal-item" onclick="openVideo('${v.id}')">
-      <div class="canal-thumb">
-        <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="${v.title}" style="width:100%;height:100%;object-fit:cover;">
-        <div class="canal-play">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="rgba(255,255,255,.9)"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,.5)"/><polygon points="10,8 16,12 10,16" fill="white"/></svg>
-        </div>
+function renderJornais() {
+  document.getElementById('jornal-list').innerHTML = jornais.map(j => `
+    <a class="jornal-item" href="${j.url}" target="_blank" rel="noopener">
+      <div class="jornal-logo" style="background:${j.bg};color:${j.color};">${j.logo}</div>
+      <div class="jornal-info">
+        <div class="jornal-name">${j.nome}</div>
+        <div class="jornal-desc">${j.desc}</div>
       </div>
-      <div class="canal-meta">
-        <div class="canal-vtitle">${v.title}</div>
-        <div class="canal-vch" style="color:${canal.cor}">${canal.nome}</div>
-      </div>
-    </div>`).join('');
-}
-
-/* ══════════════════════════════════════
-   VIDEO PLAYER
-══════════════════════════════════════ */
-function openVideo(videoId) {
-  document.getElementById('video-iframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-  document.getElementById('video-overlay').classList.add('open');
-}
-
-function closeVideo(e) {
-  if (e.target === document.getElementById('video-overlay')) {
-    document.getElementById('video-overlay').classList.remove('open');
-    document.getElementById('video-iframe').src = '';
-  }
+      <svg class="jornal-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 17L17 7M7 7h10v10"/>
+      </svg>
+    </a>`).join('');
 }
 
 /* ══════════════════════════════════════
@@ -642,8 +618,7 @@ function showToast(msg) {
    INIT
 ══════════════════════════════════════ */
 async function init() {
-  renderCanalTabs();
-  renderCanalVideos();
+  renderJornais();
   await Promise.all([loadNews(), loadIndicadores()]);
 }
 
