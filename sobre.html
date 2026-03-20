@@ -488,7 +488,17 @@ function applyRoleBadge() {
     applyRoleBadge();
     return;
   }
-  const { data: { session } } = await sb.auth.getSession();
+
+  // Tenta getSession; se falhar aguarda onAuthStateChange (até 4s)
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    session = await new Promise(resolve => {
+      const timeout = setTimeout(() => resolve(null), 4000);
+      const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
+        if (s) { clearTimeout(timeout); subscription.unsubscribe(); resolve(s); }
+      });
+    });
+  }
   if (!session) { window.location.href = 'login.html'; return; }
   currentUser = session.user;
   const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
