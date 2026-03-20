@@ -660,8 +660,13 @@ select.form-control{cursor:pointer;}
    SUPABASE via Cloudflare Worker
 ════════════════════════════════════════ */
 const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
+const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
-const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
+// sb = cliente direto para AUTH (getSession, signOut)
+// sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
+const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
+const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 
 /* ════════════════════════════════════════
    AUTH + ROLE GUARD
@@ -742,7 +747,7 @@ function devUid() { return Date.now().toString(36) + Math.random().toString(36).
 
 async function dbLoadTransactions() {
   if (IS_DEV) { state.transactions = devLoad('transactions'); return; }
-  const { data, error } = await sb.from('transactions').select('*').order('data', { ascending: false });
+  const { data, error } = await sbDb.from('transactions').select('*').order('data', { ascending: false });
   if (error) { console.error(error); return; }
   state.transactions = (data || []).map(r => ({
     id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
@@ -757,7 +762,7 @@ async function dbAddTransaction(tx) {
     devSave('transactions', list);
     return id;
   }
-  const { data, error } = await sb.from('transactions').insert({
+  const { data, error } = await sbDb.from('transactions').insert({
     user_id: currentUser.id, descricao: tx.desc, valor: tx.valor,
     tipo: tx.tipo, cat: tx.cat, data: tx.data
   }).select().single();
@@ -766,7 +771,7 @@ async function dbAddTransaction(tx) {
 }
 async function dbDeleteTransaction(id) {
   if (IS_DEV) { devSave('transactions', devLoad('transactions').filter(t => t.id !== id)); return; }
-  const { error } = await sb.from('transactions').delete().eq('id', id);
+  const { error } = await sbDb.from('transactions').delete().eq('id', id);
   if (error) showToast('Erro ao remover transação.', true);
 }
 
@@ -775,7 +780,7 @@ async function dbDeleteTransaction(id) {
 ════════════════════════════════════════ */
 async function dbLoadGoals() {
   if (IS_DEV) { state.goals = devLoad('goals'); return; }
-  const { data, error } = await sb.from('goals').select('*').order('created_at');
+  const { data, error } = await sbDb.from('goals').select('*').order('created_at');
   if (error) { console.error(error); return; }
   state.goals = (data || []).map(r => ({
     id: r.id, nome: r.nome, total: parseFloat(r.total),
@@ -787,7 +792,7 @@ async function dbAddGoal(g) {
     const id = devUid(); const list = devLoad('goals');
     list.push({ ...g, id }); devSave('goals', list); return id;
   }
-  const { data, error } = await sb.from('goals').insert({
+  const { data, error } = await sbDb.from('goals').insert({
     user_id: currentUser.id, nome: g.nome, total: g.total,
     atual: g.atual || 0, prazo: g.prazo || null, cor: g.cor
   }).select().single();
@@ -796,12 +801,12 @@ async function dbAddGoal(g) {
 }
 async function dbUpdateGoal(id, atual) {
   if (IS_DEV) { const list = devLoad('goals'); const g = list.find(x=>x.id===id); if(g) g.atual=atual; devSave('goals',list); return; }
-  const { error } = await sb.from('goals').update({ atual }).eq('id', id);
+  const { error } = await sbDb.from('goals').update({ atual }).eq('id', id);
   if (error) showToast('Erro ao atualizar meta.', true);
 }
 async function dbDeleteGoal(id) {
   if (IS_DEV) { devSave('goals', devLoad('goals').filter(g=>g.id!==id)); return; }
-  const { error } = await sb.from('goals').delete().eq('id', id);
+  const { error } = await sbDb.from('goals').delete().eq('id', id);
   if (error) showToast('Erro ao remover meta.', true);
 }
 
@@ -810,7 +815,7 @@ async function dbDeleteGoal(id) {
 ════════════════════════════════════════ */
 async function dbLoadParcelas() {
   if (IS_DEV) { state.parcelas = devLoad('parcelas'); return; }
-  const { data, error } = await sb.from('installments').select('*').order('created_at');
+  const { data, error } = await sbDb.from('installments').select('*').order('created_at');
   if (error) { console.error(error); return; }
   state.parcelas = (data || []).map(r => ({
     id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
@@ -822,7 +827,7 @@ async function dbAddParcela(p) {
     const id = devUid(); const list = devLoad('parcelas');
     list.push({ ...p, id }); devSave('parcelas', list); return id;
   }
-  const { data, error } = await sb.from('installments').insert({
+  const { data, error } = await sbDb.from('installments').insert({
     user_id: currentUser.id, descricao: p.desc, valor: p.valor,
     total: p.total, pagas: p.pagas, venc: p.venc, cat: p.cat, status: p.status
   }).select().single();
@@ -831,12 +836,12 @@ async function dbAddParcela(p) {
 }
 async function dbUpdateParcela(id, pagas, status) {
   if (IS_DEV) { const list = devLoad('parcelas'); const p = list.find(x=>x.id===id); if(p){p.pagas=pagas;p.status=status;} devSave('parcelas',list); return; }
-  const { error } = await sb.from('installments').update({ pagas, status }).eq('id', id);
+  const { error } = await sbDb.from('installments').update({ pagas, status }).eq('id', id);
   if (error) showToast('Erro ao atualizar parcela.', true);
 }
 async function dbDeleteParcela(id) {
   if (IS_DEV) { devSave('parcelas', devLoad('parcelas').filter(p=>p.id!==id)); return; }
-  const { error } = await sb.from('installments').delete().eq('id', id);
+  const { error } = await sbDb.from('installments').delete().eq('id', id);
   if (error) showToast('Erro ao remover parcela.', true);
 }
 
