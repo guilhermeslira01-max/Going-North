@@ -218,7 +218,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 /* ── AUTO-REDIRECT se já logado ── */
 (async function() {
   const { data: { session } } = await sb.auth.getSession();
-  if (session) window.location.href = 'dashboard.html';
+  if (session) window.location.href = 'index.html';
 })();
 
 /* ── MODE ── */
@@ -296,7 +296,7 @@ async function doLogin() {
     showError(msg); return;
   }
   showSuccess('Login realizado! Redirecionando...');
-  setTimeout(() => window.location.href = 'dashboard.html', 800);
+  setTimeout(() => window.location.href = 'index.html', 800);
 }
 
 /* ── REGISTER ── */
