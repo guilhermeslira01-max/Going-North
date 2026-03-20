@@ -10,7 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;text-decoration:none;}
 :root{
-  --green:#1aab5e;--green-h:#13834a;--green-glow:rgba(26,171,94,.35);--green-dim:rgba(26,171,94,.15);
+  --green:#368547;--green-h:#13834a;--green-glow:rgba(54,133,71,.35);--green-dim:rgba(54,133,71,.15);
   --font-d:'Sora',sans-serif;--font-b:'Inter',sans-serif;
   --white:#fff;--w80:rgba(255,255,255,.80);--w50:rgba(255,255,255,.50);
   --w20:rgba(255,255,255,.20);--w10:rgba(255,255,255,.10);--w06:rgba(255,255,255,.06);
@@ -19,13 +19,13 @@ html{scroll-behavior:smooth;}
 body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;align-items:stretch;}
 .bg{position:fixed;inset:0;z-index:-1;}
 .bg-img{position:absolute;inset:0;background:url('images/Component 1.png') center/cover no-repeat;filter:blur(4px);transform:scale(1.05);}
-.bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(10,30,20,.80) 0%,rgba(8,40,28,.72) 60%,rgba(10,50,30,.68) 100%);}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,51,51,.92) 0%,rgba(0,51,51,.88) 60%,rgba(0,45,45,.85) 100%);}
 .bg-glow{position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(26,171,94,.18) 0%,transparent 70%);pointer-events:none;}
 .bg-glow2{position:absolute;bottom:-15%;left:-5%;width:500px;height:500px;background:radial-gradient(circle,rgba(13,148,136,.12) 0%,transparent 70%);pointer-events:none;}
 .layout{display:flex;width:100%;min-height:100vh;}
 .left{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:40px 48px;position:relative;overflow:hidden;}
 .left-logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.15rem;}
-.left-logo-icon{width:36px;height:36px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.left-logo-icon{width:40px;height:34px;display:flex;align-items:center;justify-content:center;}
 .left-content{max-width:480px;}
 .left-tag{display:inline-flex;align-items:center;gap:8px;background:var(--w10);border:1px solid var(--w20);border-radius:20px;padding:6px 14px;font-size:.78rem;font-weight:600;color:var(--green);margin-bottom:28px;letter-spacing:.03em;}
 .left-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
@@ -94,10 +94,10 @@ body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;ali
 <div class="layout">
   <div class="left">
     <div class="left-logo">
-      <div class="left-logo-icon">
-        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M4 16L11 6L18 16" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="left-logo-icon" style="background:none;">
+        <img src="images/logo.png" alt="Going North" style="height:34px;width:auto;display:block;">
       </div>
-      Going <span style="color:var(--green);margin-left:4px;">North</span>
+      Going<span style="color:var(--green);margin-left:2px;">North</span>
     </div>
     <div class="left-content">
       <div class="left-tag"><span class="left-tag-dot"></span>Controle Financeiro Inteligente</div>
@@ -110,7 +110,7 @@ body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;ali
         <div class="feat"><div class="feat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>Exportação de extrato completo em PDF</div>
       </div>
     </div>
-    <div class="left-footer">© 2025 Going North. Todos os direitos reservados.</div>
+    <div class="left-footer">© 2026 Going North. Todos os direitos reservados.</div>
   </div>
 
   <div class="right">
@@ -204,12 +204,10 @@ body{font-family:var(--font-b);min-height:100vh;overflow:hidden;display:flex;ali
 </div>
 
 <script>
-/* ── SUPABASE ── */
+/* ── SUPABASE via Cloudflare Worker ── */
+const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
 const { createClient } = supabase;
-const sb = createClient(
-  'https://qesurszlqesjbtcpnjwz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo'
-);
+const sb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 
 /* ── AUTO-REDIRECT se já logado ── */
 (async function() {
@@ -261,7 +259,7 @@ function checkStrength() {
   if (val.length >= 10) score++;
   if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
   if (/[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val)) score++;
-  const colors = ['#ef4444','#f97316','#eab308','#1aab5e'];
+  const colors = ['#ef4444','#f97316','#eab308','#368547'];
   const labels = ['Muito fraca','Fraca','Média','Forte'];
   for (let i = 1; i <= 4; i++) {
     document.getElementById('seg'+i).style.background = i <= score ? colors[score-1] : 'rgba(255,255,255,.1)';
