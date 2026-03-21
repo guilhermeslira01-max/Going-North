@@ -666,8 +666,7 @@ const { createClient } = supabase;
 // sb = cliente direto para AUTH (getSession, signOut)
 // sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
-const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
-
+let sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 /* ════════════════════════════════════════
    AUTH + ROLE GUARD
 ════════════════════════════════════════ */
