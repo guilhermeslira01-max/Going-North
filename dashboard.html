@@ -939,6 +939,7 @@ async function addTransaction() {
   }
   const idx = state.transactions.findIndex(t => t.id === tempId);
   if (idx !== -1) state.transactions[idx].id = id;
+  calcSummary(); renderRecentTx(); renderTransactions(); renderCharts();
 }
 
 async function deleteTransaction(id) {
@@ -1019,6 +1020,7 @@ async function addGoal() {
   }
   const idx = state.goals.findIndex(g => g.id === tempId);
   if (idx !== -1) state.goals[idx].id = id;
+  renderGoals(); renderGoalsChart(); calcSummary();
 }
 
 async function deleteGoal(id) {
@@ -1100,6 +1102,7 @@ async function addParcela() {
   }
   const idx = state.parcelas.findIndex(x => x.id === tempId);
   if (idx !== -1) state.parcelas[idx].id = id;
+  renderParcelas();
 }
 
 async function pagarParcela(id) {
