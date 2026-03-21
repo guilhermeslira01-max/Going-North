@@ -968,9 +968,9 @@ async function addInvestimento() {
   const inv = { nome, tipo, inst, aporte, atual, taxa, data: data || today() };
   if (qtd && qtd > 0) { inv.cotas = qtd; inv.precoMedio = parseFloat((aporte / qtd).toFixed(6)); }
 
-  const id = await dbAddInv(inv);
-  if (!id) return;
-  inv.id = id;
+  // Optimistic update
+  const tempId = '__tmp__' + Date.now();
+  inv.id = tempId;
   investments.push(inv);
   closeModal('modal-inv');
   ['inv-nome','inv-inst','inv-aporte','inv-qtd','inv-atual','inv-taxa'].forEach(i => { const el = document.getElementById(i); if(el) el.value=''; });
@@ -978,14 +978,30 @@ async function addInvestimento() {
   updateHero();
   renderInvestimentos();
   showToast('Investimento adicionado! Clique em "Atualizar cotações" para buscar o valor atual.');
+
+  const id = await dbAddInv(inv);
+  if (!id) {
+    investments = investments.filter(i => i.id !== tempId);
+    updateHero(); renderInvestimentos();
+    return;
+  }
+  const idx = investments.findIndex(i => i.id === tempId);
+  if (idx !== -1) investments[idx].id = id;
 }
 
 async function deleteInvestimento(id) {
-  await dbDeleteInv(id);
+  const backup = investments.find(i => i.id === id);
   investments = investments.filter(i => i.id !== id);
   updateHero();
   renderInvestimentos();
   showToast('Investimento removido.');
+
+  const delResult = IS_DEV ? {} : await sbDb.from('investments').delete().eq('id', id);
+  if (delResult.error) {
+    if (backup) investments.push(backup);
+    updateHero(); renderInvestimentos();
+    showToast('Erro ao remover investimento.', true);
+  }
 }
 
 function openEdit(id) {
@@ -1001,11 +1017,22 @@ async function saveEdit() {
   const val = parseFloat(document.getElementById('edit-atual').value);
   if (isNaN(val) || val < 0) { showToast('Valor inválido.', true); return; }
   const inv = investments.find(i => i.id === id);
-  if (inv) { inv.atual = val; await dbUpdateInv(inv); }
+  if (!inv) return;
+  const prevAtual = inv.atual;
+  inv.atual = val;
   closeModal('modal-edit');
   updateHero();
   renderInvestimentos();
   showToast('Valor atualizado!');
+
+  if (!IS_DEV) {
+    const { error } = await sbDb.from('investments').update({ atual: val }).eq('id', id);
+    if (error) {
+      inv.atual = prevAtual;
+      updateHero(); renderInvestimentos();
+      showToast('Erro ao atualizar valor.', true);
+    }
+  }
 }
 
 /* ════════════════════════════════════════
