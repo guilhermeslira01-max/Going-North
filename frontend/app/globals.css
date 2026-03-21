@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nav-bg: #003333;
+  --green: #368547;
+  --green-h: #13834a;
+  --gold: #c8a96e;
+  --bg: #f0f4f2;
+  --surface: #ffffff;
+  --text: #0f2318;
+  --text2: #3d5a47;
+  --text3: #7a9585;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text font-inter antialiased;
+    background-color: #f0f4f2;
+    color: #0f2318;
+    font-family: "Inter", sans-serif;
+  }
+  h1, h2, h3, h4 {
+    font-family: "Sora", sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-brand-green hover:bg-brand-green-hover text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 active:scale-95;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 text-brand-text2 hover:text-brand-text hover:bg-black/5 font-medium px-4 py-2 rounded-xl transition-all duration-200;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px 0 rgba(15,35,24,0.08);
+    padding: 1.5rem;
+  }
+  .card-hover {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px 0 rgba(15,35,24,0.08);
+    padding: 1.5rem;
+    transition: box-shadow 0.2s;
+  }
+  .card-hover:hover {
+    box-shadow: 0 8px 32px 0 rgba(15,35,24,0.14);
+  }
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-brand-text3/30 bg-brand-surface text-brand-text placeholder-brand-text3 focus:outline-none focus:ring-2 focus:ring-brand-green/40 focus:border-brand-green transition-all duration-200;
+  }
+  .label {
+    @apply block text-sm font-medium text-brand-text2 mb-1.5;
+  }
+  .badge-admin {
+    background: rgba(200,169,110,0.18);
+    color: #c8a96e;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+  }
+  .badge-pro {
+    background: rgba(54,133,71,0.13);
+    color: #368547;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+  }
+  .badge-free {
+    background: rgba(122,149,133,0.13);
+    color: #7a9585;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 9999px;
+  }
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .section-title {
+    font-family: "Sora", sans-serif;
+    font-weight: 700;
+    font-size: 1.75rem;
+    color: #0f2318;
+  }
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-brand-text3/30 border-t-brand-green;
+  }
+}
+
+@layer utilities {
+  .text-gradient-green {
+    background: linear-gradient(135deg, #368547, #13834a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 40s linear infinite;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.article-content h2 { font-family: "Sora", sans-serif; font-weight: 700; font-size: 1.2rem; color: #0f2318; margin: 1.5rem 0 0.75rem; }
+.article-content h3 { font-family: "Sora", sans-serif; font-weight: 600; font-size: 1.05rem; color: #0f2318; margin: 1rem 0 0.5rem; }
+.article-content p  { color: #3d5a47; line-height: 1.7; margin-bottom: 1rem; }
+.article-content ul { list-style: disc; padding-left: 1.25rem; color: #3d5a47; margin-bottom: 1rem; }
+.article-content li { margin-bottom: 0.25rem; }
+.article-content strong { font-weight: 600; color: #0f2318; }
