@@ -926,7 +926,7 @@ async function addTransaction() {
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-valor').value = '';
   document.getElementById('tx-data').value = todayStr();
-  calcSummary(); renderRecentTx(); renderCharts();
+  calcSummary(); renderRecentTx(); renderTransactions(); renderCharts();
   showToast('Transação adicionada!');
 
   // Salva no banco em segundo plano e substitui o ID temporário
@@ -973,13 +973,16 @@ function renderTxItem(tx, showDelete=true) {
 }
 
 function renderRecentTx() {
-  const el   = document.getElementById('recent-tx-list');
+  const el = document.getElementById('recent-tx-list');
+  if (!el) return;
   const list = state.transactions.slice(0,5);
   if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação registrada ainda.</p><span>Clique em "Nova transação" para começar.</span></div>`; return; }
   el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t,false)).join('')}</div>`;
 }
 
 function renderTransactions() {
+  const el = document.getElementById('tx-list');
+  if (!el) return; // aba não está ativa, nada a fazer
   const search = (document.getElementById('tx-search')?.value||'').toLowerCase();
   const tipo   = document.getElementById('tx-tipo')?.value||'';
   const cat    = document.getElementById('tx-cat')?.value||'';
@@ -989,7 +992,6 @@ function renderTransactions() {
   if (tipo)   list = list.filter(t=>t.tipo===tipo);
   if (cat)    list = list.filter(t=>t.cat===cat);
   if (month)  list = list.filter(t=>t.data.startsWith(month));
-  const el = document.getElementById('tx-list');
   if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação encontrada.</p></div>`; return; }
   el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t)).join('')}</div>`;
 }
