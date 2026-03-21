@@ -1,20 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: '**' },
-    ],
-  },
-};
-
-export default nextConfig;
-/** @type {import('next').NextConfig} */
-const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,  // ← adicione isso
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,   // ← e isso
+    ignoreBuildErrors: true,
   },
 };
 
