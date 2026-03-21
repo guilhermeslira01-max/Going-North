@@ -987,6 +987,7 @@ async function addInvestimento() {
   }
   const idx = investments.findIndex(i => i.id === tempId);
   if (idx !== -1) investments[idx].id = id;
+  updateHero(); renderInvestimentos();
 }
 
 async function deleteInvestimento(id) {
