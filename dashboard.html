@@ -823,9 +823,9 @@ async function dbAddGoal(g) {
   return data.id;
 }
 async function dbUpdateGoal(id, atual) {
-  if (IS_DEV) { const list = devLoad('goals'); const g = list.find(x=>x.id===id); if(g) g.atual=atual; devSave('goals',list); return; }
+  if (IS_DEV) { const list = devLoad('goals'); const g = list.find(x=>x.id===id); if(g) g.atual=atual; devSave('goals',list); return {}; }
   const { error } = await sbDb.from('goals').update({ atual }).eq('id', id);
-  if (error) showToast('Erro ao atualizar meta.', true);
+  return { error };
 }
 async function dbDeleteGoal(id) {
   if (IS_DEV) { devSave('goals', devLoad('goals').filter(g=>g.id!==id)); return; }
@@ -918,22 +918,44 @@ async function addTransaction() {
   const data  = document.getElementById('tx-data').value;
   if (!desc || isNaN(valor) || valor<=0 || !data) { showToast('Preencha todos os campos.', true); return; }
 
-  const id = await dbAddTransaction({ desc, valor, tipo, cat, data });
-  if (!id) return;
-  state.transactions.unshift({ id, desc, valor, tipo, cat, data });
+  // Optimistic update: mostra na tela imediatamente com ID temporário
+  const tempId = '__tmp__' + Date.now();
+  const tx = { id: tempId, desc, valor, tipo, cat, data };
+  state.transactions.unshift(tx);
   closeModal('modal-tx');
   document.getElementById('tx-desc').value = '';
   document.getElementById('tx-valor').value = '';
   document.getElementById('tx-data').value = todayStr();
   calcSummary(); renderRecentTx(); renderCharts();
   showToast('Transação adicionada!');
+
+  // Salva no banco em segundo plano e substitui o ID temporário
+  const id = await dbAddTransaction({ desc, valor, tipo, cat, data });
+  if (!id) {
+    // Rollback: remove o item otimista e avisa
+    state.transactions = state.transactions.filter(t => t.id !== tempId);
+    calcSummary(); renderRecentTx(); renderCharts();
+    return;
+  }
+  const idx = state.transactions.findIndex(t => t.id === tempId);
+  if (idx !== -1) state.transactions[idx].id = id;
 }
 
 async function deleteTransaction(id) {
-  await dbDeleteTransaction(id);
+  // Optimistic update: remove da tela imediatamente
+  const backup = state.transactions.find(t => t.id === id);
   state.transactions = state.transactions.filter(t => t.id !== id);
   calcSummary(); renderTransactions(); renderRecentTx(); renderCharts();
   showToast('Transação removida.');
+
+  // Remove no banco em segundo plano
+  const delResult = IS_DEV ? {} : await sbDb.from('transactions').delete().eq('id', id);
+  if (delResult.error) {
+    if (backup) state.transactions.unshift(backup);
+    state.transactions.sort((a,b) => b.data.localeCompare(a.data));
+    calcSummary(); renderTransactions(); renderRecentTx(); renderCharts();
+    showToast('Erro ao remover transação.', true);
+  }
 }
 
 function renderTxItem(tx, showDelete=true) {
@@ -981,20 +1003,36 @@ async function addGoal() {
   const prazo = document.getElementById('goal-prazo').value;
   const cor   = document.getElementById('goal-cor').value;
   if (!nome||isNaN(total)||total<=0) { showToast('Preencha nome e valor total.', true); return; }
-  const id = await dbAddGoal({ nome, total, atual, prazo, cor });
-  if (!id) return;
-  state.goals.push({ id, nome, total, atual, prazo, cor });
+
+  const tempId = '__tmp__' + Date.now();
+  state.goals.push({ id: tempId, nome, total, atual, prazo, cor });
   closeModal('modal-goal');
   ['goal-nome','goal-total','goal-atual','goal-prazo'].forEach(i=>document.getElementById(i).value='');
   renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Meta criada!');
+
+  const id = await dbAddGoal({ nome, total, atual, prazo, cor });
+  if (!id) {
+    state.goals = state.goals.filter(g => g.id !== tempId);
+    renderGoals(); renderGoalsChart(); calcSummary();
+    return;
+  }
+  const idx = state.goals.findIndex(g => g.id === tempId);
+  if (idx !== -1) state.goals[idx].id = id;
 }
 
 async function deleteGoal(id) {
-  await dbDeleteGoal(id);
-  state.goals = state.goals.filter(g=>g.id!==id);
+  const backup = state.goals.find(g => g.id === id);
+  state.goals = state.goals.filter(g => g.id !== id);
   renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Meta removida.');
+
+  const delResult = IS_DEV ? {} : await sbDb.from('goals').delete().eq('id', id);
+  if (delResult.error) {
+    if (backup) state.goals.push(backup);
+    renderGoals(); renderGoalsChart(); calcSummary();
+    showToast('Erro ao remover meta.', true);
+  }
 }
 
 function openAporte(id) { document.getElementById('aporte-goal-id').value=id; document.getElementById('aporte-valor').value=''; openModal('modal-aporte'); }
@@ -1005,11 +1043,18 @@ async function addAporte() {
   if (isNaN(val)||val<=0) { showToast('Valor inválido.', true); return; }
   const g = state.goals.find(g=>g.id===id);
   if (!g) return;
+  const prevAtual = g.atual;
   g.atual = Math.min(g.atual+val, g.total);
-  await dbUpdateGoal(id, g.atual);
   closeModal('modal-aporte');
   renderGoals(); renderGoalsChart(); calcSummary();
   showToast('Aporte registrado!');
+
+  const { error } = await dbUpdateGoal(id, g.atual);
+  if (error) {
+    g.atual = prevAtual;
+    renderGoals(); renderGoalsChart(); calcSummary();
+    showToast('Erro ao registrar aporte.', true);
+  }
 }
 
 function renderGoals() {
@@ -1039,13 +1084,22 @@ async function addParcela() {
   const cat   = document.getElementById('p-cat').value;
   const status= document.getElementById('p-status').value;
   if (!desc||isNaN(valor)||valor<=0||isNaN(total)||total<1) { showToast('Preencha todos os campos.', true); return; }
-  const id = await dbAddParcela({ desc, valor, total, pagas, venc: venc||10, cat, status });
-  if (!id) return;
-  state.parcelas.push({ id, desc, valor, total, pagas, venc: venc||10, cat, status });
+  const tempId = '__tmp__' + Date.now();
+  const p = { id: tempId, desc, valor, total, pagas, venc: venc||10, cat, status };
+  state.parcelas.push(p);
   closeModal('modal-parcela');
   ['p-desc','p-valor','p-total','p-pagas','p-venc'].forEach(i=>document.getElementById(i).value='');
   renderParcelas();
   showToast('Parcela adicionada!');
+
+  const id = await dbAddParcela({ desc, valor, total, pagas, venc: venc||10, cat, status });
+  if (!id) {
+    state.parcelas = state.parcelas.filter(x => x.id !== tempId);
+    renderParcelas();
+    return;
+  }
+  const idx = state.parcelas.findIndex(x => x.id === tempId);
+  if (idx !== -1) state.parcelas[idx].id = id;
 }
 
 async function pagarParcela(id) {
@@ -1059,10 +1113,17 @@ async function pagarParcela(id) {
 }
 
 async function deleteParcela(id) {
-  await dbDeleteParcela(id);
-  state.parcelas = state.parcelas.filter(p=>p.id!==id);
+  const backup = state.parcelas.find(p => p.id === id);
+  state.parcelas = state.parcelas.filter(p => p.id !== id);
   renderParcelas();
   showToast('Parcela removida.');
+
+  const delResult = IS_DEV ? {} : await sbDb.from('installments').delete().eq('id', id);
+  if (delResult.error) {
+    if (backup) state.parcelas.push(backup);
+    renderParcelas();
+    showToast('Erro ao remover parcela.', true);
+  }
 }
 
 function renderParcelas() {
