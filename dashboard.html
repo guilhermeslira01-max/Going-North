@@ -681,6 +681,8 @@ function isFree()  { return currentUser?.role === 'free'; }
 
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
+  const cachedRole = cacheGet('role');
+  if (cachedRole) { currentUser.role = cachedRole; return; }
   try {
     const { data } = await sb
       .from('profiles')
@@ -688,6 +690,7 @@ async function loadUserRole() {
       .eq('id', currentUser.id)
       .single();
     currentUser.role = data?.role || 'free';
+    cacheSet('role', currentUser.role);
   } catch(e) { currentUser.role = 'free'; }
 }
 
@@ -750,8 +753,43 @@ async function initAuth() {
 }
 
 async function doLogout() {
+  cacheClearAll();
   if (!IS_DEV) await sb.auth.signOut();
   window.location.href = 'login.html';
+}
+
+
+/* ════════════════════════════════════════
+   CACHE LOCAL — 24h por user_id
+════════════════════════════════════════ */
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas em ms
+
+function cacheKey(name) {
+  const uid = currentUser?.id || 'anon';
+  return `gn_cache_${uid}_${name}`;
+}
+function cacheSet(name, data) {
+  try {
+    localStorage.setItem(cacheKey(name), JSON.stringify({ data, ts: Date.now() }));
+  } catch(e) {}
+}
+function cacheGet(name) {
+  try {
+    const raw = localStorage.getItem(cacheKey(name));
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(cacheKey(name)); return null; }
+    return data;
+  } catch(e) { return null; }
+}
+function cacheInvalidate(...names) {
+  names.forEach(n => { try { localStorage.removeItem(cacheKey(n)); } catch(e) {} });
+}
+function cacheClearAll() {
+  const uid = currentUser?.id || 'anon';
+  Object.keys(localStorage)
+    .filter(k => k.startsWith(`gn_cache_${uid}_`))
+    .forEach(k => localStorage.removeItem(k));
 }
 
 /* ════════════════════════════════════════
@@ -770,12 +808,15 @@ function devUid() { return Date.now().toString(36) + Math.random().toString(36).
 
 async function dbLoadTransactions() {
   if (IS_DEV) { state.transactions = devLoad('transactions'); return; }
+  const cached = cacheGet('transactions');
+  if (cached) { state.transactions = cached; return; }
   const { data, error } = await sbDb.from('transactions').select('*').order('data', { ascending: false });
   if (error) { console.error(error); return; }
   state.transactions = (data || []).map(r => ({
     id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
     tipo: r.tipo, cat: r.cat, data: r.data
   }));
+  cacheSet('transactions', state.transactions);
 }
 async function dbAddTransaction(tx) {
   if (IS_DEV) {
@@ -804,12 +845,15 @@ async function dbDeleteTransaction(id) {
 ════════════════════════════════════════ */
 async function dbLoadGoals() {
   if (IS_DEV) { state.goals = devLoad('goals'); return; }
+  const cached = cacheGet('goals');
+  if (cached) { state.goals = cached; return; }
   const { data, error } = await sbDb.from('goals').select('*').order('created_at');
   if (error) { console.error(error); return; }
   state.goals = (data || []).map(r => ({
     id: r.id, nome: r.nome, total: parseFloat(r.total),
     atual: parseFloat(r.atual), prazo: r.prazo, cor: r.cor
   }));
+  cacheSet('goals', state.goals);
 }
 async function dbAddGoal(g) {
   if (IS_DEV) {
@@ -839,12 +883,15 @@ async function dbDeleteGoal(id) {
 ════════════════════════════════════════ */
 async function dbLoadParcelas() {
   if (IS_DEV) { state.parcelas = devLoad('parcelas'); return; }
+  const cached = cacheGet('parcelas');
+  if (cached) { state.parcelas = cached; return; }
   const { data, error } = await sbDb.from('installments').select('*').order('created_at');
   if (error) { console.error(error); return; }
   state.parcelas = (data || []).map(r => ({
     id: r.id, desc: r.descricao, valor: parseFloat(r.valor),
     total: r.total, pagas: r.pagas, venc: r.venc, cat: r.cat, status: r.status
   }));
+  cacheSet('parcelas', state.parcelas);
 }
 async function dbAddParcela(p) {
   if (IS_DEV) {
@@ -940,6 +987,7 @@ async function addTransaction() {
   }
   const idx = state.transactions.findIndex(t => t.id === tempId);
   if (idx !== -1) state.transactions[idx].id = id;
+  cacheSet('transactions', state.transactions);
   calcSummary(); renderRecentTx(); renderTransactions(); renderCharts();
 }
 
@@ -957,6 +1005,8 @@ async function deleteTransaction(id) {
     state.transactions.sort((a,b) => b.data.localeCompare(a.data));
     calcSummary(); renderTransactions(); renderRecentTx(); renderCharts();
     showToast('Erro ao remover transação.', true);
+  } else {
+    cacheSet('transactions', state.transactions);
   }
 }
 
@@ -1023,6 +1073,7 @@ async function addGoal() {
   }
   const idx = state.goals.findIndex(g => g.id === tempId);
   if (idx !== -1) state.goals[idx].id = id;
+  cacheSet('goals', state.goals);
   renderGoals(); renderGoalsChart(); calcSummary();
 }
 
@@ -1037,6 +1088,8 @@ async function deleteGoal(id) {
     if (backup) state.goals.push(backup);
     renderGoals(); renderGoalsChart(); calcSummary();
     showToast('Erro ao remover meta.', true);
+  } else {
+    cacheSet('goals', state.goals);
   }
 }
 
@@ -1059,6 +1112,8 @@ async function addAporte() {
     g.atual = prevAtual;
     renderGoals(); renderGoalsChart(); calcSummary();
     showToast('Erro ao registrar aporte.', true);
+  } else {
+    cacheSet('goals', state.goals);
   }
 }
 
@@ -1105,6 +1160,7 @@ async function addParcela() {
   }
   const idx = state.parcelas.findIndex(x => x.id === tempId);
   if (idx !== -1) state.parcelas[idx].id = id;
+  cacheSet('parcelas', state.parcelas);
   renderParcelas();
 }
 
@@ -1129,6 +1185,8 @@ async function deleteParcela(id) {
     if (backup) state.parcelas.push(backup);
     renderParcelas();
     showToast('Erro ao remover parcela.', true);
+  } else {
+    cacheSet('parcelas', state.parcelas);
   }
 }
 
