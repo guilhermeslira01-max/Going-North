@@ -243,18 +243,6 @@ select.form-control{cursor:pointer;}
 .alloc-table tr:hover td{background:var(--surface2);}
 .perc-bar{width:80px;height:5px;background:var(--border);border-radius:20px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:8px;}
 .perc-fill{height:100%;border-radius:20px;}
-
-/* ── LOADING OVERLAY ── */
-.dash-loading{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .35s ease;}
-.dash-loading.hidden{opacity:0;pointer-events:none;}
-.dash-loading-logo{font-family:var(--font-d);font-size:1.4rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;}
-.dash-loading-logo span{color:var(--green);}
-.dash-loading-dots{display:flex;gap:7px;}
-.dash-loading-dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:dashDotPulse 1.3s ease-in-out infinite;}
-.dash-loading-dot:nth-child(2){animation-delay:.18s;}
-.dash-loading-dot:nth-child(3){animation-delay:.36s;}
-@keyframes dashDotPulse{0%,80%,100%{transform:scale(.55);opacity:.3;}40%{transform:scale(1);opacity:1;}}
-.dash-loading-text{font-size:.82rem;color:var(--text3);font-weight:500;}
 </style>
 </head>
 <body>
@@ -288,17 +276,6 @@ select.form-control{cursor:pointer;}
     </button>
   </div>
 </nav>
-
-<!-- ── LOADING OVERLAY ── -->
-<div class="dash-loading" id="dash-loading">
-  <div class="dash-loading-logo">Going<span>North</span></div>
-  <div class="dash-loading-dots">
-    <div class="dash-loading-dot"></div>
-    <div class="dash-loading-dot"></div>
-    <div class="dash-loading-dot"></div>
-  </div>
-  <div class="dash-loading-text">Carregando seus investimentos...</div>
-</div>
 
 <!-- ── TICKER BAR ── -->
 <div class="ticker-wrap" id="ticker-wrap">
@@ -772,12 +749,9 @@ function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
 
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
-  const cachedRole = cacheGet('role');
-  if (cachedRole) { currentUser.role = cachedRole; return; }
   try {
     const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
-    cacheSet('role', currentUser.role);
   } catch(e) { currentUser.role = 'free'; }
 }
 
@@ -819,38 +793,8 @@ async function initAuth() {
 }
 
 async function doLogout() {
-  cacheClearAll();
   if (!IS_DEV) await sb.auth.signOut();
   window.location.href = 'login.html';
-}
-
-
-/* ════════════════════════════════════════
-   CACHE LOCAL — 24h por user_id
-════════════════════════════════════════ */
-const CACHE_TTL = 24 * 60 * 60 * 1000;
-
-function cacheKey(name) {
-  const uid = currentUser?.id || 'anon';
-  return `gn_cache_${uid}_${name}`;
-}
-function cacheSet(name, data) {
-  try { localStorage.setItem(cacheKey(name), JSON.stringify({ data, ts: Date.now() })); } catch(e) {}
-}
-function cacheGet(name) {
-  try {
-    const raw = localStorage.getItem(cacheKey(name));
-    if (!raw) return null;
-    const { data, ts } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(cacheKey(name)); return null; }
-    return data;
-  } catch(e) { return null; }
-}
-function cacheClearAll() {
-  const uid = currentUser?.id || 'anon';
-  Object.keys(localStorage)
-    .filter(k => k.startsWith(`gn_cache_${uid}_`) || k.startsWith('gn_api_'))
-    .forEach(k => localStorage.removeItem(k));
 }
 
 /* ════════════════════════════════════════
@@ -878,8 +822,6 @@ async function loadInv() {
     devSave('investments', investments);
     return;
   }
-  const cachedInv = cacheGet('investments');
-  if (cachedInv) { investments = cachedInv; return; }
   const { data, error } = await sbDb.from('investments').select('*').order('created_at');
   if (error) { console.error('loadInv:', error); return; }
   investments = (data || []).map(r => ({
@@ -890,7 +832,6 @@ async function loadInv() {
     precoAtual:  r.preco_atual  ? parseFloat(r.preco_atual)  : null,
     variacao24h: r.variacao_24h ? parseFloat(r.variacao_24h) : null,
   }));
-  cacheSet('investments', investments);
 }
 
 async function dbAddInv(inv) {
@@ -904,7 +845,6 @@ async function dbAddInv(inv) {
     taxa: inv.taxa||null, data: inv.data||null, cotas: inv.cotas||null,
     preco_medio: inv.precoMedio||null, preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null,
   }).select().single();
-  console.log('INSERT investments result:', { data, error });
   if (error) { showToast('Erro ao salvar.', true); return null; }
   return data.id;
 }
@@ -1047,7 +987,6 @@ async function addInvestimento() {
   }
   const idx = investments.findIndex(i => i.id === tempId);
   if (idx !== -1) investments[idx].id = id;
-  cacheSet('investments', investments);
   updateHero(); renderInvestimentos();
 }
 
@@ -1063,8 +1002,6 @@ async function deleteInvestimento(id) {
     if (backup) investments.push(backup);
     updateHero(); renderInvestimentos();
     showToast('Erro ao remover investimento.', true);
-  } else {
-    cacheSet('investments', investments);
   }
 }
 
@@ -1095,8 +1032,6 @@ async function saveEdit() {
       inv.atual = prevAtual;
       updateHero(); renderInvestimentos();
       showToast('Erro ao atualizar valor.', true);
-    } else {
-      cacheSet('investments', investments);
     }
   }
 }
@@ -1330,22 +1265,10 @@ const BRAPI_BASE  = 'https://brapi.dev/api';
 const BCB_BASE    = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs';
 const COINGECKO   = 'https://api.coingecko.com/api/v3';
 
-// Cache 30min para APIs externas (persiste entre refreshes via localStorage)
-const _API_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
-function setCache(key, data, ttl = _API_CACHE_TTL) {
-  try {
-    localStorage.setItem('gn_api_' + key, JSON.stringify({ data, exp: Date.now() + ttl }));
-  } catch(e) {}
-}
-function getCache(key) {
-  try {
-    const raw = localStorage.getItem('gn_api_' + key);
-    if (!raw) return null;
-    const { data, exp } = JSON.parse(raw);
-    if (Date.now() > exp) { localStorage.removeItem('gn_api_' + key); return null; }
-    return data;
-  } catch(e) { return null; }
-}
+// Cache 5min
+const _cache = {};
+function setCache(key,data,ttl=300000){_cache[key]={data,exp:Date.now()+ttl};}
+function getCache(key){const c=_cache[key];return(c&&Date.now()<c.exp)?c.data:null;}
 
 /* ════════════════════════════════════════
    API — BCB (CDI / Selic / IPCA)
@@ -1364,7 +1287,7 @@ async function fetchIndicadores() {
       selic: parseFloat(selicJ[0]?.valor || 13.75),
       ipca:  ipcaJ.reduce((s,m) => s + parseFloat(m.valor||0), 0),
     };
-    setCache('ind', data, _API_CACHE_TTL);
+    setCache('ind', data, 600000);
     return data;
   } catch(e) {
     return { cdi: 13.65, selic: 13.75, ipca: 4.83 };
@@ -1477,7 +1400,7 @@ async function syncQuotes() {
     });
 
     window._indicadores = ind;
-    saveInv(); cacheSet('investments', investments); updateHero(); renderInvestimentos();
+    saveInv(); updateHero(); renderInvestimentos();
     // atualiza ticker com cotações recentes incluindo ativos da carteira
     buildTickerData(ind).then(renderTicker);
     showToast(updated > 0 ? `✓ ${updated} ativo(s) atualizado(s) via API` : 'Cotações verificadas (sem ativos automáticos)');
@@ -1654,8 +1577,6 @@ async function preencherTaxaReal() {
    INIT
 ════════════════════════════════════════ */
 async function init() {
-  const overlay = document.getElementById('dash-loading');
-
   const ok = await initAuth();
   if (!ok) return;
 
@@ -1666,21 +1587,17 @@ async function init() {
   updateHero();
   renderInvestimentos();
 
-  // Dados prontos — remove o overlay com fade
-  if (overlay) {
-    overlay.classList.add('hidden');
-    setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 380);
-  }
+  // Indicadores reais do BCB
+  const ind = await fetchIndicadores();
+  window._indicadores = ind;
+  document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
+  updateTaxa();
 
-  // Indicadores e ticker em segundo plano (não bloqueiam a tela)
-  fetchIndicadores().then(ind => {
-    window._indicadores = ind;
-    document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
-    updateTaxa();
-    buildTickerData(ind).then(renderTicker);
-  }).catch(() => {});
+  // Ticker animado com todos os dados
+  const tickerItems = await buildTickerData(ind);
+  renderTicker(tickerItems);
 
-  // Sincroniza cotações dos ativos em segundo plano
+  // Sincroniza cotações dos ativos
   syncQuotes();
 }
 
