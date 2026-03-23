@@ -742,6 +742,15 @@ async function initAuth() {
     global: { headers: { Authorization: `Bearer ${session.access_token}` } }
   });
 
+  // Mantém sbDb atualizado quando o token for renovado automaticamente
+  sb.auth.onAuthStateChange((event, s) => {
+    if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && s) {
+      sbDb = createClient(WORKER_URL + '/api/supabase', s.access_token, {
+        global: { headers: { Authorization: `Bearer ${s.access_token}` } }
+      });
+    }
+  });
+
   const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
   const firstName = name.split(' ')[0];
   const initials  = name.split(' ').slice(0,2).map(w => w[0].toUpperCase()).join('');
@@ -982,7 +991,7 @@ async function addTransaction() {
   if (!id) {
     // Rollback: remove o item otimista e avisa
     state.transactions = state.transactions.filter(t => t.id !== tempId);
-    calcSummary(); renderRecentTx(); renderCharts();
+    calcSummary(); renderRecentTx(); renderTransactions(); renderCharts();
     return;
   }
   const idx = state.transactions.findIndex(t => t.id === tempId);
@@ -1423,7 +1432,8 @@ async function init() {
 
     calcSummary();
     renderCharts();
-    
+    renderTransactions();
+
   } catch (error) {
     console.error("Erro ao carregar dashboard:", error);
     showToast("Erro ao carregar dashboard.", true);
