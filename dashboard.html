@@ -741,18 +741,18 @@ async function initAuth() {
     return true;
   }
 
-  // Tenta getSession primeiro; se falhar aguarda onAuthStateChange (até 6s)
+  // Obtém sessão — redireciona para login se não autenticado
   let { data: { session } } = await sb.auth.getSession();
 
   if (!session) {
+    // Aguarda até 3s pelo onAuthStateChange (Supabase pode estar inicializando)
     session = await new Promise(resolve => {
-      const timeout = setTimeout(() => resolve(null), 6000);
+      const timer = setTimeout(() => resolve(null), 3000);
       const { data: { subscription } } = sb.auth.onAuthStateChange((event, s) => {
-        // SIGNED_IN = sessão confirmada; SIGNED_OUT = deslogado de verdade
-        if (s || event === 'SIGNED_OUT') {
-          clearTimeout(timeout);
-          subscription.unsubscribe();
-          resolve(s);
+        if (event === 'SIGNED_IN' && s) {
+          clearTimeout(timer); subscription.unsubscribe(); resolve(s);
+        } else if (event === 'SIGNED_OUT') {
+          clearTimeout(timer); subscription.unsubscribe(); resolve(null);
         }
       });
     });
