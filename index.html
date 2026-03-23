@@ -489,7 +489,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const { createClient } = supabase;
 // sb = auth direto | sbDb = queries de banco via Worker
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
-const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
+let sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
 const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 function fmt(v){ return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -517,6 +517,9 @@ async function loadPreview() {
   try {
     const { data:{ session } } = IS_DEV ? {data:{session:null}} : await sb.auth.getSession();
     if (!session) { showGuest(); return; }
+    sbDb = createClient(WORKER_URL + '/api/supabase', session.access_token, {
+  global: { headers: { Authorization: `Bearer ${session.access_token}` } }
+});
 
     // Navbar logado
     const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
