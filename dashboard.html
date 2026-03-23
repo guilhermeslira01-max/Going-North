@@ -789,6 +789,7 @@ async function dbAddTransaction(tx) {
     user_id: currentUser.id, descricao: tx.desc, valor: tx.valor,
     tipo: tx.tipo, cat: tx.cat, data: tx.data
   }).select().single();
+  console.log('INSERT transactions result:', { data, error });
   if (error) { showToast('Erro ao salvar transação.', true); return null; }
   return data.id;
 }
