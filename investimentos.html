@@ -749,9 +749,12 @@ function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
 
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
+  const cachedRole = cacheGet('role');
+  if (cachedRole) { currentUser.role = cachedRole; return; }
   try {
     const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
+    cacheSet('role', currentUser.role);
   } catch(e) { currentUser.role = 'free'; }
 }
 
@@ -793,8 +796,38 @@ async function initAuth() {
 }
 
 async function doLogout() {
+  cacheClearAll();
   if (!IS_DEV) await sb.auth.signOut();
   window.location.href = 'login.html';
+}
+
+
+/* ════════════════════════════════════════
+   CACHE LOCAL — 24h por user_id
+════════════════════════════════════════ */
+const CACHE_TTL = 24 * 60 * 60 * 1000;
+
+function cacheKey(name) {
+  const uid = currentUser?.id || 'anon';
+  return `gn_cache_${uid}_${name}`;
+}
+function cacheSet(name, data) {
+  try { localStorage.setItem(cacheKey(name), JSON.stringify({ data, ts: Date.now() })); } catch(e) {}
+}
+function cacheGet(name) {
+  try {
+    const raw = localStorage.getItem(cacheKey(name));
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(cacheKey(name)); return null; }
+    return data;
+  } catch(e) { return null; }
+}
+function cacheClearAll() {
+  const uid = currentUser?.id || 'anon';
+  Object.keys(localStorage)
+    .filter(k => k.startsWith(`gn_cache_${uid}_`) || k.startsWith('gn_api_'))
+    .forEach(k => localStorage.removeItem(k));
 }
 
 /* ════════════════════════════════════════
@@ -822,6 +855,8 @@ async function loadInv() {
     devSave('investments', investments);
     return;
   }
+  const cachedInv = cacheGet('investments');
+  if (cachedInv) { investments = cachedInv; return; }
   const { data, error } = await sbDb.from('investments').select('*').order('created_at');
   if (error) { console.error('loadInv:', error); return; }
   investments = (data || []).map(r => ({
@@ -832,6 +867,7 @@ async function loadInv() {
     precoAtual:  r.preco_atual  ? parseFloat(r.preco_atual)  : null,
     variacao24h: r.variacao_24h ? parseFloat(r.variacao_24h) : null,
   }));
+  cacheSet('investments', investments);
 }
 
 async function dbAddInv(inv) {
@@ -845,6 +881,7 @@ async function dbAddInv(inv) {
     taxa: inv.taxa||null, data: inv.data||null, cotas: inv.cotas||null,
     preco_medio: inv.precoMedio||null, preco_atual: inv.precoAtual||null, variacao_24h: inv.variacao24h||null,
   }).select().single();
+  console.log('INSERT investments result:', { data, error });
   if (error) { showToast('Erro ao salvar.', true); return null; }
   return data.id;
 }
@@ -987,6 +1024,7 @@ async function addInvestimento() {
   }
   const idx = investments.findIndex(i => i.id === tempId);
   if (idx !== -1) investments[idx].id = id;
+  cacheSet('investments', investments);
   updateHero(); renderInvestimentos();
 }
 
@@ -1002,6 +1040,8 @@ async function deleteInvestimento(id) {
     if (backup) investments.push(backup);
     updateHero(); renderInvestimentos();
     showToast('Erro ao remover investimento.', true);
+  } else {
+    cacheSet('investments', investments);
   }
 }
 
@@ -1032,6 +1072,8 @@ async function saveEdit() {
       inv.atual = prevAtual;
       updateHero(); renderInvestimentos();
       showToast('Erro ao atualizar valor.', true);
+    } else {
+      cacheSet('investments', investments);
     }
   }
 }
@@ -1265,10 +1307,22 @@ const BRAPI_BASE  = 'https://brapi.dev/api';
 const BCB_BASE    = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs';
 const COINGECKO   = 'https://api.coingecko.com/api/v3';
 
-// Cache 5min
-const _cache = {};
-function setCache(key,data,ttl=300000){_cache[key]={data,exp:Date.now()+ttl};}
-function getCache(key){const c=_cache[key];return(c&&Date.now()<c.exp)?c.data:null;}
+// Cache 30min para APIs externas (persiste entre refreshes via localStorage)
+const _API_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
+function setCache(key, data, ttl = _API_CACHE_TTL) {
+  try {
+    localStorage.setItem('gn_api_' + key, JSON.stringify({ data, exp: Date.now() + ttl }));
+  } catch(e) {}
+}
+function getCache(key) {
+  try {
+    const raw = localStorage.getItem('gn_api_' + key);
+    if (!raw) return null;
+    const { data, exp } = JSON.parse(raw);
+    if (Date.now() > exp) { localStorage.removeItem('gn_api_' + key); return null; }
+    return data;
+  } catch(e) { return null; }
+}
 
 /* ════════════════════════════════════════
    API — BCB (CDI / Selic / IPCA)
@@ -1287,7 +1341,7 @@ async function fetchIndicadores() {
       selic: parseFloat(selicJ[0]?.valor || 13.75),
       ipca:  ipcaJ.reduce((s,m) => s + parseFloat(m.valor||0), 0),
     };
-    setCache('ind', data, 600000);
+    setCache('ind', data, _API_CACHE_TTL);
     return data;
   } catch(e) {
     return { cdi: 13.65, selic: 13.75, ipca: 4.83 };
@@ -1400,7 +1454,7 @@ async function syncQuotes() {
     });
 
     window._indicadores = ind;
-    saveInv(); updateHero(); renderInvestimentos();
+    saveInv(); cacheSet('investments', investments); updateHero(); renderInvestimentos();
     // atualiza ticker com cotações recentes incluindo ativos da carteira
     buildTickerData(ind).then(renderTicker);
     showToast(updated > 0 ? `✓ ${updated} ativo(s) atualizado(s) via API` : 'Cotações verificadas (sem ativos automáticos)');
