@@ -217,8 +217,15 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ── AUTO-REDIRECT se já logado ── */
 (async function() {
+  // Primeira tentativa: getSession
   const { data: { session } } = await sb.auth.getSession();
-  if (session) window.location.href = 'index.html';
+  if (session) { window.location.href = 'index.html'; return; }
+  // Segunda tentativa: onAuthStateChange (pega sessão que ainda estava carregando)
+  const { data: { subscription } } = sb.auth.onAuthStateChange((event, s) => {
+    if (s) { subscription.unsubscribe(); window.location.href = 'index.html'; }
+  });
+  // Cancela listener após 2s para não interferir com login manual
+  setTimeout(() => subscription.unsubscribe(), 2000);
 })();
 
 /* ── MODE ── */
@@ -296,7 +303,16 @@ async function doLogin() {
     showError(msg); return;
   }
   showSuccess('Login realizado! Redirecionando...');
-  setTimeout(() => window.location.href = 'index.html', 800);
+  // Aguarda sessão ser confirmada pelo Supabase antes de redirecionar
+  // Evita loop: login → index → login quando o cookie ainda não sincronizou
+  const { data: { subscription } } = sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      subscription.unsubscribe();
+      window.location.href = 'index.html';
+    }
+  });
+  // Fallback: se onAuthStateChange não disparar em 3s, redireciona mesmo assim
+  setTimeout(() => { subscription.unsubscribe(); window.location.href = 'index.html'; }, 3000);
 }
 
 /* ── REGISTER ── */
