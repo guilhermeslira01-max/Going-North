@@ -215,10 +215,22 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-/* ── AUTO-REDIRECT se já logado ── */
+/* ── AUTO-REDIRECT SEGURO ── */
 (async function() {
+  // 1. Checa se existe algum token salvo no navegador
   const { data: { session } } = await sb.auth.getSession();
-  if (session) window.location.href = 'dashboard.html';
+  
+  if (session) {
+    // 2. Se existir, pergunta ao servidor se ESSE token ainda é válido
+    const { data: { user } } = await sb.auth.getUser();
+    
+    if (user) {
+      window.location.href = 'index.html'; // Tudo certo, vai pro dashboard
+    } else {
+      // O token é velho ou a assinatura é inválida. Apaga a sujeira!
+      await sb.auth.signOut();
+    }
+  }
 })();
 
 /* ── MODE ── */
