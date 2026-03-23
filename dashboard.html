@@ -967,13 +967,38 @@ function calcSummary() {
 const catColors = { 'salário':'#1aab5e','freelance':'#0d9488','moradia':'#6366f1','alimentação':'#f97316','transporte':'#c8a96e','lazer':'#ec4899','saúde':'#3b82f6','investimento':'#1aab5e','outros':'#94a3b8' };
 const catIcons  = { 'salário':'💼','freelance':'💻','moradia':'🏠','alimentação':'🍽️','transporte':'🚗','lazer':'🎬','saúde':'❤️','investimento':'📈','outros':'📦' };
 
-async function addTransaction() {
-  const desc  = document.getElementById('tx-desc').value.trim();
-  const valor = parseFloat(document.getElementById('tx-valor').value);
-  const tipo  = document.getElementById('tx-tipo-m').value;
-  const cat   = document.getElementById('tx-cat-m').value;
-  const data  = document.getElementById('tx-data').value;
-  if (!desc || isNaN(valor) || valor<=0 || !data) { showToast('Preencha todos os campos.', true); return; }
+async function dbAddTransaction(tx) {
+  try {
+    // 1. Pega o usuário que está logado no momento
+    const { data: authData } = await sbDb.auth.getUser();
+    if (!authData.user) {
+      console.error('Usuário não autenticado.');
+      return null;
+    }
+
+    // 2. Adiciona o ID do usuário ao objeto da transação
+    tx.user_id = authData.user.id;
+
+    // 3. Salva no banco E pede os dados de volta com .select()
+    const { data, error } = await sbDb
+      .from('transactions')
+      .insert([tx])
+      .select(); // <-- ESSENCIAL PARA RECEBER O ID DE VOLTA!
+
+    // 4. Se o Supabase reclamar de algo, ele avisa aqui
+    if (error) {
+      console.error('Erro ao salvar no Supabase:', error);
+      return null;
+    }
+
+    // 5. Agora sim data[0] existe e tem um ID válido!
+    return data[0].id;
+
+  } catch (err) {
+    console.error('Erro na função dbAddTransaction:', err);
+    return null;
+  }
+}
 
   // Optimistic update: mostra na tela imediatamente com ID temporário
   const tempId = '__tmp__' + Date.now();
@@ -998,7 +1023,7 @@ async function addTransaction() {
   if (idx !== -1) state.transactions[idx].id = id;
   cacheSet('transactions', state.transactions);
   calcSummary(); renderRecentTx(); renderTransactions(); renderCharts();
-}
+
 
 async function deleteTransaction(id) {
   // Optimistic update: remove da tela imediatamente
