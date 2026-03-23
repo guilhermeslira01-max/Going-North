@@ -243,6 +243,18 @@ select.form-control{cursor:pointer;}
 .alloc-table tr:hover td{background:var(--surface2);}
 .perc-bar{width:80px;height:5px;background:var(--border);border-radius:20px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:8px;}
 .perc-fill{height:100%;border-radius:20px;}
+
+/* ── LOADING OVERLAY ── */
+.dash-loading{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .35s ease;}
+.dash-loading.hidden{opacity:0;pointer-events:none;}
+.dash-loading-logo{font-family:var(--font-d);font-size:1.4rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px;}
+.dash-loading-logo span{color:var(--green);}
+.dash-loading-dots{display:flex;gap:7px;}
+.dash-loading-dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:dashDotPulse 1.3s ease-in-out infinite;}
+.dash-loading-dot:nth-child(2){animation-delay:.18s;}
+.dash-loading-dot:nth-child(3){animation-delay:.36s;}
+@keyframes dashDotPulse{0%,80%,100%{transform:scale(.55);opacity:.3;}40%{transform:scale(1);opacity:1;}}
+.dash-loading-text{font-size:.82rem;color:var(--text3);font-weight:500;}
 </style>
 </head>
 <body>
@@ -276,6 +288,17 @@ select.form-control{cursor:pointer;}
     </button>
   </div>
 </nav>
+
+<!-- ── LOADING OVERLAY ── -->
+<div class="dash-loading" id="dash-loading">
+  <div class="dash-loading-logo">Going<span>North</span></div>
+  <div class="dash-loading-dots">
+    <div class="dash-loading-dot"></div>
+    <div class="dash-loading-dot"></div>
+    <div class="dash-loading-dot"></div>
+  </div>
+  <div class="dash-loading-text">Carregando seus investimentos...</div>
+</div>
 
 <!-- ── TICKER BAR ── -->
 <div class="ticker-wrap" id="ticker-wrap">
@@ -776,37 +799,13 @@ async function initAuth() {
     applyRoleBadge();
     return true;
   }
-  // Tenta getSession primeiro; se falhar aguarda onAuthStateChange (até 4s)
-  let { data: { session } } = await sb.auth.getSession();
-
-  if (!session) {
-    session = await new Promise(resolve => {
-      const timeout = setTimeout(() => resolve(null), 4000);
-      const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
-        if (s) {
-          clearTimeout(timeout);
-          subscription.unsubscribe();
-          resolve(s);
-        }
-      });
-    });
-  }
-
+  const { data: { session } } = await sb.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return false; }
   currentUser = session.user;
 
   // Cria sbDb com o JWT real do usuário para que o RLS do Supabase funcione
   sbDb = createClient(WORKER_URL + '/api/supabase', session.access_token, {
     global: { headers: { Authorization: `Bearer ${session.access_token}` } }
-  });
-
-  // Mantém sbDb atualizado quando o token for renovado automaticamente
-  sb.auth.onAuthStateChange((event, s) => {
-    if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && s) {
-      sbDb = createClient(WORKER_URL + '/api/supabase', s.access_token, {
-        global: { headers: { Authorization: `Bearer ${s.access_token}` } }
-      });
-    }
   });
 
   const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
@@ -1655,6 +1654,8 @@ async function preencherTaxaReal() {
    INIT
 ════════════════════════════════════════ */
 async function init() {
+  const overlay = document.getElementById('dash-loading');
+
   const ok = await initAuth();
   if (!ok) return;
 
@@ -1665,17 +1666,21 @@ async function init() {
   updateHero();
   renderInvestimentos();
 
-  // Indicadores reais do BCB
-  const ind = await fetchIndicadores();
-  window._indicadores = ind;
-  document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
-  updateTaxa();
+  // Dados prontos — remove o overlay com fade
+  if (overlay) {
+    overlay.classList.add('hidden');
+    setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 380);
+  }
 
-  // Ticker animado com todos os dados
-  const tickerItems = await buildTickerData(ind);
-  renderTicker(tickerItems);
+  // Indicadores e ticker em segundo plano (não bloqueiam a tela)
+  fetchIndicadores().then(ind => {
+    window._indicadores = ind;
+    document.getElementById('sim-taxa').value = Math.min(ind.cdi.toFixed(1), 30);
+    updateTaxa();
+    buildTickerData(ind).then(renderTicker);
+  }).catch(() => {});
 
-  // Sincroniza cotações dos ativos
+  // Sincroniza cotações dos ativos em segundo plano
   syncQuotes();
 }
 
