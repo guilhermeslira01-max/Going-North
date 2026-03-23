@@ -776,13 +776,37 @@ async function initAuth() {
     applyRoleBadge();
     return true;
   }
-  const { data: { session } } = await sb.auth.getSession();
+  // Tenta getSession primeiro; se falhar aguarda onAuthStateChange (até 4s)
+  let { data: { session } } = await sb.auth.getSession();
+
+  if (!session) {
+    session = await new Promise(resolve => {
+      const timeout = setTimeout(() => resolve(null), 4000);
+      const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
+        if (s) {
+          clearTimeout(timeout);
+          subscription.unsubscribe();
+          resolve(s);
+        }
+      });
+    });
+  }
+
   if (!session) { window.location.href = 'login.html'; return false; }
   currentUser = session.user;
 
   // Cria sbDb com o JWT real do usuário para que o RLS do Supabase funcione
   sbDb = createClient(WORKER_URL + '/api/supabase', session.access_token, {
     global: { headers: { Authorization: `Bearer ${session.access_token}` } }
+  });
+
+  // Mantém sbDb atualizado quando o token for renovado automaticamente
+  sb.auth.onAuthStateChange((event, s) => {
+    if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && s) {
+      sbDb = createClient(WORKER_URL + '/api/supabase', s.access_token, {
+        global: { headers: { Authorization: `Bearer ${s.access_token}` } }
+      });
+    }
   });
 
   const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
