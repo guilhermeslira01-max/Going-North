@@ -28,6 +28,8 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--text);-webkit-fo
 a{text-decoration:none;color:inherit;}
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:99px;}
+
+/* ── NAVBAR ── */
 .navbar{background:var(--nav);padding:0 32px;display:flex;align-items:center;height:60px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 rgba(255,255,255,.06);}
 .nav-logo{display:flex;align-items:center;gap:6px;color:#fff;font-family:var(--font-d);font-weight:700;font-size:1.1rem;margin-right:40px;white-space:nowrap;}
 .nav-logo-icon{width:40px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -43,6 +45,8 @@ a{text-decoration:none;color:inherit;}
 .nav-avatar{width:32px;height:32px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#fff;font-family:var(--font-d);}
 .btn-logout{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:7px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:var(--font-b);}
 .btn-logout:hover{border-color:rgba(255,255,255,.3);color:#fff;}
+
+/* ── HERO ── */
 .hero{background:linear-gradient(135deg,var(--nav) 0%,#003d2a 60%,#002b1e 100%);padding:40px 32px 52px;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;top:-100px;right:-80px;width:600px;height:600px;background:radial-gradient(circle,rgba(26,171,94,.13) 0%,transparent 65%);pointer-events:none;}
 .hero::after{content:'';position:absolute;bottom:-40px;left:5%;width:350px;height:350px;background:radial-gradient(circle,rgba(13,148,136,.09) 0%,transparent 65%);pointer-events:none;}
@@ -57,6 +61,8 @@ a{text-decoration:none;color:inherit;}
 .hero-filter{padding:7px 18px;border-radius:20px;font-size:.8rem;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);background:transparent;transition:all .2s;font-family:var(--font-b);}
 .hero-filter:hover{border-color:var(--green);color:#fff;}
 .hero-filter.active{background:var(--green);border-color:var(--green);color:#fff;}
+
+/* ── TICKER ── */
 .ticker-wrap{background:#001a1a;border-bottom:1px solid rgba(54,133,71,.15);overflow:hidden;height:36px;display:flex;align-items:center;position:relative;}
 .ticker-wrap::before{content:'';position:absolute;left:0;top:0;bottom:0;width:60px;background:linear-gradient(90deg,#001a1a,transparent);z-index:2;pointer-events:none;}
 .ticker-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:60px;background:linear-gradient(270deg,#001a1a,transparent);z-index:2;pointer-events:none;}
@@ -74,7 +80,11 @@ a{text-decoration:none;color:inherit;}
 .ticker-dot.up{background:#4ade80;}
 .ticker-dot.dn{background:#f87171;}
 .ticker-dot.neu{background:rgba(255,255,255,.3);}
+
+/* ── MAIN LAYOUT ── */
 .main{max-width:1300px;margin:0 auto;padding:28px 32px 60px;display:grid;grid-template-columns:1fr 340px;gap:28px;}
+
+/* ── NEWS SECTION ── */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
 .sec-title{font-family:var(--font-d);font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
 .sec-dot{width:8px;height:8px;border-radius:2px;background:var(--green);}
@@ -83,6 +93,8 @@ a{text-decoration:none;color:inherit;}
 .btn-refresh:hover{background:var(--green);color:#fff;}
 .btn-refresh.loading svg{animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── NEWS DESTAQUE ── */
 .news-featured{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px;cursor:pointer;transition:all .25s;display:grid;grid-template-columns:1fr 1fr;}
 .news-featured:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
 .news-featured-img{min-height:220px;background:linear-gradient(135deg,#0f2318,#1a4731);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
@@ -93,17 +105,21 @@ a{text-decoration:none;color:inherit;}
 .news-source{font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;}
 .news-time{font-size:.71rem;color:var(--text3);}
 .news-featured-title{font-family:var(--font-d);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:10px;}
-.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;}
+.news-featured-desc{font-size:.82rem;color:var(--text3);line-height:1.6;margin-bottom:16px;display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;}
 .news-read-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:600;transition:background .2s;}
 .news-read-btn:hover{background:var(--green-h);}
+
+/* ── NEWS LIST ── */
 .news-list{display:flex;flex-direction:column;gap:12px;}
 .news-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:1fr 80px;gap:14px;align-items:start;}
 .news-card:hover{border-color:var(--green);box-shadow:var(--shadow);}
 .news-card-cat{font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
-.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-card-title{font-family:var(--font-d);font-size:.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:5px;display: -webkit-box;-webkit-line-clamp: 2;line-clamp: 2; -webkit-box-orient: vertical;overflow: hidden; text-overflow: ellipsis;}
 .news-card-meta{font-size:.72rem;color:var(--text3);display:flex;align-items:center;gap:6px;}
 .news-card-img{width:80px;height:68px;border-radius:10px;object-fit:cover;background:linear-gradient(135deg,#e2f0e9,#c5dfd1);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;overflow:hidden;}
 .news-card-img img{width:100%;height:100%;object-fit:cover;}
+
+/* ── LOADING / EMPTY ── */
 .news-skeleton{display:flex;flex-direction:column;gap:12px;}
 .skel{background:linear-gradient(90deg,var(--surface2) 25%,#e8f0eb 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--r-lg);}
 @keyframes shimmer{to{background-position:-200% 0;}}
@@ -111,7 +127,11 @@ a{text-decoration:none;color:inherit;}
 .skel-card{height:100px;}
 .empty-news{text-align:center;padding:40px;color:var(--text3);}
 .empty-news svg{margin-bottom:12px;opacity:.4;}
+
+/* ── SIDEBAR ── */
 .sidebar{display:flex;flex-direction:column;gap:20px;}
+
+/* ── JORNAIS CARD ── */
 .jornal-card{background:var(--surface);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow);}
 .jornal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);}
 .jornal-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);}
@@ -124,6 +144,8 @@ a{text-decoration:none;color:inherit;}
 .jornal-desc{font-size:.72rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .jornal-arrow{color:var(--text3);transition:color .2s;flex-shrink:0;}
 .jornal-item:hover .jornal-arrow{color:var(--green);}
+
+/* ── INDICADORES CARD ── */
 .ind-card{background:var(--surface);border-radius:var(--r-xl);padding:20px;box-shadow:var(--shadow);}
 .ind-title{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .ind-list{display:flex;flex-direction:column;gap:10px;}
@@ -131,31 +153,55 @@ a{text-decoration:none;color:inherit;}
 .ind-name{font-size:.8rem;font-weight:600;color:var(--text2);}
 .ind-val{font-family:var(--font-d);font-size:.9rem;font-weight:700;color:var(--green);}
 .ind-sub{font-size:.7rem;color:var(--text3);margin-top:1px;}
+
+/* ── PAGINATION ── */
 .pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:24px;}
 .page-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
 .page-btn:hover,.page-btn.active{background:var(--green);border-color:var(--green);color:#fff;}
 .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── TOAST ── */
 .toast{position:fixed;bottom:28px;right:28px;background:var(--nav);color:#fff;padding:13px 20px;border-radius:12px;font-size:.86rem;font-weight:500;box-shadow:var(--shadow-md);z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast-icon{color:var(--green);}
+
 @media(max-width:1000px){.main{grid-template-columns:1fr;}.news-featured{grid-template-columns:1fr;}.news-featured-img{min-height:160px;}}
 @media(max-width:680px){.main{padding:16px 16px 48px;}.hero{padding:28px 16px 44px;}.navbar{padding:0 16px;}.nav-links{display:none;}}
 </style>
 </head>
 <body>
+
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-logo">
-    <div class="nav-logo-icon"><img src="images/logo.png" alt="Going North" style="height:30px;width:auto;display:block;mix-blend-mode:lighten;opacity:.95;"></div>
+    <div class="nav-logo-icon">
+      <img src="images/logo.png" alt="Going North" style="height:30px;width:auto;display:block;mix-blend-mode:lighten;opacity:.95;">
+    </div>
     Going<span style="color:var(--green);margin-left:2px;">North</span>
   </div>
   <div class="nav-links">
-    <a href="index.html">Home</a><a href="dashboard.html">Dashboard</a><a href="investimentos.html">Investimentos</a><a href="educacao.html">Educação</a><a href="noticias.html" class="active">Notícias</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="investimentos.html">Investimentos</a>
+    <a href="educacao.html">Educação</a>
+    <a href="noticias.html" class="active">Notícias</a>
+    <a href="sobre.html">Sobre</a>
+    <a href="contato.html">Contato</a>
   </div>
   <div class="nav-right">
-    <div class="nav-user"><div class="nav-avatar" id="nav-avatar">?</div><span id="nav-username">...</span><span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span></div>
-    <button class="btn-logout" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span id="nav-username">...</span>
+      <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sair
+    </button>
   </div>
 </nav>
+
+<!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-tag"><span class="live-dot"></span>Ao vivo · Atualizado agora</div>
@@ -171,6 +217,8 @@ a{text-decoration:none;color:inherit;}
     </div>
   </div>
 </div>
+
+<!-- TICKER -->
 <div class="ticker-wrap">
   <div class="ticker-track" id="ticker-track">
     <div class="ticker-item"><span class="ticker-name">CDI</span><span class="ticker-price">—</span></div>
@@ -181,20 +229,43 @@ a{text-decoration:none;color:inherit;}
     <div class="ticker-item"><span class="ticker-name">IBOV</span><span class="ticker-price">—</span></div>
   </div>
 </div>
+
+<!-- MAIN -->
 <div class="main">
+
+  <!-- NEWS COLUMN -->
   <div class="news-section">
     <div class="sec-head">
-      <div class="sec-title"><div class="sec-dot"></div>Últimas notícias<span class="sec-count" id="news-count"></span></div>
+      <div class="sec-title">
+        <div class="sec-dot"></div>
+        Últimas notícias
+        <span class="sec-count" id="news-count"></span>
+      </div>
       <button class="btn-refresh" id="btn-refresh" onclick="loadNews()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Atualizar
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Atualizar
       </button>
     </div>
-    <div id="news-container"><div class="news-skeleton"><div class="skel skel-feat"></div><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div></div></div>
+    <div id="news-container">
+      <div class="news-skeleton">
+        <div class="skel skel-feat"></div>
+        <div class="skel skel-card"></div>
+        <div class="skel skel-card"></div>
+        <div class="skel skel-card"></div>
+      </div>
+    </div>
     <div class="pagination" id="pagination"></div>
   </div>
+
+  <!-- SIDEBAR -->
   <aside class="sidebar">
+
+    <!-- INDICADORES -->
     <div class="ind-card">
-      <div class="ind-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Indicadores do mercado</div>
+      <div class="ind-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Indicadores do mercado
+      </div>
       <div class="ind-list" id="ind-list">
         <div class="ind-item"><div><div class="ind-name">CDI</div><div class="ind-sub">ao ano</div></div><div class="ind-val" id="ind-cdi">--</div></div>
         <div class="ind-item"><div><div class="ind-name">Selic</div><div class="ind-sub">ao ano</div></div><div class="ind-val" id="ind-selic">--</div></div>
@@ -203,42 +274,61 @@ a{text-decoration:none;color:inherit;}
         <div class="ind-item"><div><div class="ind-name">Dólar</div><div class="ind-sub">compra</div></div><div class="ind-val" id="ind-usd">--</div></div>
       </div>
     </div>
+
+    <!-- JORNAIS INFORMATIVOS -->
     <div class="jornal-card">
-      <div class="jornal-head"><div class="jornal-title">🗞️ Jornais e portais</div></div>
+      <div class="jornal-head">
+        <div class="jornal-title">🗞️ Jornais e portais</div>
+      </div>
       <div class="jornal-list" id="jornal-list"></div>
     </div>
+
   </aside>
 </div>
+
+
+<!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
 <script>
+/* ══════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════ */
 const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
 const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
+// sb = cliente direto para AUTH (getSession, signOut)
+// sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
 const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
-
-/* ── Role cache — evita query ao Supabase a cada visita ── */
-const _ROLE_TTL = 86400000;
-function _rck(uid) { return `gn_cache_${uid}_role`; }
-function _rcg(uid) {
-  try { const r=localStorage.getItem(_rck(uid)); if(!r) return null; const {v,ts}=JSON.parse(r); if(Date.now()-ts>_ROLE_TTL){localStorage.removeItem(_rck(uid));return null;} return v; } catch(e){return null;}
-}
-function _rcs(uid,role) { try{localStorage.setItem(_rck(uid),JSON.stringify({v:role,ts:Date.now()}));}catch(e){} }
-function _rcClear() { try{Object.keys(localStorage).filter(k=>k.startsWith('gn_cache_')||k.startsWith('gn_api_')).forEach(k=>localStorage.removeItem(k));}catch(e){} }
-
 const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
 let currentUser = null;
+
 function isAdmin() { return currentUser?.role === 'admin'; }
 function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
+
 function applyRoleBadge() {
   const badge = document.getElementById('nav-role-badge');
   if (!badge) return;
-  if (isAdmin()) { badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex'; }
-  else if (isPro()) { badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex'; }
+  if (isAdmin()) {
+    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
+  } else if (isPro()) {
+    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
+  }
 }
+
 (async function() {
-  if (IS_DEV) { currentUser = { id: 'dev-user', role: 'admin' }; document.getElementById('nav-username').textContent = 'Preview'; document.getElementById('nav-avatar').textContent = 'PV'; applyRoleBadge(); return; }
+  if (IS_DEV) {
+    currentUser = { id: 'dev-user', role: 'admin' };
+    document.getElementById('nav-username').textContent = 'Preview';
+    document.getElementById('nav-avatar').textContent = 'PV';
+    applyRoleBadge();
+    return;
+  }
+
+  // Tenta getSession; se falhar aguarda onAuthStateChange (até 4s)
   let { data: { session } } = await sb.auth.getSession();
   if (!session) {
     session = await new Promise(resolve => {
@@ -253,44 +343,29 @@ function applyRoleBadge() {
   const name = session.user.user_metadata?.name || session.user.email.split('@')[0];
   document.getElementById('nav-username').textContent = name.split(' ')[0];
   document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
-  const _cr = _rcg(currentUser.id);
-  if (_cr) { currentUser.role = _cr; }
-  else {
-    try {
-      const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
-      currentUser.role = data?.role || 'free';
-      _rcs(currentUser.id, currentUser.role);
-    } catch(e) { currentUser.role = 'free'; }
-  }
+  try {
+    const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
+    currentUser.role = data?.role || 'free';
+  } catch(e) { currentUser.role = 'free'; }
   applyRoleBadge();
 })();
+
 async function doLogout() {
-  _rcClear();
   if (!IS_DEV) await sb.auth.signOut();
   window.location.href = 'login.html';
 }
 
+/* ══════════════════════════════════════
+   GNEWS API
+══════════════════════════════════════ */
 const GNEWS_KEY = '96227d727885f04bace320ff8244fe5d';
 const GNEWS_BASE = 'https://gnews.io/api/v4';
 
-/* ── Cache 30min para APIs externas (persiste entre refreshes) ── */
-const _API_TTL = 30 * 60 * 1000;
-function _apiCacheSet(key, data) {
-  try { localStorage.setItem('gn_api_' + key, JSON.stringify({ data, exp: Date.now() + _API_TTL })); } catch(e) {}
-}
-function _apiCacheGet(key) {
-  try {
-    const raw = localStorage.getItem('gn_api_' + key);
-    if (!raw) return null;
-    const { data, exp } = JSON.parse(raw);
-    if (Date.now() > exp) { localStorage.removeItem('gn_api_' + key); return null; }
-    return data;
-  } catch(e) { return null; }
-}
-
-let allNews = [], currentPage = 1;
+let allNews = [];
+let currentPage = 1;
 const PAGE_SIZE = 6;
 let currentCat = '';
+
 const catQueries = {
   '': 'finanças OR investimento OR economia OR bolsa de valores Brasil',
   'economia': 'economia brasileira OR PIB OR inflação IPCA',
@@ -299,45 +374,56 @@ const catQueries = {
   'cripto': 'bitcoin OR ethereum OR criptomoeda',
   'renda fixa': 'tesouro direto OR CDB OR renda fixa',
 };
+
 function setCategoria(cat, btn) {
-  currentCat = cat; currentPage = 1;
+  currentCat = cat;
+  currentPage = 1;
   document.querySelectorAll('.hero-filter').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); loadNews();
+  btn.classList.add('active');
+  loadNews();
 }
+
 async function loadNews() {
   const btn = document.getElementById('btn-refresh');
   btn.classList.add('loading');
-  document.getElementById('news-container').innerHTML = `<div class="news-skeleton"><div class="skel skel-feat"></div><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div></div>`;
-
-  // Cache de 30min por categoria — evita bater na GNews a cada refresh
-  const cacheKey = 'news_' + (currentCat || 'all');
-  const cachedNews = _apiCacheGet(cacheKey);
-  if (cachedNews) {
-    allNews = cachedNews;
-    document.getElementById('news-count').textContent = `· ${allNews.length} notícias`;
-    renderNews();
-    btn.classList.remove('loading');
-    return;
-  }
+  document.getElementById('news-container').innerHTML = `
+    <div class="news-skeleton">
+      <div class="skel skel-feat"></div>
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+      <div class="skel skel-card"></div>
+    </div>`;
 
   const query = encodeURIComponent(catQueries[currentCat] || catQueries['']);
   const url = `${GNEWS_BASE}/search?q=${query}&lang=pt&country=br&max=10&apikey=${GNEWS_KEY}`;
+
   try {
-    const res = await fetch(url);
+    const res  = await fetch(url);
     const data = await res.json();
+
     if (!data.articles || data.articles.length === 0) {
-      document.getElementById('news-container').innerHTML = `<div class="empty-news"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/></svg><p>Nenhuma notícia encontrada.<br>Tente outra categoria.</p></div>`;
-      document.getElementById('pagination').innerHTML = ''; btn.classList.remove('loading'); return;
+      document.getElementById('news-container').innerHTML = `
+        <div class="empty-news">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/></svg>
+          <p>Nenhuma notícia encontrada.<br>Tente outra categoria.</p>
+        </div>`;
+      document.getElementById('pagination').innerHTML = '';
+      btn.classList.remove('loading');
+      return;
     }
+
     allNews = data.articles;
-    _apiCacheSet(cacheKey, allNews);
     document.getElementById('news-count').textContent = `· ${allNews.length} notícias`;
     renderNews();
   } catch(e) {
-    document.getElementById('news-container').innerHTML = `<div class="empty-news"><p>Erro ao carregar notícias. Verifique sua conexão.</p></div>`;
+    document.getElementById('news-container').innerHTML = `
+      <div class="empty-news">
+        <p>Erro ao carregar notícias. Verifique sua conexão.</p>
+      </div>`;
   }
   btn.classList.remove('loading');
 }
+
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
@@ -346,53 +432,86 @@ function timeAgo(dateStr) {
   if (h < 24) return `${h}h atrás`;
   return `${Math.floor(h/24)}d atrás`;
 }
+
+function catLabel(url) {
+  if (!url) return 'Finanças';
+  if (url.includes('cripto')||url.includes('bitcoin')) return 'Cripto';
+  if (url.includes('acao')||url.includes('bolsa')||url.includes('b3')) return 'Bolsa';
+  if (url.includes('economia')) return 'Economia';
+  if (url.includes('investimento')) return 'Investimentos';
+  return 'Finanças';
+}
+
 function renderNews() {
-  const start = (currentPage - 1) * PAGE_SIZE;
-  const page = allNews.slice(start, start + PAGE_SIZE);
+  const start   = (currentPage - 1) * PAGE_SIZE;
+  const page    = allNews.slice(start, start + PAGE_SIZE);
   const [feat, ...rest] = page;
+
   if (!feat) return;
-  const featHtml = `<div class="news-featured" onclick="window.open('${feat.url}','_blank')">
-    <div class="news-featured-img">${feat.image ? `<img src="${feat.image}" alt="" onerror="this.style.display='none'">` : `<span class="news-featured-img-fallback">📰</span>`}</div>
-    <div class="news-featured-body">
-      <div class="news-source-row"><span class="news-source">${feat.source?.name || 'Notícia'}</span><span class="news-time">${timeAgo(feat.publishedAt)}</span></div>
-      <div class="news-featured-title">${feat.title}</div>
-      <div class="news-featured-desc">${feat.description || ''}</div>
-      <span class="news-read-btn">Ler notícia completa →</span>
-    </div>
-  </div>`;
-  const cardsHtml = rest.map(n => `<div class="news-card" onclick="window.open('${n.url}','_blank')">
-    <div><div class="news-card-cat">${n.source?.name || 'Finanças'}</div><div class="news-card-title">${n.title}</div><div class="news-card-meta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${timeAgo(n.publishedAt)}</div></div>
-    <div class="news-card-img">${n.image ? `<img src="${n.image}" alt="" onerror="this.style.display='none'">` : '📰'}</div>
-  </div>`).join('');
+
+  const featHtml = `
+    <div class="news-featured" onclick="window.open('${feat.url}','_blank')">
+      <div class="news-featured-img">
+        ${feat.image
+          ? `<img src="${feat.image}" alt="" onerror="this.style.display='none'">`
+          : `<span class="news-featured-img-fallback">📰</span>`}
+      </div>
+      <div class="news-featured-body">
+        <div class="news-source-row">
+          <span class="news-source">${feat.source?.name || 'Notícia'}</span>
+          <span class="news-time">${timeAgo(feat.publishedAt)}</span>
+        </div>
+        <div class="news-featured-title">${feat.title}</div>
+        <div class="news-featured-desc">${feat.description || ''}</div>
+        <span class="news-read-btn">Ler notícia completa →</span>
+      </div>
+    </div>`;
+
+  const cardsHtml = rest.map(n => `
+    <div class="news-card" onclick="window.open('${n.url}','_blank')">
+      <div>
+        <div class="news-card-cat">${n.source?.name || 'Finanças'}</div>
+        <div class="news-card-title">${n.title}</div>
+        <div class="news-card-meta">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${timeAgo(n.publishedAt)}
+        </div>
+      </div>
+      <div class="news-card-img">
+        ${n.image
+          ? `<img src="${n.image}" alt="" onerror="this.style.display='none'">`
+          : '📰'}
+      </div>
+    </div>`).join('');
+
   document.getElementById('news-container').innerHTML = featHtml + `<div class="news-list">${cardsHtml}</div>`;
   renderPagination();
 }
+
 function renderPagination() {
   const total = Math.ceil(allNews.length / PAGE_SIZE);
   if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
   let html = `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">‹</button>`;
-  for (let i = 1; i <= total; i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  for (let i = 1; i <= total; i++) {
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
   html += `<button class="page-btn" ${currentPage===total?'disabled':''} onclick="goPage(${currentPage+1})">›</button>`;
   document.getElementById('pagination').innerHTML = html;
 }
-function goPage(p) { currentPage = p; renderNews(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+function goPage(p) {
+  currentPage = p;
+  renderNews();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════
+   INDICADORES + TICKER DINÂMICO
+══════════════════════════════════════ */
 async function loadIndicadores() {
-  // Cache 30min — evita bater nas APIs de indicadores a cada refresh
-  const cachedInd = _apiCacheGet('indicadores');
-  if (cachedInd) {
-    const { cdiVal, selicVal, ipcaVal, usd, btcBrl, ethBrl, ibovPrice, ibovChg, items } = cachedInd;
-    if (document.getElementById('ind-cdi'))   document.getElementById('ind-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
-    if (document.getElementById('ind-selic')) document.getElementById('ind-selic').textContent = selicVal.toFixed(2) + '% a.a.';
-    if (document.getElementById('ind-ipca'))  document.getElementById('ind-ipca').textContent  = ipcaVal.toFixed(2) + '%';
-    if (usd && document.getElementById('ind-usd'))  document.getElementById('ind-usd').textContent  = 'R$ ' + usd.toFixed(2);
-    if (btcBrl && document.getElementById('ind-btc')) document.getElementById('ind-btc').textContent = 'R$ ' + btcBrl.toLocaleString('pt-BR', {maximumFractionDigits:0});
-    renderTicker(items);
-    return;
-  }
-
   const items = [];
-  let cdiVal = 0, selicVal = 0, ipcaVal = 0, usd = null, btcBrl = null, ethBrl = null, ibovPrice = null, ibovChg = null;
 
+  // BCB — CDI, Selic, IPCA
   try {
     const [cdiRes, selicRes, ipcaRes] = await Promise.all([
       fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados/ultimos/1?formato=json'),
@@ -400,86 +519,127 @@ async function loadIndicadores() {
       fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json'),
     ]);
     const [cdi, selic, ipcaArr] = await Promise.all([cdiRes.json(), selicRes.json(), ipcaRes.json()]);
-    cdiVal   = parseFloat(cdi[0]?.valor || 0);
-    selicVal = parseFloat(selic[0]?.valor || 0);
-    ipcaVal  = ipcaArr.reduce((s, x) => s + parseFloat(x.valor || 0), 0);
+    const cdiVal   = parseFloat(cdi[0]?.valor || 0);
+    const selicVal = parseFloat(selic[0]?.valor || 0);
+    const ipcaVal  = ipcaArr.reduce((s, x) => s + parseFloat(x.valor || 0), 0);
+
+    // Sidebar
     document.getElementById('ind-cdi').textContent   = cdiVal.toFixed(2) + '% a.a.';
     document.getElementById('ind-selic').textContent = selicVal.toFixed(2) + '% a.a.';
     document.getElementById('ind-ipca').textContent  = ipcaVal.toFixed(2) + '%';
-    items.push({ name:'CDI', price: cdiVal.toFixed(2)+'% a.a.', chg: null });
-    items.push({ name:'SELIC', price: selicVal.toFixed(2)+'% a.a.', chg: null });
-    items.push({ name:'IPCA 12m', price: ipcaVal.toFixed(2)+'%', chg: null });
+
+    // Ticker
+    items.push({ name:'CDI',      price: cdiVal.toFixed(2)+'% a.a.',  chg: null });
+    items.push({ name:'SELIC',    price: selicVal.toFixed(2)+'% a.a.',chg: null });
+    items.push({ name:'IPCA 12m', price: ipcaVal.toFixed(2)+'%',      chg: null });
   } catch(e) {}
+
+  // Dólar
   try {
-    const _rUsd = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
-    const _dUsd = await _rUsd.json();
-    usd = parseFloat(_dUsd.USDBRL?.bid);
-    const _usdChg = parseFloat(_dUsd.USDBRL?.pctChange || 0);
-    if (usd) { document.getElementById('ind-usd').textContent = 'R$ ' + usd.toFixed(2); items.push({ name:'DÓLAR', price:'R$'+usd.toFixed(2), chg:_usdChg }); }
-  } catch(e) {}
-  try {
-    const _rCr = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl&include_24hr_change=true');
-    const _dCr = await _rCr.json();
-    if (_dCr.bitcoin) {
-      btcBrl = _dCr.bitcoin.brl;
-      document.getElementById('ind-btc').textContent = 'R$ ' + btcBrl.toLocaleString('pt-BR', {maximumFractionDigits:0});
-      items.push({ name:'BITCOIN', price:'R$'+btcBrl.toLocaleString('pt-BR'), chg: _dCr.bitcoin.brl_24h_change });
-    }
-    if (_dCr.ethereum) {
-      ethBrl = _dCr.ethereum.brl;
-      items.push({ name:'ETHEREUM', price:'R$'+ethBrl.toLocaleString('pt-BR'), chg: _dCr.ethereum.brl_24h_change });
-    }
-  } catch(e) {}
-  try {
-    const _rIb = await fetch('https://brapi.dev/api/quote/%5EBVSP?token=nkmxvyU4duvGAX1x5Fu9SM');
-    const _dIb = await _rIb.json();
-    const ibov = _dIb.results?.[0];
-    if (ibov) {
-      ibovPrice = ibov.regularMarketPrice;
-      ibovChg   = ibov.regularMarketChangePercent;
-      items.push({ name:'IBOV', price: ibovPrice?.toLocaleString('pt-BR', {maximumFractionDigits:0})+' pts', chg: ibovChg });
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+    const d = await r.json();
+    const usd = parseFloat(d.USDBRL?.bid);
+    const chg = parseFloat(d.USDBRL?.pctChange || 0);
+    if (usd) {
+      document.getElementById('ind-usd').textContent = 'R$ ' + usd.toFixed(2);
+      items.push({ name:'DÓLAR', price:'R$'+usd.toFixed(2), chg });
     }
   } catch(e) {}
 
-  // Salva no cache por 30 minutos
-  _apiCacheSet('indicadores', { cdiVal, selicVal, ipcaVal, usd, btcBrl, ethBrl, ibovPrice, ibovChg, items });
+  // Bitcoin
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl&include_24hr_change=true');
+    const d = await r.json();
+    if (d.bitcoin) {
+      const fmt = 'R$ ' + d.bitcoin.brl.toLocaleString('pt-BR', {maximumFractionDigits:0});
+      document.getElementById('ind-btc').textContent = fmt;
+      items.push({ name:'BITCOIN',  price:'R$'+d.bitcoin.brl.toLocaleString('pt-BR'),  chg: d.bitcoin.brl_24h_change });
+    }
+    if (d.ethereum) {
+      items.push({ name:'ETHEREUM', price:'R$'+d.ethereum.brl.toLocaleString('pt-BR'), chg: d.ethereum.brl_24h_change });
+    }
+  } catch(e) {}
+
+  // IBOVESPA
+  try {
+    const r = await fetch('https://brapi.dev/api/quote/%5EBVSP?token=nkmxvyU4duvGAX1x5Fu9SM');
+    const d = await r.json();
+    const ibov = d.results?.[0];
+    if (ibov) {
+      const val = ibov.regularMarketPrice?.toLocaleString('pt-BR', {maximumFractionDigits:0});
+      items.push({ name:'IBOV', price: val+' pts', chg: ibov.regularMarketChangePercent });
+    }
+  } catch(e) {}
+
   renderTicker(items);
 }
+
 function renderTicker(items) {
   if (!items.length) return;
   const fmt = (item) => {
-    const cls = item.chg === null ? 'neu' : item.chg >= 0 ? 'up' : 'dn';
-    const sign = item.chg === null ? '' : item.chg >= 0 ? '+' : '';
+    const cls    = item.chg === null ? 'neu' : item.chg >= 0 ? 'up' : 'dn';
+    const sign   = item.chg === null ? '' : item.chg >= 0 ? '+' : '';
     const chgTxt = item.chg === null ? '' : ` ${sign}${item.chg.toFixed(2)}%`;
-    return `<div class="ticker-item">${item.chg !== null ? `<span class="ticker-dot ${cls}"></span>` : ''}<span class="ticker-name">${item.name}</span><span class="ticker-price">${item.price}</span>${chgTxt ? `<span class="ticker-chg ${cls}">${chgTxt}</span>` : ''}</div>`;
+    return `<div class="ticker-item">
+      ${item.chg !== null ? `<span class="ticker-dot ${cls}"></span>` : ''}
+      <span class="ticker-name">${item.name}</span>
+      <span class="ticker-price">${item.price}</span>
+      ${chgTxt ? `<span class="ticker-chg ${cls}">${chgTxt}</span>` : ''}
+    </div>`;
   };
   const html = items.map(fmt).join('') + items.map(fmt).join('');
   document.getElementById('ticker-track').innerHTML = html;
   const dur = Math.max(30, items.length * 180 / 80);
   document.getElementById('ticker-track').style.animationDuration = dur + 's';
 }
+
+/* ══════════════════════════════════════
+   JORNAIS INFORMATIVOS
+══════════════════════════════════════ */
 const jornais = [
-  { nome: 'Valor Econômico', desc: 'O principal jornal de negócios do Brasil', url: 'https://valor.globo.com', logo: 'VE', bg: '#003366', color: '#fff' },
-  { nome: 'InfoMoney', desc: 'Notícias de finanças, bolsa e investimentos', url: 'https://www.infomoney.com.br', logo: 'IM', bg: '#e8f5e9', color: '#368547' },
-  { nome: 'Exame', desc: 'Economia, negócios e política financeira', url: 'https://exame.com/economia', logo: 'EX', bg: '#1a1a2e', color: '#fff' },
-  { nome: 'CNN Brasil Business', desc: 'Cobertura econômica e mercado financeiro', url: 'https://www.cnnbrasil.com.br/economy', logo: 'CN', bg: '#cc0000', color: '#fff' },
-  { nome: 'Folha — Mercado', desc: 'Seção de mercado do maior jornal do país', url: 'https://www1.folha.uol.com.br/mercado', logo: 'FS', bg: '#003580', color: '#fff' },
-  { nome: 'G1 Economia', desc: 'Economia para o público em geral', url: 'https://g1.globo.com/economia', logo: 'G1', bg: '#e30613', color: '#fff' },
-  { nome: 'Money Times', desc: 'Finanças, mercados e criptomoedas', url: 'https://www.moneytimes.com.br', logo: 'MT', bg: '#001a1a', color: '#4ade80' },
-  { nome: 'Broadcast', desc: 'Agência de notícias econômico-financeiras', url: 'https://broadcast.com.br', logo: 'BC', bg: '#f0a500', color: '#fff' },
+  { nome: 'Valor Econômico',   desc: 'O principal jornal de negócios do Brasil',          url: 'https://valor.globo.com',             logo: 'VE', bg: '#003366', color: '#fff' },
+  { nome: 'InfoMoney',          desc: 'Notícias de finanças, bolsa e investimentos',       url: 'https://www.infomoney.com.br',         logo: 'IM', bg: '#e8f5e9', color: '#368547' },
+  { nome: 'Exame',              desc: 'Economia, negócios e política financeira',          url: 'https://exame.com/economia',           logo: 'EX', bg: '#1a1a2e', color: '#fff' },
+  { nome: 'CNN Brasil Business',desc: 'Cobertura econômica e mercado financeiro',          url: 'https://www.cnnbrasil.com.br/economy', logo: 'CN', bg: '#cc0000', color: '#fff' },
+  { nome: 'Folha — Mercado',    desc: 'Seção de mercado do maior jornal do país',          url: 'https://www1.folha.uol.com.br/mercado', logo: 'FS', bg: '#003580', color: '#fff' },
+  { nome: 'G1 Economia',        desc: 'Economia para o público em geral',                  url: 'https://g1.globo.com/economia',        logo: 'G1', bg: '#e30613', color: '#fff' },
+  { nome: 'Money Times',        desc: 'Finanças, mercados e criptomoedas',                 url: 'https://www.moneytimes.com.br',        logo: 'MT', bg: '#001a1a', color: '#4ade80' },
+  { nome: 'Broadcast',          desc: 'Agência de notícias econômico-financeiras',         url: 'https://broadcast.com.br',             logo: 'BC', bg: '#f0a500', color: '#fff' },
 ];
+
 function renderJornais() {
   document.getElementById('jornal-list').innerHTML = jornais.map(j => `
     <a class="jornal-item" href="${j.url}" target="_blank" rel="noopener">
       <div class="jornal-logo" style="background:${j.bg};color:${j.color};">${j.logo}</div>
-      <div class="jornal-info"><div class="jornal-name">${j.nome}</div><div class="jornal-desc">${j.desc}</div></div>
-      <svg class="jornal-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      <div class="jornal-info">
+        <div class="jornal-name">${j.nome}</div>
+        <div class="jornal-desc">${j.desc}</div>
+      </div>
+      <svg class="jornal-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 17L17 7M7 7h10v10"/>
+      </svg>
     </a>`).join('');
 }
-function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-async function init() { renderJornais(); await Promise.all([loadNews(), loadIndicadores()]); }
-document.addEventListener('DOMContentLoaded', init);
 
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+async function init() {
+  renderJornais();
+  await Promise.all([loadNews(), loadIndicadores()]);
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
