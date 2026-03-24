@@ -1,0 +1,64 @@
+/* ═══════════════════════════════════════════════
+   GOING NORTH — Design Tokens (fonte única)
+   Importe este arquivo em TODAS as páginas.
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* ── Cores primárias ── */
+  --green:          #368547;
+  --green-h:        #13834a;
+  --green-light:    rgba(54, 133, 71, .10);
+  --green-glow:     rgba(54, 133, 71, .25);
+  --green-dim:      rgba(54, 133, 71, .15);
+
+  /* ── Cores de apoio ── */
+  --teal:           #0d9488;
+  --teal-light:     rgba(13, 148, 136, .12);
+  --gold:           #c8a96e;
+  --gold-light:     rgba(200, 169, 110, .12);
+  --red:            #ef4444;
+  --red-light:      rgba(239, 68, 68, .10);
+  --blue:           #3b82f6;
+  --purple:         #7c3aed;
+  --purple-light:   rgba(124, 58, 237, .10);
+
+  /* ── Superfícies (páginas claras) ── */
+  --bg:             #f0f4f2;
+  --surface:        #ffffff;
+  --surface2:       #f7faf8;
+  --border:         rgba(0, 0, 0, .07);
+  --border2:        rgba(0, 0, 0, .04);
+
+  /* ── Textos (páginas claras) ── */
+  --text:           #0f2318;
+  --text2:          #3d5a47;
+  --text3:          #7a9585;
+
+  /* ── Navbar ── */
+  --nav-bg:         #003333;
+  --nav-text:       rgba(255, 255, 255, .75);
+
+  /* ── Brancos com opacidade (páginas escuras/login) ── */
+  --white:          #ffffff;
+  --w80:            rgba(255, 255, 255, .80);
+  --w50:            rgba(255, 255, 255, .50);
+  --w20:            rgba(255, 255, 255, .20);
+  --w10:            rgba(255, 255, 255, .10);
+  --w06:            rgba(255, 255, 255, .06);
+
+  /* ── Tipografia ── */
+  --font-d:         'Sora', sans-serif;
+  --font-b:         'Inter', sans-serif;
+  --font-s:         'Lora', serif;
+
+  /* ── Border-radius ── */
+  --r-sm:           8px;
+  --r-md:           14px;
+  --r-lg:           20px;
+  --r-xl:           28px;
+
+  /* ── Sombras ── */
+  --shadow:         0 2px 12px rgba(0, 0, 0, .07);
+  --shadow-md:      0 4px 24px rgba(0, 0, 0, .10);
+  --shadow-lg:      0 12px 48px rgba(0, 0, 0, .14);
+}
