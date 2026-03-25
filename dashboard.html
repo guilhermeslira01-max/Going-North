@@ -722,6 +722,7 @@ async function dbDeleteParcela(id) {
 ════════════════════════════════════════ */
 function fmt(v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function fmtSigned(v) { return (v>=0?'+ R$ ':'− R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function showToast(msg, isError) {
   const t = document.getElementById('toast');
@@ -816,11 +817,11 @@ function renderTxItem(tx, showDelete=true) {
   const icon     = catIcons[tx.cat]  || '📦';
   const d        = new Date(tx.data+'T12:00:00').toLocaleDateString('pt-BR');
   const catClass = tx.tipo==='receita' ? 'cat-receita' : tx.cat==='moradia' ? 'cat-fixo' : tx.cat==='investimento' ? 'cat-meta' : 'cat-variavel';
-  return `<div class="tx-item" id="tx-${tx.id}">
+  return `<div class="tx-item" id="tx-${escapeHtml(tx.id)}">
     <div class="tx-dot" style="background:${color}22;">${icon}</div>
-    <div class="tx-info"><div class="tx-name">${tx.desc}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${tx.cat}</span></div></div>
+    <div class="tx-info"><div class="tx-name">${escapeHtml(tx.desc)}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${escapeHtml(tx.cat)}</span></div></div>
     <div class="tx-amount ${tx.tipo==='receita'?'pos':'neg'}">${tx.tipo==='receita'?'+':'−'} ${fmt(tx.valor)}</div>
-    ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
+    ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${escapeHtml(tx.id)}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
   </div>`;
 }
 

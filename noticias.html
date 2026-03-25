@@ -202,9 +202,14 @@ async function doLogout() {
 
 /* ══════════════════════════════════════
    GNEWS API
+   ⚠️  SEGURANÇA: Esta chave está exposta no cliente.
+   TODO: mover para o Cloudflare Worker em /api/news
+   para que a chave fique apenas no ambiente server-side.
 ══════════════════════════════════════ */
 const GNEWS_KEY = '96227d727885f04bace320ff8244fe5d';
 const GNEWS_BASE = 'https://gnews.io/api/v4';
+
+function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 let allNews = [];
 let currentPage = 1;
@@ -295,28 +300,28 @@ function renderNews() {
   if (!feat) return;
 
   const featHtml = `
-    <div class="news-featured" onclick="window.open('${feat.url}','_blank')">
+    <div class="news-featured news-open-link" data-url="${_esc(feat.url)}">
       <div class="news-featured-img">
         ${feat.image
-          ? `<img src="${feat.image}" alt="" onerror="this.style.display='none'">`
+          ? `<img src="${_esc(feat.image)}" alt="" onerror="this.style.display='none'">`
           : `<span class="news-featured-img-fallback">📰</span>`}
       </div>
       <div class="news-featured-body">
         <div class="news-source-row">
-          <span class="news-source">${feat.source?.name || 'Notícia'}</span>
+          <span class="news-source">${_esc(feat.source?.name || 'Notícia')}</span>
           <span class="news-time">${timeAgo(feat.publishedAt)}</span>
         </div>
-        <div class="news-featured-title">${feat.title}</div>
-        <div class="news-featured-desc">${feat.description || ''}</div>
+        <div class="news-featured-title">${_esc(feat.title)}</div>
+        <div class="news-featured-desc">${_esc(feat.description || '')}</div>
         <span class="news-read-btn">Ler notícia completa →</span>
       </div>
     </div>`;
 
   const cardsHtml = rest.map(n => `
-    <div class="news-card" onclick="window.open('${n.url}','_blank')">
+    <div class="news-card news-open-link" data-url="${_esc(n.url)}">
       <div>
-        <div class="news-card-cat">${n.source?.name || 'Finanças'}</div>
-        <div class="news-card-title">${n.title}</div>
+        <div class="news-card-cat">${_esc(n.source?.name || 'Finanças')}</div>
+        <div class="news-card-title">${_esc(n.title)}</div>
         <div class="news-card-meta">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           ${timeAgo(n.publishedAt)}
@@ -324,7 +329,7 @@ function renderNews() {
       </div>
       <div class="news-card-img">
         ${n.image
-          ? `<img src="${n.image}" alt="" onerror="this.style.display='none'">`
+          ? `<img src="${_esc(n.image)}" alt="" onerror="this.style.display='none'">`
           : '📰'}
       </div>
     </div>`).join('');
@@ -480,6 +485,12 @@ function showToast(msg) {
    INIT
 ══════════════════════════════════════ */
 async function init() {
+  // Delegated handler: abre links de notícias sem inline onclick
+  document.getElementById('news-container').addEventListener('click', e => {
+    const card = e.target.closest('.news-open-link');
+    if (card?.dataset.url) window.open(card.dataset.url, '_blank', 'noopener');
+  });
+
   renderJornais();
   await Promise.all([loadNews(), loadIndicadores()]);
 }

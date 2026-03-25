@@ -342,6 +342,12 @@ function generateFeatured() {
 /* ══════════════════════════════════════
    ABRIR ARTIGO (gera com IA)
 ══════════════════════════════════════ */
+// Contexto guardado para o botão de retry (evita injeção de HTML via parâmetro)
+let _retryCtx = null;
+function retryArticle() { if (_retryCtx) openArticle(_retryCtx.tema, _retryCtx.cor, _retryCtx.badge); }
+
+function _esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
 async function openArticle(tema, cor, badge) {
   const overlay = document.getElementById('reader-overlay');
   const title   = document.getElementById('reader-title');
@@ -351,7 +357,7 @@ async function openArticle(tema, cor, badge) {
   // Formata título bonito
   const titleText = tema.length > 60 ? tema.slice(0,60) + '...' : tema.charAt(0).toUpperCase() + tema.slice(1);
   title.textContent = titleText;
-  meta.innerHTML = `<span class="reader-badge" style="background:${cor}22;color:${cor};">${badge}</span><span class="reader-time">~5 min · Gerado por IA</span>`;
+  meta.innerHTML = `<span class="reader-badge" style="background:${_esc(cor)}22;color:${_esc(cor)};">${_esc(badge)}</span><span class="reader-time">~5 min · Gerado por IA</span>`;
   body.innerHTML = `<div class="reader-loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>Gerando artigo com IA...</span></div>`;
   overlay.classList.add('open');
   document.getElementById('reader-card').scrollTop = 0;
@@ -361,7 +367,7 @@ async function openArticle(tema, cor, badge) {
 
   try {
     const html = await callAI(
-      `Escreva um artigo educativo completo sobre: "${tema}". 
+      `Escreva um artigo educativo completo sobre: "${tema}".
       O artigo deve ter: introdução cativante, pelo menos 3 seções com subtítulos, exemplos práticos com valores em R$, dicas acionáveis e uma conclusão motivadora.
       Use <div class="highlight"> para destacar a dica mais importante do artigo.
       Seja direto, use linguagem simples e acessível. Escreva pelo menos 600 palavras.`
@@ -369,12 +375,14 @@ async function openArticle(tema, cor, badge) {
     articleCache[tema] = html;
     body.innerHTML = html;
   } catch(e) {
+    _retryCtx = { tema, cor, badge };
+    const msg = _esc(e.message || 'Verifique sua conexão e tente novamente.');
     body.innerHTML = `
       <div style="text-align:center;padding:32px 20px;">
         <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
         <p style="color:var(--text);font-weight:600;margin-bottom:8px;">Não foi possível gerar o artigo</p>
-        <p style="color:var(--text3);font-size:.85rem;margin-bottom:20px;">${e.message || 'Verifique sua conexão e tente novamente.'}</p>
-        <button onclick="openArticle('${tema.replace(/'/g,"\\'")}','${cor}','${badge}')"
+        <p style="color:var(--text3);font-size:.85rem;margin-bottom:20px;">${msg}</p>
+        <button onclick="retryArticle()"
           style="background:var(--green);color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:.87rem;font-weight:600;cursor:pointer;font-family:var(--font-b);">
           ↺ Tentar novamente
         </button>
