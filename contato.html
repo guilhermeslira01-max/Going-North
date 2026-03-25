@@ -223,34 +223,21 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-icon" id="toast-icon-el">✓</span><span id="toast-msg"></span></div>
 
-<script defer data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script defer data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>  <script defer src="js/config.js"></script>
+  <script defer src="js/shared.js"></script>
+<script>
 /* ══════════════════════════════════════
    SUPABASE + AUTH
 ══════════════════════════════════════ */
-const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
-const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
 // sb = cliente direto para AUTH (getSession, signOut)
 // sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
 const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
-const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 let currentUser = null;
 
-function isAdmin() { return currentUser?.role === 'admin'; }
-function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
 
-function applyRoleBadge() {
-  const badge = document.getElementById('nav-role-badge');
-  if (!badge) return;
-  if (isAdmin()) {
-    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
-  } else if (isPro()) {
-    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
-  }
-}
 
 (async function() {
   if (IS_DEV) {
@@ -285,10 +272,6 @@ function applyRoleBadge() {
   applyRoleBadge();
 })();
 
-async function doLogout() {
-  if (!IS_DEV) await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
 
 /* ══════════════════════════════════════
    FORM
@@ -389,15 +372,6 @@ function toggleFAQ(i) {
 /* ══════════════════════════════════════
    TOAST
 ══════════════════════════════════════ */
-function showToast(msg, isError) {
-  const t = document.getElementById('toast');
-  const icon = document.getElementById('toast-icon-el');
-  document.getElementById('toast-msg').textContent = msg;
-  if (icon) icon.textContent = isError ? '✕' : '✓';
-  if (icon) icon.style.color = isError ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   renderFAQ();

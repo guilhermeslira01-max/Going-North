@@ -456,13 +456,12 @@
   <span id="toast-msg"></span>
 </div>
 
+  <script defer src="js/config.js"></script>
+  <script defer src="js/shared.js"></script>
 <script>
 /* ════════════════════════════════════════
    SUPABASE via Cloudflare Worker
 ════════════════════════════════════════ */
-const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
-const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
 // sb = cliente direto para AUTH (getSession, signOut)
 // sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
@@ -474,11 +473,7 @@ let sbDb = null; // inicializado após login com o JWT do usuário
 ════════════════════════════════════════ */
 let currentUser = null;
 
-const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-function isAdmin() { return currentUser?.role === 'admin'; }
-function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
-function isFree()  { return currentUser?.role === 'free'; }
 
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
@@ -495,19 +490,6 @@ async function loadUserRole() {
   } catch(e) { currentUser.role = 'free'; }
 }
 
-function applyRoleBadge() {
-  const badge = document.getElementById('nav-role-badge');
-  if (!badge) return;
-  if (isAdmin()) {
-    badge.textContent = 'Admin';
-    badge.className = 'nav-role-badge badge-admin';
-    badge.style.display = 'inline-flex';
-  } else if (isPro()) {
-    badge.textContent = 'Pro';
-    badge.className = 'nav-role-badge badge-pro';
-    badge.style.display = 'inline-flex';
-  }
-}
 
 async function initAuth() {
   if (IS_DEV) {
@@ -562,45 +544,12 @@ async function initAuth() {
   return true;
 }
 
-async function doLogout() {
-  cacheClearAll();
-  if (!IS_DEV) await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
 
 
 /* ════════════════════════════════════════
    CACHE LOCAL — 24h por user_id
 ════════════════════════════════════════ */
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas em ms
 
-function cacheKey(name) {
-  const uid = currentUser?.id || 'anon';
-  return `gn_cache_${uid}_${name}`;
-}
-function cacheSet(name, data) {
-  try {
-    localStorage.setItem(cacheKey(name), JSON.stringify({ data, ts: Date.now() }));
-  } catch(e) {}
-}
-function cacheGet(name) {
-  try {
-    const raw = localStorage.getItem(cacheKey(name));
-    if (!raw) return null;
-    const { data, ts } = JSON.parse(raw);
-    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(cacheKey(name)); return null; }
-    return data;
-  } catch(e) { return null; }
-}
-function cacheInvalidate(...names) {
-  names.forEach(n => { try { localStorage.removeItem(cacheKey(n)); } catch(e) {} });
-}
-function cacheClearAll() {
-  const uid = currentUser?.id || 'anon';
-  Object.keys(localStorage)
-    .filter(k => k.startsWith(`gn_cache_${uid}_`))
-    .forEach(k => localStorage.removeItem(k));
-}
 
 /* ════════════════════════════════════════
    STATE (memória local — carregado do banco)
@@ -731,20 +680,6 @@ async function dbDeleteParcela(id) {
 /* ════════════════════════════════════════
    HELPERS
 ════════════════════════════════════════ */
-function fmt(v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fmtSigned(v) { return (v>=0?'+ R$ ':'− R$ ')+Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function todayStr() { return new Date().toISOString().split('T')[0]; }
-function showToast(msg, isError) {
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  t.querySelector('.toast-icon').textContent = isError ? '✕' : '✓';
-  t.querySelector('.toast-icon').style.color = isError ? 'var(--red)' : 'var(--green)';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
 
 /* ════════════════════════════════════════
    SUMMARY

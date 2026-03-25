@@ -300,32 +300,19 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
 
+  <script defer src="js/config.js"></script>
+  <script defer src="js/shared.js"></script>
 <script>
 /* ══ SUPABASE + AUTH ══ */
-const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
-const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
 // sb = cliente direto para AUTH (getSession, signOut)
 // sbDb = cliente via Worker para QUERIES de banco (profiles, transactions, etc)
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
 const sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
-const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 let currentUser = null;
 
-function isAdmin() { return currentUser?.role === 'admin'; }
-function isPro()   { return ['admin','pro'].includes(currentUser?.role); }
 
-function applyRoleBadge() {
-  const badge = document.getElementById('nav-role-badge');
-  if (!badge) return;
-  if (isAdmin()) {
-    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
-  } else if (isPro()) {
-    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
-  }
-}
 
 (async function() {
   if (IS_DEV) {
@@ -358,10 +345,6 @@ function applyRoleBadge() {
   applyRoleBadge();
 })();
 
-async function doLogout() {
-  if (!IS_DEV) await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
 
 /* ══ ANIMAÇÕES ══ */
 // Anima barras de progresso das metas quando entram na tela

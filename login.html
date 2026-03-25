@@ -143,13 +143,13 @@
   </div>
 </div>
 
+  <script defer src="js/config.js"></script>
+  <script defer src="js/shared.js"></script>
 <script>
 /* ── SUPABASE ──
    Auth (login/register/reset) vai DIRETO para o Supabase.
    O Worker só é usado para queries de banco nas outras páginas.
 ── */
-const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 

@@ -273,36 +273,18 @@
 
 <div class="toast" id="toast"><span style="color:var(--green)">&#10003;</span><span id="toast-msg"></span></div>
 
+  <script defer src="js/config.js"></script>
+  <script defer src="js/shared.js"></script>
 <script>
-const WORKER_URL = 'https://goingnorth.goingnorthbusiness.workers.dev';
-const SUPABASE_URL = 'https://qesurszlqesjbtcpnjwz.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFlc3Vyc3pscWVzamJ0Y3Buand6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MTI4NTYsImV4cCI6MjA4ODM4ODg1Nn0.K12Lek882wI3Y4jEkZdxjKDrpeWxye_24phlc0XbsHo';
 const { createClient } = supabase;
 // sb = auth direto | sbDb = queries de banco via Worker
 const sb   = createClient(SUPABASE_URL, SUPABASE_ANON);
 let sbDb = createClient(WORKER_URL + '/api/supabase', 'going-north-client');
-const IS_DEV = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-function fmt(v){ return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function fmtS(v){ return 'R$ ' + Math.abs(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
 
-function isAdmin() { return window._userRole === 'admin'; }
-function isPro()   { return ['admin','pro'].includes(window._userRole); }
 
-function applyRoleBadge() {
-  const badge = document.getElementById('nav-role-badge');
-  if (!badge) return;
-  if (isAdmin()) {
-    badge.textContent = 'Admin'; badge.className = 'nav-role-badge badge-admin'; badge.style.display = 'inline-flex';
-  } else if (isPro()) {
-    badge.textContent = 'Pro'; badge.className = 'nav-role-badge badge-pro'; badge.style.display = 'inline-flex';
-  }
-}
 
-async function doLogout() {
-  await sb.auth.signOut();
-  window.location.href = 'login.html';
-}
 
 async function loadPreview() {
   try {
