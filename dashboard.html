@@ -626,12 +626,12 @@ async function dbAddGoal(g) {
     const id = devUid(); const list = devLoad('goals');
     list.push({ ...g, id }); devSave('goals', list); return id;
   }
-  const { data, error } = await sbDb.from('goals').insert({
+  const { data, error } = await sbDb.from('goals').insert([{
     user_id: currentUser.id, nome: g.nome, total: g.total,
     atual: g.atual || 0, prazo: g.prazo || null, cor: g.cor
-  }).select().single();
-  if (error) { showToast('Erro ao salvar meta.', true); return null; }
-  return data.id;
+  }]).select();
+  if (error) { console.error('Erro ao salvar meta:', error); showToast('Erro ao salvar meta.', true); return null; }
+  return data && data.length > 0 ? data[0].id : null;
 }
 async function dbUpdateGoal(id, atual) {
   if (IS_DEV) { const list = devLoad('goals'); const g = list.find(x=>x.id===id); if(g) g.atual=atual; devSave('goals',list); return {}; }
@@ -664,12 +664,12 @@ async function dbAddParcela(p) {
     const id = devUid(); const list = devLoad('parcelas');
     list.push({ ...p, id }); devSave('parcelas', list); return id;
   }
-  const { data, error } = await sbDb.from('installments').insert({
+  const { data, error } = await sbDb.from('installments').insert([{
     user_id: currentUser.id, descricao: p.desc, valor: p.valor,
     total: p.total, pagas: p.pagas, venc: p.venc, cat: p.cat, status: p.status
-  }).select().single();
-  if (error) { showToast('Erro ao salvar parcela.', true); return null; }
-  return data.id;
+  }]).select();
+  if (error) { console.error('Erro ao salvar parcela:', error); showToast('Erro ao salvar parcela.', true); return null; }
+  return data && data.length > 0 ? data[0].id : null;
 }
 async function dbUpdateParcela(id, pagas, status) {
   if (IS_DEV) { const list = devLoad('parcelas'); const p = list.find(x=>x.id===id); if(p){p.pagas=pagas;p.status=status;} devSave('parcelas',list); return; }
@@ -821,6 +821,7 @@ async function addGoal() {
   if (!id) {
     state.goals = state.goals.filter(g => g.id !== tempId);
     renderGoals(); renderGoalsChart(); calcSummary();
+    showToast('Erro ao salvar meta. Tente novamente.', true);
     return;
   }
   const idx = state.goals.findIndex(g => g.id === tempId);
@@ -908,6 +909,7 @@ async function addParcela() {
   if (!id) {
     state.parcelas = state.parcelas.filter(x => x.id !== tempId);
     renderParcelas();
+    showToast('Erro ao salvar parcela. Tente novamente.', true);
     return;
   }
   const idx = state.parcelas.findIndex(x => x.id === tempId);
