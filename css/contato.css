@@ -1,0 +1,248 @@
+/* ═══════════════════════════════════════════════
+   GOING NORTH — contato.css
+   Estilos exclusivos da página de contato.
+   ═══════════════════════════════════════════════ */
+
+/* ── Toast de feedback ── */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--nav);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 11px;
+  font-size: .84rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 10000;
+  transform: translateY(70px);
+  opacity: 0;
+  transition: all .28s cubic-bezier(.34, 1.56, .64, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 320px;
+}
+.toast.show   { transform: translateY(0); opacity: 1; }
+.toast-icon   { color: var(--green); flex-shrink: 0; }
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--nav) 0%, #003d2a 55%, #002b1e 100%);
+  padding: 52px 32px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -60px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(26,171,94,.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 8%;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(13,148,136,.10) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* Etiqueta de destaque no hero */
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(26,171,94,.15);
+  border: 1px solid rgba(26,171,94,.3);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: #4ade80;
+  margin-bottom: 18px;
+  letter-spacing: .04em;
+}
+.hero-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+
+.hero h1       { font-family: var(--font-d); font-size: 2.4rem; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 16px; }
+.hero h1 span  { color: #4ade80; }
+.hero-sub      { color: rgba(255,255,255,.6); font-size: .95rem; line-height: 1.75; margin-bottom: 32px; }
+.hero-cards    { display: flex; flex-direction: column; gap: 12px; }
+
+/* Cards de canal de contato no hero */
+.hero-contact-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all .25s;
+}
+.hero-contact-card:hover {
+  background: rgba(255,255,255,.10);
+  border-color: rgba(26,171,94,.4);
+  transform: translateX(4px);
+}
+.hcc-icon   { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem; }
+.hcc-label  { font-size: .73rem; color: rgba(255,255,255,.45); font-weight: 500; margin-bottom: 2px; }
+.hcc-val    { font-size: .9rem; color: #fff; font-weight: 600; }
+.hcc-arrow  { margin-left: auto; color: rgba(255,255,255,.3); transition: all .2s; }
+.hero-contact-card:hover .hcc-arrow { color: var(--green); transform: translateX(3px); }
+
+/* ── Layout principal ── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 32px;
+}
+
+/* ── Card do formulário ── */
+.form-card        { background: var(--surface); border-radius: var(--r-xl); padding: 36px; box-shadow: var(--shadow-md); }
+.form-card-title  { font-family: var(--font-d); font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.form-card-sub    { font-size: .86rem; color: var(--text3); margin-bottom: 28px; line-height: 1.6; }
+
+.form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: .78rem; font-weight: 600; color: var(--text2); margin-bottom: 7px; letter-spacing: .02em; }
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: .88rem;
+  font-family: var(--font-b);
+  color: var(--text);
+  background: var(--surface2);
+  outline: none;
+  transition: all .2s;
+}
+.form-control::placeholder { color: var(--text3); }
+.form-control:focus        { border-color: var(--green); background: #fff; box-shadow: 0 0 0 3px rgba(26,171,94,.08); }
+textarea.form-control      { resize: vertical; min-height: 130px; line-height: 1.6; }
+
+/* Select com seta customizada */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9585' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.char-count { text-align: right; font-size: .72rem; color: var(--text3); margin-top: 4px; }
+
+/* Botão de envio */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: 11px;
+  background: var(--green);
+  border: none;
+  color: #fff;
+  font-size: .93rem;
+  font-weight: 700;
+  font-family: var(--font-d);
+  cursor: pointer;
+  transition: all .25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  letter-spacing: .01em;
+  margin-top: 4px;
+}
+.btn-submit:hover    { background: var(--green-h); transform: translateY(-1px); box-shadow: 0 6px 24px var(--green-glow); }
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Spinner de carregamento dentro do botão */
+.btn-submit .spinner      { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+@keyframes spin           { to { transform: rotate(360deg); } }
+.btn-submit.loading .spinner  { display: block; }
+.btn-submit.loading .btn-text { display: none; }
+
+/* Estado de sucesso após envio */
+.success-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 16px;
+}
+.success-state.show { display: flex; }
+.success-icon       { width: 64px; height: 64px; border-radius: 50%; background: rgba(26,171,94,.12); display: flex; align-items: center; justify-content: center; animation: popIn .4s ease; }
+@keyframes popIn    { from { transform: scale(0); } to { transform: scale(1); } }
+.success-state h3   { font-family: var(--font-d); font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.success-state p    { font-size: .86rem; color: var(--text3); line-height: 1.6; }
+.btn-reset          { background: var(--green-light); border: none; color: var(--green); padding: 10px 22px; border-radius: 9px; font-size: .85rem; font-weight: 600; cursor: pointer; font-family: var(--font-b); transition: all .2s; margin-top: 4px; }
+.btn-reset:hover    { background: var(--green); color: #fff; }
+
+/* ── Sidebar direita ── */
+.sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+/* Card de redes sociais */
+.social-card    { background: var(--surface); border-radius: var(--r-xl); padding: 24px; box-shadow: var(--shadow); }
+.card-title     { font-family: var(--font-d); font-size: .95rem; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.social-links   { display: flex; flex-direction: column; gap: 10px; }
+.social-item    { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer; transition: all .22s; }
+.social-item:hover { transform: translateX(4px); }
+.social-item.instagram:hover { border-color: #e1306c; background: rgba(225,48,108,.04); }
+.social-item.linkedin:hover  { border-color: #0077b5; background: rgba(0,119,181,.04); }
+.social-item.whatsapp:hover  { border-color: #25d366; background: rgba(37,211,102,.04); }
+.social-item.email:hover     { border-color: var(--green); background: var(--green-light); }
+.social-icon  { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.social-info  { flex: 1; }
+.social-name  { font-size: .86rem; font-weight: 600; color: var(--text); }
+.social-handle { font-size: .75rem; color: var(--text3); margin-top: 1px; }
+.social-arrow  { color: var(--text3); transition: transform .2s; }
+.social-item:hover .social-arrow { transform: translateX(3px); }
+
+/* Card de FAQ */
+.faq-card   { background: var(--surface); border-radius: var(--r-xl); padding: 24px; box-shadow: var(--shadow); }
+.faq-list   { display: flex; flex-direction: column; gap: 8px; }
+.faq-item   { border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
+.faq-item.open { border-color: rgba(26,171,94,.25); }
+.faq-question  { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 12px; font-size: .86rem; font-weight: 600; color: var(--text); transition: background .15s; }
+.faq-question:hover          { background: var(--surface2); }
+.faq-item.open .faq-question { background: rgba(26,171,94,.05); color: var(--green); }
+.faq-chevron                 { width: 18px; height: 18px; flex-shrink: 0; transition: transform .25s; }
+.faq-item.open .faq-chevron  { transform: rotate(180deg); }
+.faq-answer                  { max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease; font-size: .82rem; color: var(--text3); line-height: 1.7; padding: 0 16px; }
+.faq-item.open .faq-answer   { max-height: 300px; padding: 0 16px 14px; }
+
+/* ── Responsivo ── */
+@media (max-width: 1000px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+  .main       { grid-template-columns: 1fr; }
+  .hero       { padding: 40px 20px 48px; }
+}
+@media (max-width: 680px) {
+  .hero     { padding: 32px 16px 44px; }
+  .main     { padding: 24px 16px 60px; }
+  .form-row { grid-template-columns: 1fr; }
+  .navbar   { padding: 0 16px; }
+}
