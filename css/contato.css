@@ -7,7 +7,7 @@
 .toast {
   position: fixed;
   bottom: 24px; right: 24px;
-  background: var(--nav);
+  background: var(--nav-bg);
   color: #fff;
   padding: 12px 18px;
   border-radius: 11px;
@@ -28,7 +28,7 @@
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(135deg, var(--nav) 0%, #003d2a 55%, #002b1e 100%);
+  background: linear-gradient(135deg, var(--nav-bg) 0%, #003d2a 55%, #002b1e 100%);
   padding: 52px 32px 64px;
   position: relative;
   overflow: hidden;

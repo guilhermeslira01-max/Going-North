@@ -5,7 +5,7 @@
 
 /* ── Hero ── */
 .hero {
-  background: linear-gradient(135deg, var(--nav) 0%, #003d2a 55%, #002b1e 100%);
+  background: linear-gradient(135deg, var(--nav-bg) 0%, #003d2a 55%, #002b1e 100%);
   padding: 48px 32px 56px;
   position: relative;
   overflow: hidden;
@@ -152,7 +152,7 @@
 .side-article-cat     { font-size: .72rem; color: var(--text3); }
 
 /* ── Toast de feedback ── */
-.toast      { position: fixed; bottom: 28px; right: 28px; background: var(--nav); color: #fff; padding: 13px 20px; border-radius: 12px; font-size: .86rem; font-weight: 500; box-shadow: var(--shadow-md); z-index: 9999; transform: translateY(80px); opacity: 0; transition: all .3s; display: flex; align-items: center; gap: 10px; }
+.toast      { position: fixed; bottom: 28px; right: 28px; background: var(--nav-bg); color: #fff; padding: 13px 20px; border-radius: 12px; font-size: .86rem; font-weight: 500; box-shadow: var(--shadow-md); z-index: 9999; transform: translateY(80px); opacity: 0; transition: all .3s; display: flex; align-items: center; gap: 10px; }
 .toast.show { transform: translateY(0); opacity: 1; }
 .toast-icon { color: var(--green); }
 

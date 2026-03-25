@@ -589,7 +589,7 @@ async function dbAddTransaction(tx) {
     .from('transactions')
     .insert([{
       user_id: currentUser.id,
-      desc: tx.desc,
+      descricao: tx.desc,
       valor: tx.valor,
       tipo: tx.tipo,
       cat: tx.cat,

@@ -604,7 +604,7 @@ async function dbAddInvestment(inv) {
   const { data, error } = await sbDb
     .from('investments')
     .insert([{
-      user_id: state.user.id,
+      user_id: currentUser.id,
       tipo: inv.tipo,
       ativo: inv.ativo,
       valor: inv.valor,
