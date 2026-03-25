@@ -164,7 +164,7 @@ let currentUser = null;
       const timeout = setTimeout(() => resolve(null), 4000);
       const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
         if (s) { clearTimeout(timeout); subscription.unsubscribe(); resolve(s); }
-        if (event === 'SIGNED_OUT') {
+        if (_event === 'SIGNED_OUT') {
       cacheClearAll();
       window.location.href = 'login.html';
     }
@@ -177,7 +177,7 @@ let currentUser = null;
   document.getElementById('nav-username').textContent = name.split(' ')[0];
   document.getElementById('nav-avatar').textContent = name.split(' ').slice(0,2).map(w=>w[0].toUpperCase()).join('');
   try {
-    const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
+    const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
   } catch(e) { currentUser.role = 'free'; }
   applyRoleBadge();

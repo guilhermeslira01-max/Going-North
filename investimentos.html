@@ -527,7 +527,7 @@ let currentUser = null;
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
   try {
-    const { data } = await sbDb.from('profiles').select('role').eq('id', currentUser.id).single();
+    const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
   } catch(e) { currentUser.role = 'free'; }
 }
@@ -1207,7 +1207,7 @@ async function buildTickerData(ind) {
 
   // ── Ações da B3: pool fixo (blue chips + IBOV) + carteira do usuário ──
   const POOL_B3 = [
-    '^BVSP',                          // IBOVESPA
+    // '^BVSP' removido — BRAPI free tier não aceita símbolos de índice (causa 400 no lote inteiro)
     'PETR4','VALE3','ITUB4','BBAS3',  // blue chips lote 1
     'WEGE3','ABEV3','MGLU3','RENT3',  // blue chips lote 2
     'HGLG11','MXRF11',                // FIIs populares
