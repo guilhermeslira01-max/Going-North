@@ -424,6 +424,7 @@
         <select class="form-control" id="p-status">
           <option value="ativa">Ativa</option>
           <option value="atrasada">Atrasada</option>
+          <option value="paga">Paga</option>
         </select>
       </div>
     </div>
@@ -946,15 +947,15 @@ async function deleteParcela(id) {
 
 function renderParcelas() {
   const el = document.getElementById('parcelas-list');
-  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; return; }
+  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; renderParcelasChart(); return; }
   const today = new Date().getDate();
   el.innerHTML = state.parcelas.map(p => {
     const rest = p.total-p.pagas;
-    const statusClass = p.status==='quitada'?'badge-quitada':p.status==='atrasada'?'badge-atrasada':'badge-ativa';
-    const statusLabel = p.status==='quitada'?'Quitada':p.status==='atrasada'?'Atrasada':'Ativa';
+    const statusClass = (p.status==='quitada'||p.status==='paga')?'badge-quitada':p.status==='atrasada'?'badge-atrasada':'badge-ativa';
+    const statusLabel = p.status==='quitada'?'Quitada':p.status==='paga'?'Paga':p.status==='atrasada'?'Atrasada':'Ativa';
     const daysLeft = p.venc-today;
     let vencClass='venc-ok',vencText='';
-    if (p.status!=='quitada') {
+    if (p.status!=='quitada'&&p.status!=='paga') {
       if (daysLeft<0)      { vencClass='venc-late'; vencText=`Vencida há ${Math.abs(daysLeft)} dia(s)`; }
       else if (daysLeft<=5){ vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
       else                 { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
@@ -963,7 +964,7 @@ function renderParcelas() {
       <div style="font-size:1.4rem">${catIcons[p.cat]||'📦'}</div>
       <div class="parcela-info"><div class="parcela-name">${p.desc}</div><div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>${vencText?`<div class="parcela-venc ${vencClass}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>`:''}</div>
       <div class="parcela-right"><div class="parcela-val">${fmt(p.valor)}/mês</div><div class="parcela-progress">${rest} restante(s) · ${fmt(p.valor*rest)} total</div>
-      <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">${p.status!=='quitada'?`<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}<button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button></div></div>
+      <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">${(p.status!=='quitada'&&p.status!=='paga')?`<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}<button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button></div></div>
     </div>`;
   }).join('');
   const ativas   = state.parcelas.filter(p=>p.status!=='quitada');
