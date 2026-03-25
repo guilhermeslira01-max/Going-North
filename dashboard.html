@@ -532,6 +532,11 @@ async function initAuth() {
         global: { headers: { Authorization: `Bearer ${s.access_token}` } }
       });
     }
+    if (event === 'SIGNED_OUT') {
+      // Token expirou sem renovação — redireciona para login
+      cacheClearAll();
+      window.location.href = 'login.html';
+    }
   });
 
   const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];

@@ -330,7 +330,11 @@ let currentUser = null;
       const timeout = setTimeout(() => resolve(null), 4000);
       const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
         if (s) { clearTimeout(timeout); subscription.unsubscribe(); resolve(s); }
-      });
+        if (event === 'SIGNED_OUT') {
+      cacheClearAll();
+      window.location.href = 'login.html';
+    }
+  });
     });
   }
   if (!session) { window.location.href = 'login.html'; return; }
