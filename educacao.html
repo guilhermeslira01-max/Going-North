@@ -40,7 +40,7 @@
       <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
     </div>
     <button class="btn-logout" onclick="doLogout()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Sair
     </button>
   </div>
@@ -65,7 +65,7 @@
   <div class="search-box">
     <input type="text" id="search-input" placeholder="Busque um tema: Tesouro Direto, reserva de emergência, como investir..." onkeydown="if(event.key==='Enter') searchTopic()">
     <button class="search-btn" onclick="searchTopic()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Gerar artigo com IA
     </button>
   </div>
@@ -107,7 +107,7 @@
         <div class="reader-meta" id="reader-meta"></div>
         <div class="reader-title" id="reader-title"></div>
       </div>
-      <button class="reader-close" onclick="document.getElementById('reader-overlay').classList.remove('open')">✕</button>
+      <button class="reader-close" onclick="document.getElementById('reader-overlay').classList.remove('open')" aria-label="Fechar artigo">✕</button>
     </div>
     <div class="reader-body" id="reader-body">
       <div class="reader-loading">
@@ -317,7 +317,7 @@ function renderFeatured() {
         <div class="featured-title">${main.title}</div>
         <div class="featured-excerpt">Um guia completo e prático para você entender e aplicar esse conceito no seu dia a dia financeiro.</div>
         <div class="featured-footer">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           ~5 min de leitura · Gerado por IA
         </div>
       </div>

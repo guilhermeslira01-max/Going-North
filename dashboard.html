@@ -41,7 +41,7 @@
       <span id="nav-role-badge" class="nav-role-badge" style="display:none;"></span>
     </div>
     <button class="btn-logout" onclick="doLogout()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Sair
     </button>
   </div>
@@ -58,11 +58,11 @@
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn-ghost" onclick="exportPDF()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         Exportar PDF
       </button>
       <button class="btn-primary" onclick="openModal('modal-tx')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nova transação
       </button>
     </div>
@@ -86,7 +86,7 @@
         <div class="scard-top">
           <div class="scard-label">Receitas</div>
           <div class="scard-icon si-green">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
           </div>
         </div>
         <div class="scard-val green" id="s-receitas">R$ 0,00</div>
@@ -96,7 +96,7 @@
         <div class="scard-top">
           <div class="scard-label">Despesas</div>
           <div class="scard-icon si-red">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
           </div>
         </div>
         <div class="scard-val red" id="s-despesas">R$ 0,00</div>
@@ -106,7 +106,7 @@
         <div class="scard-top">
           <div class="scard-label">Saldo</div>
           <div class="scard-icon si-teal">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
           </div>
         </div>
         <div class="scard-val" id="s-saldo">R$ 0,00</div>
@@ -116,7 +116,7 @@
         <div class="scard-top">
           <div class="scard-label">Investido em metas</div>
           <div class="scard-icon si-gold">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
         </div>
         <div class="scard-val" id="s-metas">R$ 0,00</div>
@@ -172,7 +172,7 @@
         <div class="card-title">Todas as Transações</div>
         <div style="display:flex;gap:10px;">
           <button class="btn-pdf" onclick="exportPDF()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             Exportar PDF
           </button>
           <button class="btn-primary" onclick="openModal('modal-tx')">+ Nova transação</button>
@@ -262,7 +262,7 @@
             <button class="period-btn" onclick="setPeriod('1y',this)">1 ano</button>
           </div>
           <button class="btn-pdf" onclick="exportPDF()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             Exportar PDF
           </button>
         </div>
@@ -820,7 +820,7 @@ function renderTxItem(tx, showDelete=true) {
     <div class="tx-dot" style="background:${color}22;">${icon}</div>
     <div class="tx-info"><div class="tx-name">${tx.desc}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${tx.cat}</span></div></div>
     <div class="tx-amount ${tx.tipo==='receita'?'pos':'neg'}">${tx.tipo==='receita'?'+':'−'} ${fmt(tx.valor)}</div>
-    ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
+    ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover" aria-label="Remover transação"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
   </div>`;
 }
 
@@ -828,7 +828,7 @@ function renderRecentTx() {
   const el = document.getElementById('recent-tx-list');
   if (!el) return;
   const list = state.transactions.slice(0,5);
-  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação registrada ainda.</p><span>Clique em "Nova transação" para começar.</span></div>`; return; }
+  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação registrada ainda.</p><span>Clique em "Nova transação" para começar.</span></div>`; return; }
   el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t,false)).join('')}</div>`;
 }
 
@@ -844,7 +844,7 @@ function renderTransactions() {
   if (tipo)   list = list.filter(t=>t.tipo===tipo);
   if (cat)    list = list.filter(t=>t.cat===cat);
   if (month)  list = list.filter(t=>t.data.startsWith(month));
-  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação encontrada.</p></div>`; return; }
+  if (!list.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></svg><p>Nenhuma transação encontrada.</p></div>`; return; }
   el.innerHTML = `<div class="tx-list">${list.map(t=>renderTxItem(t)).join('')}</div>`;
 }
 
@@ -920,14 +920,14 @@ async function addAporte() {
 
 function renderGoals() {
   const el = document.getElementById('goals-list');
-  if (!state.goals.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><p>Nenhuma meta criada ainda</p></div>`; return; }
+  if (!state.goals.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><p>Nenhuma meta criada ainda</p></div>`; return; }
   el.innerHTML = state.goals.map(g => {
     const pct       = Math.min(100,Math.round((g.atual/g.total)*100));
     const prazoFmt  = g.prazo ? new Date(g.prazo+'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
     return `<div class="goal-item">
       <div class="goal-top"><div><div class="goal-name">${g.nome}</div><div class="goal-vals">${fmt(g.atual)} de ${fmt(g.total)}</div></div><div class="goal-pct">${pct}%</div></div>
       <div class="goal-bar"><div class="goal-fill" style="width:${pct}%;background:${g.cor}"></div></div>
-      <div class="goal-deadline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Prazo: ${prazoFmt}</div>
+      <div class="goal-deadline"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Prazo: ${prazoFmt}</div>
       <div class="goal-actions"><button class="goal-btn" onclick="openAporte('${g.id}')">+ Aporte</button><button class="goal-btn danger" onclick="deleteGoal('${g.id}')">Excluir</button></div>
     </div>`;
   }).join('');
@@ -993,7 +993,7 @@ async function deleteParcela(id) {
 
 function renderParcelas() {
   const el = document.getElementById('parcelas-list');
-  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; return; }
+  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; return; }
   const today = new Date().getDate();
   el.innerHTML = state.parcelas.map(p => {
     const rest = p.total-p.pagas;
@@ -1008,7 +1008,7 @@ function renderParcelas() {
     }
     return `<div class="parcela-item">
       <div style="font-size:1.4rem">${catIcons[p.cat]||'📦'}</div>
-      <div class="parcela-info"><div class="parcela-name">${p.desc}</div><div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>${vencText?`<div class="parcela-venc ${vencClass}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>`:''}</div>
+      <div class="parcela-info"><div class="parcela-name">${p.desc}</div><div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>${vencText?`<div class="parcela-venc ${vencClass}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>`:''}</div>
       <div class="parcela-right"><div class="parcela-val">${fmt(p.valor)}/mês</div><div class="parcela-progress">${rest} restante(s) · ${fmt(p.valor*rest)} total</div>
       <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">${p.status!=='quitada'?`<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}<button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button></div></div>
     </div>`;
