@@ -340,6 +340,51 @@ select.tx-filter-input      { cursor: pointer; }
 .venc-warn    { color: var(--gold); }
 .venc-late    { color: var(--red); }
 
+/* ── Parcelas v2 ── */
+.p-filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.p-filter-btn { padding: 5px 14px; border-radius: 20px; font-size: .78rem; font-weight: 600; border: 1.5px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
+.p-filter-btn:hover { border-color: var(--green); color: var(--green); }
+.p-filter-btn.active { background: var(--green); border-color: var(--green); color: #fff; }
+
+.parcela-item-v2 { background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; transition: box-shadow .15s; }
+.parcela-item-v2:hover { box-shadow: var(--shadow-sm); }
+
+.p-card-main { display: flex; gap: 14px; align-items: flex-start; }
+.p-card-icon { font-size: 1.5rem; flex-shrink: 0; padding-top: 2px; }
+.p-card-info { flex: 1; min-width: 0; }
+.p-card-name { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.p-card-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: .75rem; color: var(--text3); margin-bottom: 8px; }
+.p-meta-sep  { color: var(--border); }
+
+.p-progress-wrap  { display: flex; align-items: center; gap: 10px; }
+.p-progress-bar   { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.p-progress-fill  { height: 100%; background: var(--green); border-radius: 99px; transition: width .3s; }
+.p-progress-label { font-size: .72rem; color: var(--text3); white-space: nowrap; }
+
+.p-card-right         { text-align: right; flex-shrink: 0; }
+.p-card-val           { font-family: var(--font-d); font-size: .95rem; font-weight: 700; color: var(--text); }
+.p-card-val-suffix    { font-size: .72rem; font-weight: 400; color: var(--text3); }
+.p-card-rest          { font-size: .72rem; color: var(--red); margin-top: 2px; }
+
+.p-card-actions  { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.p-expand-btn    { font-size: .75rem; font-weight: 600; color: var(--green); background: none; border: none; cursor: pointer; padding: 0; }
+.p-expand-btn:hover { text-decoration: underline; }
+
+.p-installments { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.p-inst-row     { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; font-size: .78rem; }
+.p-inst-row.paga    { background: rgba(26,171,94,.06); }
+.p-inst-row.proxima { background: rgba(99,102,241,.07); }
+.p-inst-row.pendente { background: transparent; }
+.p-inst-icon    { width: 14px; text-align: center; }
+.p-inst-row.paga .p-inst-icon    { color: var(--green); }
+.p-inst-row.proxima .p-inst-icon { color: #6366f1; }
+.p-inst-row.pendente .p-inst-icon { color: var(--text3); }
+.p-inst-label   { font-weight: 600; color: var(--text); min-width: 90px; }
+.p-inst-month   { color: var(--text3); min-width: 52px; }
+.badge-pendente { background: rgba(0,0,0,.04); color: var(--text3); }
+.p-inst-pay-btn { margin-left: auto; padding: 3px 12px; font-size: .72rem; font-weight: 600; background: var(--green); color: #fff; border: none; border-radius: 20px; cursor: pointer; }
+.p-inst-pay-btn:hover { opacity: .85; }
+
 /* ── Histórico ── */
 .hist-period { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 

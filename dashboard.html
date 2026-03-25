@@ -435,6 +435,66 @@
   </div>
 </div>
 
+<!-- Modal: Editar Parcela -->
+<div class="modal-overlay" id="modal-edit-parcela">
+  <div class="modal">
+    <h3>Editar Parcela</h3>
+    <input type="hidden" id="ep-id">
+    <div class="form-group">
+      <label>Descrição</label>
+      <input class="form-control" id="ep-desc" placeholder="Ex: Financiamento do carro">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor por parcela (R$)</label>
+        <input class="form-control" id="ep-valor" type="number" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Total de parcelas</label>
+        <input class="form-control" id="ep-total" type="number" min="1" step="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Parcelas pagas</label>
+        <input class="form-control" id="ep-pagas" type="number" min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label>Dia de vencimento</label>
+        <input class="form-control" id="ep-venc" type="number" min="1" max="31">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select class="form-control" id="ep-cat">
+          <option value="moradia">Moradia</option>
+          <option value="transporte">Transporte</option>
+          <option value="eletrodoméstico">Eletrodoméstico</option>
+          <option value="eletrônico">Eletrônico</option>
+          <option value="viagem">Viagem</option>
+          <option value="educação">Educação</option>
+          <option value="saúde">Saúde</option>
+          <option value="outros">Outros</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="ep-status">
+          <option value="ativa">Ativa</option>
+          <option value="atrasada">Atrasada</option>
+          <option value="paga">Paga</option>
+          <option value="quitada">Quitada</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-edit-parcela')">Cancelar</button>
+      <button class="btn-primary" onclick="saveEditParcela()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Aporte em Meta -->
 <div class="modal-overlay" id="modal-aporte">
   <div class="modal">
@@ -560,7 +620,7 @@ async function initAuth() {
 /* ════════════════════════════════════════
    STATE (memória local — carregado do banco)
 ════════════════════════════════════════ */
-let state = { transactions: [], goals: [], parcelas: [], historyPeriod: 'all', currentYear: new Date().getFullYear() };
+let state = { transactions: [], goals: [], parcelas: [], historyPeriod: 'all', currentYear: new Date().getFullYear(), parcelasFilter: 'todas', parcelasExpanded: {} };
 
 /* ════════════════════════════════════════
    DB — TRANSACTIONS
@@ -681,6 +741,18 @@ async function dbDeleteParcela(id) {
   if (IS_DEV) { devSave('parcelas', devLoad('parcelas').filter(p=>p.id!==id)); return; }
   const { error } = await sbDb.from('installments').delete().eq('id', id);
   if (error) showToast('Erro ao remover parcela.', true);
+}
+async function dbEditParcela(id, d) {
+  if (IS_DEV) {
+    const list = devLoad('parcelas'); const p = list.find(x=>x.id===id);
+    if (p) Object.assign(p, { descricao:d.desc, valor:d.valor, total:d.total, pagas:d.pagas, venc:d.venc, cat:d.cat, status:d.status });
+    devSave('parcelas', list); return {};
+  }
+  const { error } = await sbDb.from('installments').update({
+    descricao: d.desc, valor: d.valor, total: d.total,
+    pagas: d.pagas, venc: d.venc, cat: d.cat, status: d.status
+  }).eq('id', id);
+  return { error };
 }
 
 /* ════════════════════════════════════════
@@ -921,12 +993,74 @@ async function addParcela() {
 
 async function pagarParcela(id) {
   const p = state.parcelas.find(x=>x.id===id);
-  if (!p||p.pagas>=p.total) return;
+  if (!p||p.pagas>=p.total||p.status==='paga'||p.status==='quitada') return;
   p.pagas++;
   if (p.pagas>=p.total) p.status='quitada'; else p.status='ativa';
   await dbUpdateParcela(id, p.pagas, p.status);
+  cacheSet('parcelas', state.parcelas);
   renderParcelas();
   showToast('Parcela registrada como paga!');
+}
+
+function filterParcelas(f) { state.parcelasFilter = f; renderParcelas(); }
+
+function toggleExpandParcela(id) {
+  state.parcelasExpanded[id] = !state.parcelasExpanded[id];
+  renderParcelas();
+}
+
+function openEditParcela(id) {
+  const p = state.parcelas.find(x=>x.id===id);
+  if (!p) return;
+  document.getElementById('ep-id').value    = id;
+  document.getElementById('ep-desc').value  = p.desc;
+  document.getElementById('ep-valor').value = p.valor;
+  document.getElementById('ep-total').value = p.total;
+  document.getElementById('ep-pagas').value = p.pagas;
+  document.getElementById('ep-venc').value  = p.venc;
+  document.getElementById('ep-cat').value   = p.cat;
+  document.getElementById('ep-status').value= p.status;
+  openModal('modal-edit-parcela');
+}
+
+async function saveEditParcela() {
+  const id    = document.getElementById('ep-id').value;
+  const desc  = document.getElementById('ep-desc').value.trim();
+  const valor = parseFloat(document.getElementById('ep-valor').value);
+  const total = parseInt(document.getElementById('ep-total').value);
+  const pagas = parseInt(document.getElementById('ep-pagas').value)||0;
+  const venc  = parseInt(document.getElementById('ep-venc').value)||10;
+  const cat   = document.getElementById('ep-cat').value;
+  const status= document.getElementById('ep-status').value;
+  if (!desc||isNaN(valor)||valor<=0||isNaN(total)||total<1) { showToast('Preencha todos os campos.', true); return; }
+  const p = state.parcelas.find(x=>x.id===id);
+  if (!p) return;
+  const backup = { ...p };
+  Object.assign(p, { desc, valor, total, pagas, venc, cat, status });
+  closeModal('modal-edit-parcela');
+  renderParcelas();
+  showToast('Parcela atualizada!');
+  const { error } = await dbEditParcela(id, { desc, valor, total, pagas, venc, cat, status });
+  if (error) { Object.assign(p, backup); renderParcelas(); showToast('Erro ao atualizar parcela.', true); }
+  else cacheSet('parcelas', state.parcelas);
+}
+
+/* Calcula mês aproximado de cada parcela individual com base no dia de vencimento */
+function buildInstallments(p, today) {
+  const todayDay = today.getDate();
+  const monthNames = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  // O próximo vencimento é este mês se ainda não passou, ou o próximo mês
+  let ndYear = today.getFullYear(), ndMonth = today.getMonth();
+  if (todayDay >= p.venc) { ndMonth++; if (ndMonth>11){ndMonth=0;ndYear++;} }
+  const result = [];
+  for (let i=0; i<p.total; i++) {
+    const offset = i - p.pagas;
+    let m=ndMonth+offset, y=ndYear;
+    while(m<0){m+=12;y--;} while(m>11){m-=12;y++;}
+    const status = i<p.pagas?'paga':i===p.pagas?'proxima':'pendente';
+    result.push({ month:`${monthNames[m]}/${String(y).slice(2)}`, status });
+  }
+  return result;
 }
 
 async function deleteParcela(id) {
@@ -947,35 +1081,87 @@ async function deleteParcela(id) {
 
 function renderParcelas() {
   const el = document.getElementById('parcelas-list');
-  if (!state.parcelas.length) { el.innerHTML=`<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`; document.getElementById('parcelas-resumo').innerHTML=''; renderParcelasChart(); return; }
-  const today = new Date().getDate();
-  el.innerHTML = state.parcelas.map(p => {
-    const rest = p.total-p.pagas;
-    const statusClass = (p.status==='quitada'||p.status==='paga')?'badge-quitada':p.status==='atrasada'?'badge-atrasada':'badge-ativa';
-    const statusLabel = p.status==='quitada'?'Quitada':p.status==='paga'?'Paga':p.status==='atrasada'?'Atrasada':'Ativa';
-    const daysLeft = p.venc-today;
-    let vencClass='venc-ok',vencText='';
-    if (p.status!=='quitada'&&p.status!=='paga') {
-      if (daysLeft<0)      { vencClass='venc-late'; vencText=`Vencida há ${Math.abs(daysLeft)} dia(s)`; }
-      else if (daysLeft<=5){ vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
-      else                 { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
-    }
-    return `<div class="parcela-item">
-      <div style="font-size:1.4rem">${catIcons[p.cat]||'📦'}</div>
-      <div class="parcela-info"><div class="parcela-name">${p.desc}</div><div class="parcela-meta">${p.pagas}/${p.total} parcelas · <span class="badge ${statusClass}">${statusLabel}</span></div>${vencText?`<div class="parcela-venc ${vencClass}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${vencText}</div>`:''}</div>
-      <div class="parcela-right"><div class="parcela-val">${fmt(p.valor)}/mês</div><div class="parcela-progress">${rest} restante(s) · ${fmt(p.valor*rest)} total</div>
-      <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;">${(p.status!=='quitada'&&p.status!=='paga')?`<button class="goal-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}<button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button></div></div>
-    </div>`;
-  }).join('');
-  const ativas   = state.parcelas.filter(p=>p.status!=='quitada');
-  const totalMes = ativas.reduce((s,p)=>s+p.valor,0);
-  const totalRest= ativas.reduce((s,p)=>s+(p.valor*(p.total-p.pagas)),0);
-  const atrasadas= state.parcelas.filter(p=>p.status==='atrasada').length;
+  const filterLabels = { todas:'Todas', ativa:'Ativas', atrasada:'Atrasadas', paga:'Pagas', quitada:'Quitadas' };
+  const filterBar = `<div class="p-filter-bar">${Object.keys(filterLabels).map(f=>`<button class="p-filter-btn${state.parcelasFilter===f?' active':''}" onclick="filterParcelas('${f}')">${filterLabels[f]}</button>`).join('')}</div>`;
+
+  if (!state.parcelas.length) {
+    el.innerHTML = filterBar + `<div class="empty-state"><svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><p>Nenhum pagamento cadastrado.</p></div>`;
+    document.getElementById('parcelas-resumo').innerHTML=''; renderParcelasChart(); return;
+  }
+
+  const filtered = state.parcelasFilter==='todas' ? state.parcelas : state.parcelas.filter(p=>p.status===state.parcelasFilter);
+  const today = new Date();
+  const todayDay = today.getDate();
+
+  const cards = !filtered.length
+    ? `<div class="empty-state"><p>Nenhuma parcela com este filtro.</p></div>`
+    : filtered.map(p => {
+        const pct = Math.min(100, Math.round((p.pagas/p.total)*100));
+        const rest = p.total - p.pagas;
+        const statusClass = (p.status==='quitada'||p.status==='paga')?'badge-quitada':p.status==='atrasada'?'badge-atrasada':'badge-ativa';
+        const statusLabel = p.status==='quitada'?'Quitada':p.status==='paga'?'Paga':p.status==='atrasada'?'Atrasada':'Ativa';
+        const daysLeft = p.venc - todayDay;
+        let vencClass='venc-ok', vencText='';
+        if (p.status!=='quitada'&&p.status!=='paga') {
+          if (daysLeft<0)       { vencClass='venc-late'; vencText=`Vencida há ${Math.abs(daysLeft)} dia(s)`; }
+          else if (daysLeft<=5) { vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
+          else                  { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
+        }
+        const expanded = !!state.parcelasExpanded[p.id];
+        const installments = buildInstallments(p, today);
+        const installmentsHtml = expanded ? `<div class="p-installments">${installments.map((inst,i)=>`
+          <div class="p-inst-row ${inst.status}">
+            <span class="p-inst-icon">${inst.status==='paga'?'✓':inst.status==='proxima'?'→':'○'}</span>
+            <span class="p-inst-label">Parcela ${i+1}/${p.total}</span>
+            <span class="p-inst-month">${inst.month}</span>
+            <span class="badge ${inst.status==='paga'?'badge-quitada':inst.status==='proxima'?'badge-ativa':'badge-pendente'}">${inst.status==='paga'?'Paga':inst.status==='proxima'?'Próxima':'Pendente'}</span>
+            ${inst.status==='proxima'?`<button class="p-inst-pay-btn" onclick="pagarParcela('${p.id}')">Pagar</button>`:''}
+          </div>`).join('')}</div>` : '';
+        return `<div class="parcela-item-v2">
+          <div class="p-card-main">
+            <div class="p-card-icon">${catIcons[p.cat]||'📦'}</div>
+            <div class="p-card-info">
+              <div class="p-card-name">${escapeHtml(p.desc)}</div>
+              <div class="p-card-meta">
+                <span class="badge ${statusClass}">${statusLabel}</span>
+                <span class="p-meta-sep">·</span><span>${p.cat}</span>
+                ${vencText?`<span class="p-meta-sep">·</span><span class="parcela-venc ${vencClass}">${vencText}</span>`:''}
+              </div>
+              <div class="p-progress-wrap">
+                <div class="p-progress-bar"><div class="p-progress-fill" style="width:${pct}%"></div></div>
+                <span class="p-progress-label">${p.pagas}/${p.total} (${pct}%)</span>
+              </div>
+            </div>
+            <div class="p-card-right">
+              <div class="p-card-val">${fmt(p.valor)}<span class="p-card-val-suffix">/mês</span></div>
+              ${rest>0?`<div class="p-card-rest">${fmt(p.valor*rest)} restante</div>`:''}
+            </div>
+          </div>
+          <div class="p-card-actions">
+            <button class="p-expand-btn" onclick="toggleExpandParcela('${p.id}')">${expanded?'▲ Ocultar parcelas':`▼ Ver parcelas (${rest} restante${rest!==1?'s':''})`}</button>
+            <div style="display:flex;gap:6px;">
+              <button class="goal-btn" onclick="openEditParcela('${p.id}')">Editar</button>
+              <button class="goal-btn danger" onclick="deleteParcela('${p.id}')">Excluir</button>
+            </div>
+          </div>
+          ${installmentsHtml}
+        </div>`;
+      }).join('');
+
+  el.innerHTML = filterBar + cards;
+
+  // Resumo: só ativas e atrasadas contam no total mensal
+  const activeList = state.parcelas.filter(p=>p.status==='ativa'||p.status==='atrasada');
+  const totalMes   = activeList.reduce((s,p)=>s+p.valor,0);
+  const totalRest  = activeList.reduce((s,p)=>s+(p.valor*(p.total-p.pagas)),0);
+  const atrasadas  = state.parcelas.filter(p=>p.status==='atrasada').length;
+  const concluidas = state.parcelas.filter(p=>p.status==='quitada'||p.status==='paga').length;
   document.getElementById('parcelas-resumo').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <div class="scard" style="padding:14px;"><div class="scard-label">Total mensal em parcelas</div><div class="scard-val red" style="font-size:1.2rem;margin-top:8px;">${fmt(totalMes)}</div></div>
+      <div class="scard" style="padding:14px;"><div class="scard-label">Total mensal ativo</div><div class="scard-val red" style="font-size:1.2rem;margin-top:8px;">${fmt(totalMes)}</div><div style="font-size:.73rem;color:var(--text3);margin-top:4px;">${activeList.length} parcela(s) ativa(s)</div></div>
       <div class="scard" style="padding:14px;"><div class="scard-label">Total restante</div><div class="scard-val" style="font-size:1.1rem;margin-top:8px;">${fmt(totalRest)}</div></div>
-      ${atrasadas>0?`<div class="scard" style="padding:14px;border-color:rgba(239,68,68,.3)"><div class="scard-label" style="color:var(--red)">⚠️ Parcelas atrasadas</div><div class="scard-val red" style="font-size:1.1rem;margin-top:8px;">${atrasadas}</div></div>`:''}
+      ${atrasadas>0?`<div class="scard" style="padding:14px;border-color:rgba(239,68,68,.3)"><div class="scard-label" style="color:var(--red)">⚠️ Atrasadas</div><div class="scard-val red" style="font-size:1.1rem;margin-top:8px;">${atrasadas}</div></div>`:''}
+      ${concluidas>0?`<div class="scard" style="padding:14px;border-color:rgba(26,171,94,.2)"><div class="scard-label" style="color:var(--green)">✓ Quitadas / Pagas</div><div class="scard-val green" style="font-size:1.1rem;margin-top:8px;">${concluidas}</div></div>`:''}
     </div>`;
   renderParcelasChart();
 }
@@ -1062,8 +1248,9 @@ function renderGoalsChart() {
 function renderParcelasChart() {
   destroyChart('parcelas');
   const ctx = document.getElementById('chart-parcelas');
-  if (!ctx||!state.parcelas.length) return;
-  charts.parcelas = new Chart(ctx,{type:'pie',data:{labels:state.parcelas.map(p=>p.desc.length>12?p.desc.slice(0,12)+'…':p.desc),datasets:[{data:state.parcelas.map(p=>p.valor),backgroundColor:['#1aab5e','#0d9488','#6366f1','#f97316','#c8a96e','#ec4899','#3b82f6','#ef4444'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},color:'#3d5a47',boxWidth:10}}}}});
+  const active = state.parcelas.filter(p=>p.status==='ativa'||p.status==='atrasada');
+  if (!ctx||!active.length) return;
+  charts.parcelas = new Chart(ctx,{type:'pie',data:{labels:active.map(p=>p.desc.length>12?p.desc.slice(0,12)+'…':p.desc),datasets:[{data:active.map(p=>p.valor),backgroundColor:['#1aab5e','#0d9488','#6366f1','#f97316','#c8a96e','#ec4899','#3b82f6','#ef4444'],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{family:'Inter',size:10},color:'#3d5a47',boxWidth:10}}}}});
 }
 
 function renderHistoryChart() {
