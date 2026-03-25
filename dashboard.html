@@ -1103,9 +1103,14 @@ function renderParcelas() {
         const daysLeft = p.venc - todayDay;
         let vencClass='venc-ok', vencText='';
         if (p.status!=='quitada'&&p.status!=='paga') {
-          if (daysLeft<0)       { vencClass='venc-late'; vencText=`Vencida há ${Math.abs(daysLeft)} dia(s)`; }
-          else if (daysLeft<=5) { vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
-          else                  { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
+          if (daysLeft < 0) {
+            // Dia de vencimento passou este mês → próximo vencimento é no mês seguinte
+            const nextVenc = new Date(today.getFullYear(), today.getMonth()+1, p.venc);
+            const daysUntilNext = Math.round((nextVenc - today) / 86400000);
+            if (daysUntilNext <= 5) { vencClass='venc-warn'; vencText=`Vence em ${daysUntilNext} dia(s)`; }
+            else                    { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
+          } else if (daysLeft <= 5) { vencClass='venc-warn'; vencText=`Vence em ${daysLeft} dia(s)`; }
+          else                      { vencClass='venc-ok';   vencText=`Vence dia ${p.venc}`; }
         }
         const expanded = !!state.parcelasExpanded[p.id];
         const installments = buildInstallments(p, today);
