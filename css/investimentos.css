@@ -231,6 +231,16 @@ select.form-control   { cursor: pointer; }
   .platform-grid  { grid-template-columns: 1fr 1fr; }
   .three-col      { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 768px) {
+  .tabs           { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .tab            { white-space: nowrap; padding: 7px 14px; font-size: .8rem; }
+  .page-head      { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .modal-box      { width: 96%; padding: 24px 18px; max-height: 92dvh; overflow-y: auto; }
+  .alloc-table    { font-size: .8rem; }
+  .inv-donut-wrap { flex-direction: column; }
+}
+
 @media (max-width: 700px) {
   .hero-cards     { grid-template-columns: 1fr; }
   .two-col        { grid-template-columns: 1fr; }
@@ -238,8 +248,10 @@ select.form-control   { cursor: pointer; }
   .platform-grid  { grid-template-columns: 1fr; }
   .sim-grid       { grid-template-columns: 1fr; }
   .form-row       { grid-template-columns: 1fr; }
-  .main           { padding: 16px; }
-  .inv-hero       { padding: 24px 16px 36px; }
+  .main           { padding: 12px; }
+  .inv-hero       { padding: 20px 12px 32px; }
   .navbar         { padding: 0 16px; }
   .nav-links      { display: none; }
+  .ticker-bar     { font-size: .75rem; }
+  .inv-card       { padding: 16px; }
 }
