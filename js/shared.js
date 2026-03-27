@@ -44,10 +44,12 @@ async function doLogout() {
    FORMATAÇÃO DE MOEDA
    ═══════════════════════════════════════════════════════════ */
 function fmt(v) {
-  return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const safe = isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+  return 'R$ ' + Math.abs(safe).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function fmtSigned(v) {
-  return (v >= 0 ? '+ R$ ' : '− R$ ') + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const safe = isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+  return (safe >= 0 ? '+ R$ ' : '− R$ ') + Math.abs(safe).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function todayStr() {
   return new Date().toISOString().split('T')[0];

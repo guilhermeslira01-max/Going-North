@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://qesurszlqesjbtcpnjwz.supabase.co https://goingnorth.goingnorthbusiness.workers.dev https://brapi.dev https://api.coingecko.com https://api.bcb.gov.br https://economia.awesomeapi.com.br https://gnews.io; img-src 'self' data: blob:; frame-ancestors 'none'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Going North — Dashboard</title>
   <meta name="description" content="Visão geral das suas finanças: saldo, transações, metas e parcelas em um só lugar.">
@@ -54,6 +55,9 @@
     <button class="btn-logout" onclick="doLogout()">
       <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Sair
+    </button>
+    <button class="btn-delete-account" onclick="openModal('modal-delete-account')" title="Excluir minha conta">
+      <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
     </button>
   </div>
 </nav>
@@ -495,6 +499,22 @@
   </div>
 </div>
 
+<!-- Modal: Excluir Conta (LGPD) -->
+<div class="modal-overlay" id="modal-delete-account">
+  <div class="modal">
+    <h3 style="color:var(--red)">Excluir minha conta</h3>
+    <p style="font-size:.88rem;color:var(--text3);margin:12px 0 16px;">Esta ação é <strong>permanente e irreversível</strong>. Todos os seus dados financeiros (transações, metas, parcelas, investimentos) serão deletados definitivamente conforme a LGPD.</p>
+    <div class="form-group">
+      <label>Digite <strong>EXCLUIR</strong> para confirmar</label>
+      <input class="form-control" id="delete-confirm-input" placeholder="EXCLUIR" autocomplete="off">
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-delete-account')">Cancelar</button>
+      <button class="btn-danger" id="btn-confirm-delete" onclick="deleteAccount()">Excluir permanentemente</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Aporte em Meta -->
 <div class="modal-overlay" id="modal-aporte">
   <div class="modal">
@@ -551,6 +571,38 @@ async function loadUserRole() {
   } catch(e) { currentUser.role = 'free'; }
 }
 
+
+async function deleteAccount() {
+  const confirm = document.getElementById('delete-confirm-input').value.trim();
+  if (confirm !== 'EXCLUIR') { showToast('Digite EXCLUIR para confirmar.', true); return; }
+  const btn = document.getElementById('btn-confirm-delete');
+  btn.disabled = true; btn.textContent = 'Excluindo...';
+  try {
+    if (!IS_DEV) {
+      // Deleta todos os dados do usuário (o Supabase faz cascade via ON DELETE CASCADE no banco)
+      const uid = currentUser.id;
+      await Promise.all([
+        sbDb.from('transactions').delete().eq('user_id', uid),
+        sbDb.from('goals').delete().eq('user_id', uid),
+        sbDb.from('installments').delete().eq('user_id', uid),
+        sbDb.from('investments').delete().eq('user_id', uid),
+        sbDb.from('profiles').delete().eq('id', uid),
+      ]);
+      // Deleta a conta de auth via Worker (requer endpoint /api/delete-user)
+      await fetch(WORKER_URL + '/api/delete-user', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${(await sb.auth.getSession()).data.session?.access_token}` }
+      });
+    }
+    cacheClearAll();
+    await sb.auth.signOut();
+    window.location.href = 'login.html?deleted=1';
+  } catch(e) {
+    console.error('Erro ao excluir conta:', e);
+    showToast('Erro ao excluir conta. Contate o suporte.', true);
+    btn.disabled = false; btn.textContent = 'Excluir permanentemente';
+  }
+}
 
 async function initAuth() {
   if (IS_DEV) {
@@ -842,7 +894,7 @@ function renderTxItem(tx, showDelete=true) {
   const catClass = tx.tipo==='receita' ? 'cat-receita' : tx.cat==='moradia' ? 'cat-fixo' : tx.cat==='investimento' ? 'cat-meta' : 'cat-variavel';
   return `<div class="tx-item" id="tx-${tx.id}">
     <div class="tx-dot" style="background:${color}22;">${icon}</div>
-    <div class="tx-info"><div class="tx-name">${tx.desc}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${tx.cat}</span></div></div>
+    <div class="tx-info"><div class="tx-name">${escapeHtml(tx.desc)}</div><div class="tx-meta">${d} <span class="tx-cat ${catClass}">${escapeHtml(tx.cat)}</span></div></div>
     <div class="tx-amount ${tx.tipo==='receita'?'pos':'neg'}">${tx.tipo==='receita'?'+':'−'} ${fmt(tx.valor)}</div>
     ${showDelete?`<button class="tx-delete" onclick="deleteTransaction('${tx.id}')" title="Remover" aria-label="Remover transação"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg></button>`:''}
   </div>`;
@@ -950,7 +1002,7 @@ function renderGoals() {
     const pct       = Math.min(100,Math.round((g.atual/g.total)*100));
     const prazoFmt  = g.prazo ? new Date(g.prazo+'T12:00:00').toLocaleDateString('pt-BR') : 'Sem prazo';
     return `<div class="goal-item">
-      <div class="goal-top"><div><div class="goal-name">${g.nome}</div><div class="goal-vals">${fmt(g.atual)} de ${fmt(g.total)}</div></div><div class="goal-pct">${pct}%</div></div>
+      <div class="goal-top"><div><div class="goal-name">${escapeHtml(g.nome)}</div><div class="goal-vals">${fmt(g.atual)} de ${fmt(g.total)}</div></div><div class="goal-pct">${pct}%</div></div>
       <div class="goal-bar"><div class="goal-fill" style="width:${pct}%;background:${g.cor}"></div></div>
       <div class="goal-deadline"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Prazo: ${prazoFmt}</div>
       <div class="goal-actions"><button class="goal-btn" onclick="openAporte('${g.id}')">+ Aporte</button><button class="goal-btn danger" onclick="deleteGoal('${g.id}')">Excluir</button></div>
@@ -1236,7 +1288,7 @@ function renderDonutChart() {
   const legend = document.getElementById('donut-legend');
   if (!vals.length) { destroyChart('donut'); legend.innerHTML='<div style="color:var(--text3);font-size:.8rem;text-align:center;">Sem despesas no mês</div>'; return; }
   const total = vals.reduce((s,v)=>s+v,0);
-  legend.innerHTML = labels.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div><span class="legend-name">${l}</span><span class="legend-pct">${Math.round(vals[i]/total*100)}%</span></div>`).join('');
+  legend.innerHTML = labels.map((l,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${colors[i]}"></div><span class="legend-name">${escapeHtml(l)}</span><span class="legend-pct">${Math.round(vals[i]/total*100)}%</span></div>`).join('');
   destroyChart('donut');
   const ctx = document.getElementById('chart-donut');
   if (!ctx) return;

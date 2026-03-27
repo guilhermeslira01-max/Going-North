@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://qesurszlqesjbtcpnjwz.supabase.co https://goingnorth.goingnorthbusiness.workers.dev https://brapi.dev https://api.coingecko.com https://api.bcb.gov.br https://economia.awesomeapi.com.br https://gnews.io; img-src 'self' data: blob:; frame-ancestors 'none'; form-action 'self';">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Going North — Investimentos</title>
   <meta name="description" content="Acompanhe sua carteira de investimentos, ações, FIIs e simule retornos com a Going North.">
@@ -526,12 +527,14 @@ let currentUser = null;
 
 async function loadUserRole() {
   if (IS_DEV) { currentUser.role = 'admin'; return; }
+  const cachedRole = cacheGet('role');
+  if (cachedRole) { currentUser.role = cachedRole; return; }
   try {
     const { data } = await sb.from('profiles').select('role').eq('id', currentUser.id).single();
     currentUser.role = data?.role || 'free';
+    cacheSet('role', currentUser.role);
   } catch(e) { currentUser.role = 'free'; }
 }
-
 
 async function initAuth() {
   if (IS_DEV) {
@@ -541,13 +544,35 @@ async function initAuth() {
     applyRoleBadge();
     return true;
   }
-  const { data: { session } } = await sb.auth.getSession();
+
+  let { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    session = await new Promise(resolve => {
+      const timeout = setTimeout(() => resolve(null), 4000);
+      const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
+        if (s) { clearTimeout(timeout); subscription.unsubscribe(); resolve(s); }
+      });
+    });
+  }
   if (!session) { window.location.href = 'login.html'; return false; }
+
   currentUser = session.user;
 
-  // Cria sbDb com o JWT real do usuário para que o RLS do Supabase funcione
   sbDb = createClient(WORKER_URL + '/api/supabase', session.access_token, {
     global: { headers: { Authorization: `Bearer ${session.access_token}` } }
+  });
+
+  // Mantém sbDb atualizado quando o token for renovado, redireciona no logout
+  sb.auth.onAuthStateChange((event, s) => {
+    if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && s) {
+      sbDb = createClient(WORKER_URL + '/api/supabase', s.access_token, {
+        global: { headers: { Authorization: `Bearer ${s.access_token}` } }
+      });
+    }
+    if (event === 'SIGNED_OUT') {
+      cacheClearAll();
+      window.location.href = 'login.html';
+    }
   });
 
   const name      = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
@@ -826,10 +851,10 @@ function renderInvestimentos() {
     return `<div class="inv-item">
       <div class="inv-icon" style="background:${cfg.color}18;">${cfg.icon}</div>
       <div class="inv-info">
-        <div class="inv-name">${inv.nome}</div>
+        <div class="inv-name">${escapeHtml(inv.nome)}</div>
         <div class="inv-meta">
-          <span class="badge ${cfg.badge}">${inv.tipo}</span>
-          ${inv.inst ? `<span>${inv.inst}</span>` : ''}
+          <span class="badge ${cfg.badge}">${escapeHtml(inv.tipo)}</span>
+          ${inv.inst ? `<span>${escapeHtml(inv.inst)}</span>` : ''}
           ${inv.taxa ? `<span style="color:var(--green);font-weight:600;">${inv.taxa}</span>` : ''}
           <span>desde ${d}</span>
         </div>
@@ -925,8 +950,8 @@ function renderAllocTable() {
     const pct = inv.aporte > 0 ? (ganho/inv.aporte*100) : 0;
     const alloc = total > 0 ? (inv.atual/total*100) : 0;
     return `<tr>
-      <td><strong>${inv.nome}</strong>${inv.inst ? `<div style="font-size:.74rem;color:var(--text3);">${inv.inst}</div>` : ''}</td>
-      <td><span class="badge ${cfg.badge}">${inv.tipo}</span></td>
+      <td><strong>${escapeHtml(inv.nome)}</strong>${inv.inst ? `<div style="font-size:.74rem;color:var(--text3);">${escapeHtml(inv.inst)}</div>` : ''}</td>
+      <td><span class="badge ${cfg.badge}">${escapeHtml(inv.tipo)}</span></td>
       <td>${fmt(inv.aporte)}</td>
       <td>${fmt(inv.atual)}</td>
       <td style="color:${ganho>=0?'var(--green)':'var(--red)'};font-weight:600;">${ganho>=0?'+':''}${fmt(ganho)} <span style="font-size:.74rem;">(${pct.toFixed(1)}%)</span></td>
@@ -1278,9 +1303,9 @@ function exportPDFInv() {
     const cor = g >= 0 ? '#368547' : '#ef4444';
     const sinal = g >= 0 ? '+' : '';
     return `<tr>
-      <td>${inv.nome}</td>
-      <td>${inv.tipo||'—'}</td>
-      <td>${inv.inst||'—'}</td>
+      <td>${escapeHtml(inv.nome)}</td>
+      <td>${escapeHtml(inv.tipo||'—')}</td>
+      <td>${escapeHtml(inv.inst||'—')}</td>
       <td>R$ ${(inv.aporte||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
       <td>R$ ${a.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
       <td style="color:${cor};font-weight:600;">${sinal}R$ ${Math.abs(g).toLocaleString('pt-BR',{minimumFractionDigits:2})} (${sinal}${pct}%)</td>
